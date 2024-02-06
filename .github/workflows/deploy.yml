@@ -30,16 +30,9 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0
         with:
-          useConfigFile: true      
+          useConfigFile: true
 
-      - name: Create .htaccess secrets file
-        run: |
-          cd Src
-          mkdir -p secrets
-          cd secrets
-          echo "<?php" >> .htaccess      
-
-      - name: Upload service
+      - name: Upload site
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{ secrets.FTP_SERVER }}
