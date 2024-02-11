@@ -8,7 +8,7 @@
     <title>GStraccini Bot</title>
     <style type="text/css">
         body {
-            background: #341b3b;
+            background: #27425B;
             color: #FFF;
         }
 
