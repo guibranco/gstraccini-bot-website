@@ -11,19 +11,26 @@
             background: #27425B;
             color: #FFF;
         }
-
-        h1 {
-            margin-top: 150px;
-            text-align: center;
+        div {
+          display: flex;
+          justify-content: center;
         }
-        
+        div#logo img {
+            width: 280px;
+        }
+        div#logomark img {
+            width: 640px;
+        }
     </style>
 </head>
 
 <body>
-    <img src="logo.png" alt="Website logo" />
-    <h1>GStraccini Bot</h1>
-    <img src="gstraccini-bot.png" alt="GStraccini bot logo's" />
+    <div id="logo">
+        <img src="logo.png" alt="Website logo" />
+    </div>
+    <div id="logomark">
+        <img src="gstraccini-bot.png" alt="GStraccini bot logo's" />
+    </div>
 </body>
 
 </html>
