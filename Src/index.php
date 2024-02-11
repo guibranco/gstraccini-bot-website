@@ -16,10 +16,12 @@
             margin-top: 150px;
             text-align: center;
         }
+        
     </style>
 </head>
 
 <body>
+    <img src="logo.png" alt="Website logo" />
     <h1>GStraccini Bot</h1>
     <img src="gstraccini-bot.png" alt="GStraccini bot logo's" />
 </body>
