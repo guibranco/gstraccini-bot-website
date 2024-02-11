@@ -402,7 +402,7 @@
                                                                 <tr>
                                                                     <td align="left" valign="top" style="text-align: left;">
                                                                         <a alias="logo" href="https://bot.straccini.com" target="_blank">
-                                                                            <img class="height img-width" src="Images/logo.png" width="171" height="40" style="width:171px;height:40px;max-width:237px;font-family:'Inter',Helvetica, arial, sans-serif;font-size:24px;line-height:40px;" alt="Grammarly" aria-label="Grammarly Logo" border="0">
+                                                                            <img class="height img-width" src="logo.png" width="171" height="40" style="width:171px;height:40px;max-width:237px;font-family:'Inter',Helvetica, arial, sans-serif;font-size:24px;line-height:40px;" alt="Grammarly" aria-label="GStraccini Bot Logo" border="0">
                                                                         </a>
                                                                     </td>
                                                                     <td align="right" valign="center" style="font-family:'Inter', Helvetica, arial, sans-serif;font-size:14px;line-height:21px;color:#28B473;"></td>
