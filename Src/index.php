@@ -21,6 +21,7 @@
 
 <body>
     <h1>GStraccini Bot</h1>
+    <img src="gstraccini-bot.png" alt="GStraccini bot logo's" />
 </body>
 
 </html>
