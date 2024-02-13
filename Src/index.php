@@ -629,7 +629,7 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="gblue" align="center" valign="top" style="font-family: Helvetica, arial, sans-serif; font-size: 13px; line-height: 20px; color: #999999;">
-                                                                        © 2024 GUilherme Branco Stracini ME. CNPJ: 34.291.019/0001-56
+                                                                        © 2024 Guilherme Branco Stracini ME. CNPJ: 34.291.019/0001-56
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
