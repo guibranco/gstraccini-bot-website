@@ -476,13 +476,13 @@
                                                                             <li><code class="notranslate">type</code>: <code class="notranslate">[required]</code> Specifies if should trigger a build in a <code class="notranslate">commit</code> or <code class="notranslate">pull request</code>.</li>
                                                                             </ul>
                                                                             </li>
-                                                                            <li><code class="notranslate">@gstraccini bump version &lt;version&gt; &lt;project&gt;</code>: Bumps the <a href="https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core" rel="nofollow">.NET version</a> in .csproj files. <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)
+                                                                            <li><code class="notranslate">@gstraccini bump version &lt;version&gt; &lt;project&gt;</code>: Bumps the <a href="https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core" rel="nofollow">.NET version</a> in .csproj files.
                                                                             <ul dir="auto">
                                                                             <li><code class="notranslate">version</code>: <code class="notranslate">[required]</code> The .NET version</li>
                                                                             <li><code class="notranslate">project</code>: <code class="notranslate">[optional]</code> The <code class="notranslate">.csproj</code> file to update. Suppressing this parameter will run the command in all <code class="notranslate">.csproj</code> in the repository/branch.</li>
                                                                             </ul>
                                                                             </li>
-                                                                            <li><code class="notranslate">@gstraccini change runner &lt;runner&gt; &lt;workflow&gt; &lt;jobs&gt;</code>: Changes the <a href="https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources">GitHub action runner</a> in a workflow file (.yml). <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)
+                                                                            <li><code class="notranslate">@gstraccini change runner &lt;runner&gt; &lt;workflow&gt; &lt;jobs&gt;</code>: Changes the <a href="https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources">GitHub action runner</a> in a workflow file (.yml).
                                                                             <ul dir="auto">
                                                                             <li><code class="notranslate">runner</code>: <code class="notranslate">[required]</code> The runner's name</li>
                                                                             <li><code class="notranslate">workflow</code>: <code class="notranslate">[required]</code> The workflow filename (with or without the .yml/.yaml extension).</li>
@@ -490,12 +490,12 @@
                                                                             </ul>
                                                                             </li>
                                                                             <li><code class="notranslate">@gstraccini csharpier</code>: Formats the C# code using <a href="https://csharpier.com" rel="nofollow">CSharpier</a> (only for <strong>.NET</strong> projects).</li>
-                                                                            <li><code class="notranslate">@gstraccini fix csproj</code>: Updates the <code class="notranslate">.csproj</code> file with <code class="notranslate">packages.config</code> version of <a href="https://nuget.org" rel="nofollow">NuGet packages</a> (only for <strong>.NET Framework</strong> projects). <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)</li>
+                                                                            <li><code class="notranslate">@gstraccini fix csproj</code>: Updates the <code class="notranslate">.csproj</code> file with <code class="notranslate">packages.config</code> version of <a href="https://nuget.org" rel="nofollow">NuGet packages</a> (only for <strong>.NET Framework</strong> projects).</li>
                                                                             <li><code class="notranslate">@gstraccini prettier</code>: Formats the code using <a href="https://prettier.io" rel="nofollow">Prettier</a>.</li>
-                                                                            <li><code class="notranslate">@gstraccini review</code>: Enable review for the target pull request. This is useful when the PR submitter wasn't in the watch list, the webhook was not captured, or some failed scenario occurred.</li>
-                                                                            <li><code class="notranslate">@gstraccini track</code>: Tracks the specified pull request. Queue a build, raise a <strong><a href="https://github.com/dependabot">dependabot</a> recreate</strong> comment to resolve conflicts, and synchronize merge branches. <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)</li>
+                                                                            <li><code class="notranslate">@gstraccini review</code>: Enable review for the target pull request. This is useful when the PR submitter wasn't on the watch list, the webhook was not captured, or some failed scenario occurred.</li>
+                                                                            <li><code class="notranslate">@gstraccini track</code>: Tracks the specified pull request. Queue a build, raise a <strong><a href="https://github.com/dependabot">dependabot</a> recreate</strong> comment to resolve conflicts, and synchronize merge branches.</li>
                                                                             </ul>
-                                                                        <p dir="auto">Multiple commands can be issued at the same time, just respect each command pattern (with bot name prefix + command).</p>
+                                                                        <p dir="auto">Multiple commands can be issued at the same time. Just respect each command pattern (with bot name prefix + command).</p>
                                                                         <blockquote>
                                                                         <p dir="auto"><strong>Warning</strong></p>
                                                                         <p dir="auto">If you aren't allowed to use this bot, a reaction with a thumbs down will be added to your comment.</p>
@@ -540,7 +540,7 @@
                                                                                 <tr>
                                                                                     <td align="center" width="80">
                                                                                         <a href="https://facebook.com/guilherme.stracini" style="text-decoration: none;" alias="ftr-facebook">
-                                                                                            <img src="Images/Facebook.png" border="0" width="12" height="21" style="
+                                                                                            <img src="Facebook.png" border="0" width="12" height="21" style="
                                                                                                     width: 12px;
                                                                                                     height: 21px;
                                                                                                     max-width: 21px;
@@ -556,7 +556,7 @@
                                                                                     </td>
                                                                                     <td align="center" width="80">
                                                                                         <a href="https://instagram.com/gui.stracini" style="text-decoration: none;" alias="ftr-instagram">
-                                                                                            <img src="Images/Instagram.png" border="0" width="26" height="25" style="
+                                                                                            <img src="Instagram.png" border="0" width="26" height="25" style="
                                                                                                     width: 26px;
                                                                                                     height: 25px;
                                                                                                     max-width: 26px;
@@ -572,7 +572,7 @@
                                                                                     </td>
                                                                                     <td align="center" width="80">
                                                                                         <a href="https://linkedin.com/in/guilhermestracini" style="text-decoration: none;" alias="ftr-LinkedIn">
-                                                                                            <img src="Images/LinkedIn.png" border="0" width="19" height="18" style="
+                                                                                            <img src="LinkedIn.png" border="0" width="19" height="18" style="
                                                                                                     width: 19px;
                                                                                                     height: 18px;
                                                                                                     max-width: 19px;
@@ -588,7 +588,7 @@
                                                                                     </td>
                                                                                     <td align="center" width="80">
                                                                                         <a href="https://twitter.com/GuiBranco" style="text-decoration: none;" alias="ftr-twitter">
-                                                                                            <img src="Images/Twitter.png" border="0" width="23" height="20" style="
+                                                                                            <img src="Twitter.png" border="0" width="23" height="20" style="
                                                                                                     width: 23px;
                                                                                                     height: 20px;
                                                                                                     max-width: 23px;
