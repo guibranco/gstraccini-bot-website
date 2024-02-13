@@ -466,65 +466,40 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td align="center" class="w95">
-                                                                        <table cellpadding="0" cellspacing="0" border="0" class="w95" style="font-family:'Inter',Helvetica,Arial,sans-serif;font-size:15px;line-height:150%;font-weight:normal;">
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <td width="30" class="hide"></td>
-                                                                                    <td valign="middle" align="left" width="280" height="45">
-                                                                                        <table cellpadding="0" cellspacing="0" border="0">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <td colspan="3" bgcolor="#ffffff" height="10" style="line-height: 10px; font-size: 10px;">
-                                                                                                        &nbsp;
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <td valign="top" style="color:#555C6A;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:14px;text-transform:uppercase;line-height:normal;font-weight:700;">GStraccini bot stats</td>
-                                                                                                    <td width="20"></td>
-                                                                                                </tr>
-                                                                                                
-                                                                                                
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </td>
-                                                                                    <td width="80"></td>
-                                                                                    <td valign="middle" style="border-left: #f5f5f5 1px solid;" width="200" align="middle">
-                                                                                        <table cellpadding="0" cellspacing="0" border="0">
-                                                                                            <tbody>
-                                                                                                <tr>
-                                                                                                    <td valign="middle" align="center" height="65" class="padd-left-15">
-                                                                                                        <table cellpadding="0" cellspacing="0" border="0">
-                                                                                                            <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td background="Images/Next+Badge+50x45+1x.png" bgcolor="#ffffff" width="50" height="45" valign="top">
-                                                                                                                        <div align="center">
-                                                                                                                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                                                                                                                <tbody>
-                                                                                                                                    <tr>
-                                                                                                                                        <td height="45" valign="middle" align="center" style="color:#333954;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:17px;line-height:normal;font-weight:700;">
-                                                                                                                                            80k
-                                                                                                                                        </td>
-                                                                                                                                    </tr>
-                                                                                                                                </tbody>
-                                                                                                                            </table>
-                                                                                                                        </div>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            </tbody>
-                                                                                                        </table>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                                <tr>
-                                                                                                    <td class="font9" align="center" style="color:#6D758D;font-family:'Inter',Helvetica,Arial,sans-serif;font-size:12px;line-height:normal;font-weight:normal;">
-                                                                                                        Next Achievement
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                                      <p dir="auto">That's what I can do <img class="emoji" title=":neckbeard:" alt=":neckbeard:" src="https://github.githubassets.com/images/icons/emoji/neckbeard.png" height="20" width="20" align="absmiddle">:</p>
+                                                                        <ul dir="auto">
+                                                                            <li><code class="notranslate">@gstraccini help</code>: Shows the help message with available commands.</li>
+                                                                            <li><code class="notranslate">@gstraccini hello</code>: Says hello to the invoker.</li>
+                                                                            <li><code class="notranslate">@gstraccini thank you</code>: Replies with you are welcome message to the invoker.</li>
+                                                                            <li><code class="notranslate">@gstraccini appveyor &lt;type&gt;</code>: Runs the <a href="https://ci.appveyor.com" rel="nofollow">AppVeyor</a> build for the target commit and/or pull request.
+                                                                            <ul dir="auto">
+                                                                            <li><code class="notranslate">type</code>: <code class="notranslate">[required]</code> Specifies if should trigger a build in a <code class="notranslate">commit</code> or <code class="notranslate">pull request</code>.</li>
+                                                                            </ul>
+                                                                            </li>
+                                                                            <li><code class="notranslate">@gstraccini bump version &lt;version&gt; &lt;project&gt;</code>: Bumps the <a href="https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core" rel="nofollow">.NET version</a> in .csproj files. <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)
+                                                                            <ul dir="auto">
+                                                                            <li><code class="notranslate">version</code>: <code class="notranslate">[required]</code> The .NET version</li>
+                                                                            <li><code class="notranslate">project</code>: <code class="notranslate">[optional]</code> The <code class="notranslate">.csproj</code> file to update. Suppressing this parameter will run the command in all <code class="notranslate">.csproj</code> in the repository/branch.</li>
+                                                                            </ul>
+                                                                            </li>
+                                                                            <li><code class="notranslate">@gstraccini change runner &lt;runner&gt; &lt;workflow&gt; &lt;jobs&gt;</code>: Changes the <a href="https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources">GitHub action runner</a> in a workflow file (.yml). <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)
+                                                                            <ul dir="auto">
+                                                                            <li><code class="notranslate">runner</code>: <code class="notranslate">[required]</code> The runner's name</li>
+                                                                            <li><code class="notranslate">workflow</code>: <code class="notranslate">[required]</code> The workflow filename (with or without the .yml/.yaml extension).</li>
+                                                                            <li><code class="notranslate">jobs</code>: <code class="notranslate">[optional]</code> The jobs to apply this command. Suppressing this parameter will run the command in all jobs within the workflow.</li>
+                                                                            </ul>
+                                                                            </li>
+                                                                            <li><code class="notranslate">@gstraccini csharpier</code>: Formats the C# code using <a href="https://csharpier.com" rel="nofollow">CSharpier</a> (only for <strong>.NET</strong> projects).</li>
+                                                                            <li><code class="notranslate">@gstraccini fix csproj</code>: Updates the <code class="notranslate">.csproj</code> file with <code class="notranslate">packages.config</code> version of <a href="https://nuget.org" rel="nofollow">NuGet packages</a> (only for <strong>.NET Framework</strong> projects). <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)</li>
+                                                                            <li><code class="notranslate">@gstraccini prettier</code>: Formats the code using <a href="https://prettier.io" rel="nofollow">Prettier</a>.</li>
+                                                                            <li><code class="notranslate">@gstraccini review</code>: Enable review for the target pull request. This is useful when the PR submitter wasn't in the watch list, the webhook was not captured, or some failed scenario occurred.</li>
+                                                                            <li><code class="notranslate">@gstraccini track</code>: Tracks the specified pull request. Queue a build, raise a <strong><a href="https://github.com/dependabot">dependabot</a> recreate</strong> comment to resolve conflicts, and synchronize merge branches. <g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> (in development - maybe not working as expected!)</li>
+                                                                            </ul>
+                                                                        <p dir="auto">Multiple commands can be issued at the same time, just respect each command pattern (with bot name prefix + command).</p>
+                                                                        <blockquote>
+                                                                        <p dir="auto"><strong>Warning</strong></p>
+                                                                        <p dir="auto">If you aren't allowed to use this bot, a reaction with a thumbs down will be added to your comment.</p>
+                                                                        </blockquote>    
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
