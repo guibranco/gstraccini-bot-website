@@ -116,6 +116,15 @@
                 position: relative;
                 top: -0.4em;
             }
+            ul {
+                text-align: left;
+            }
+            code.notranslate {
+                font-weight: bold;
+                background-color: navajowhite;
+                color: black;
+                padding: 2px 4px;
+            }
             @media only screen and (max-width: 480px) {
                 .container {
                     width: 100% !important;
