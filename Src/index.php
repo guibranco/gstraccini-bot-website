@@ -544,7 +544,6 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td align="center" class="w95">
-                                                                      <p dir="auto">That's what I can do <img title=":neckbeard:" alt=":neckbeard:" src="https://github.githubassets.com/images/icons/emoji/neckbeard.png" height="20" width="20" /></p>
                                                                         <ul>
                                                                             <li><a href="https://github.com/marketplace/gstraccini-bot">GitHub Marketplace</a></li>
                                                                             <li><a href="https://github.com/apps/gstraccini">GitHub App</a></li>
