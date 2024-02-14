@@ -531,6 +531,47 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td align="center" valign="top">
+                                                        <table cellpadding="0" cellspacing="0" border="0" class="w95" bgcolor="#FFFFFF" width="100%">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td bgcolor="#ffffff" height="20" style="line-height: 20px; font-size: 20px;">
+                                                                        &nbsp;
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td align="center" class="w95">
+                                                                      <p dir="auto">That's what I can do <img title=":neckbeard:" alt=":neckbeard:" src="https://github.githubassets.com/images/icons/emoji/neckbeard.png" height="20" width="20" /></p>
+                                                                        <ul>
+                                                                            <li><a href="https://github.com/marketplace/gstraccini-bot">GitHub Marketplace</a></li>
+                                                                            <li><a href="https://github.com/apps/gstraccini">GitHub App</a></li>
+                                                                            <li><a href="https://github.com/guibranco/gstraccini-bot">Repository on GitHub</a></li>
+                                                                        </ul>  
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td bgcolor="#ffffff" height="20" style="line-height: 20px; font-size: 20px;">
+                                                                        &nbsp;
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td bgcolor="#F5F6FB" height="20" style="line-height: 20px; font-size: 20px;">
+                                                        &nbsp;
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                         <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" class="footerdevice">
                                             <tbody>
                                                 <tr>
