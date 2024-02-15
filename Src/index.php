@@ -125,6 +125,13 @@
                 color: black;
                 padding: 2px 4px;
             }
+            .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px
+            }
             @media only screen and (max-width: 480px) {
                 .container {
                     width: 100% !important;
