@@ -130,6 +130,9 @@
                 width: 20px;
                 height: 20px
             }
+            .gh-links {
+                list-style-type: none;
+            }
             @media only screen and (max-width: 480px) {
                 .container {
                     width: 100% !important;
