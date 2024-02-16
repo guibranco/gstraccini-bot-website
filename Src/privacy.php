@@ -483,46 +483,46 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td align="center" class="w95">
-                                                                        <b>General Information</b>
+                                                                        <b>General Information</b><br /><br />
                                                                         GStraccini-bot is owned and operated by <a href="https://github.com/guibranco">GuiBranco</a>. GStraccini-bot ("we," "us" or "our") applies this policy to the Subscriber (the "Subscriber," "user," you" or "your"). By using GStraccini-bot, you expressly consent to the data handling practices described in this notice.
-                                                                        
+                                                                        <br /><br />
                                                                         We collect no information about those who sign up to GStraccini-bot apart from the name of the repo that GStraccini-bot is installed into and aggregate information on what pages consumers access or visit, as well as information volunteered by the consumer. The information we collect is used to improve the content of our web pages and the quality of our service and is not shared with or sold to other organizations for commercial purposes except to provide products or services you've requested when we have your permission, or under the following circumstances:
-                                                                        
+                                                                        <br /><br />
                                                                         It is necessary to share information in order to investigate, prevent, or take action regarding illegal activities, suspected fraud, situations involving potential threats to the physical safety of any person, or as otherwise required by law.
                                                                         We transfer information about you if GStraccini-bot is acquired by or merged with another company. In this event, GStraccini-bot will notify you before information about you is transferred and becomes subject to a different privacy policy.
                                                                         Information Gathering and Usage
                                                                         You may provide GStraccini-bot personal information if you, as an individual or otherwise, sign up to use GStraccini-bot. GStraccini-bot collects information for the following general purposes: product and service provision, billing, identification and authentication, service improvement, contact, and research.
-                                                                        
-                                                                        <b>Cookies</b>
+                                                                        <br /><br />
+                                                                        <b>Cookies</b><br /><br />
                                                                         A cookie is a small amount of data, which often includes an anonymous unique identifier, that is sent to your browser from a website's computers and stored on your computer's hard drive.
-                                                                        
+                                                                        <br /><br />
                                                                         Cookies are required to use the GStraccini-bot service. We use cookies to record current session information but do not use permanent cookies.
-                                                                        
+                                                                        <br /><br />
                                                                         Analytics cookies allow us to track analytics data about the usage of the GStraccini-bot website.
                                                                         You may use your browser settings to disable non-essential cookies.
-                                                                        
-                                                                        <b>Data Storage</b>
+                                                                        <br /><br />
+                                                                        <b>Data Storage</b><br /><br />
                                                                         GStraccini-bot uses third-party vendors and hosting partners to provide the necessary hardware, software, networking, storage, and related technology required to run the service. Although GStraccini-bot owns the code, databases, and all rights to the application, you retain all rights to your data.
-                                                                        
-                                                                        <b>Source Code</b>
+                                                                        <br /><br />
+                                                                        <b>Source Code</b><br /><br />
                                                                         GStraccini-bot does not store any of the user's private source code unless given explicit, written permission to access their source code in order to provide support.
                                                                         GStraccini-bot does not store GitHub credentials. Using GitHub apps means we do not access your GitHub password, and you can revoke our access at any time.
                                                                         GStraccini-bot uses certificate authentication with GitHub to obtain a temporary token in order to create branches and open pull requests.
                                                                         Data Security
                                                                         We always put security at the forefront of our services. We cannot, however, ensure or warrant the security of any information you transmit to GStraccini-bot, and you do so at your own risk. We cannot guarantee that such information may not be accessed, disclosed, altered, or destroyed by breach of any of our safeguards; however, we make reasonable industry efforts to ensure the security of our systems.
-                                                                        
-                                                                        If you find a vulnerability, please report it to us immediately at help@straccini.com. We ask that you do not publicly share the issue until it has been resolved.
-                                                                        
-                                                                        <b>Disclosure</b>
+                                                                        <br /><br />
+                                                                        If you find a vulnerability, please report it to us immediately at bot@straccini.com. We ask that you do not publicly share the issue until it has been resolved.
+                                                                        <br /><br />
+                                                                        <b>Disclosure</b><br /><br />
                                                                         GStraccini-bot may disclose personally identifiable information under special circumstances, such as to comply with subpoenas or when your actions violate the Terms of Service.
-                                                                        
-                                                                        <b>Changes</b>
+                                                                        <br /><br />
+                                                                        <b>Changes</b><br /><br />
                                                                         GStraccini-bot may periodically update this policy without further notice to you, and this will be reflected by a "last modified" date above. It is your responsibility to check this policy periodically for changes. Your continued use of or access to the Service following the posting of any changes to this policy constitutes acceptance of those changes.
-                                                                        
+                                                                        <br /><br />
                                                                         We will notify you about significant changes in the way we treat personal information by placing a prominent notice on our site.
-                                                                        
-                                                                        <b>Questions</b>
-                                                                        Any questions about the Privacy Policy should be addressed to help@straccini.com
+                                                                        <br /><br />
+                                                                        <b>Questions</b><br /><br />
+                                                                        Any questions about the Privacy Policy should be addressed to bot@straccini.com
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
