@@ -483,11 +483,14 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td align="center" class="w95">
-                                                                        🤖 :octocat: A GitHub bot that runs on issues, pull requests, and pull request comments.
+                                                                        <b>Bot status:</b>
                                                                         <br /> <br />
                                                                         <a href="https://github.com/apps/gstraccini"><img src="https://camo.githubusercontent.com/39710bd1b4fb38d2084528acbfe7a8805041e4d158201bb720bf904c11b65e24/68747470733a2f2f6865616c7468636865636b732e696f2f62616467652f37373531653466382d313431652d346530342d383661302d6331396364392f58784e35777954692f67737472616363696e692d626f742e737667" alt="HealthCheck.io Badge" data-canonical-src="https://healthchecks.io/badge/7751e4f8-141e-4e04-86a0-c19cd9/XxN5wyTi/gstraccini-bot.svg" style="max-width: 100%;"></a>
+                                                                        <br />
                                                                         <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/deploy.yml"><img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/deploy.yml/badge.svg" alt="Deploy via ftp" style="max-width: 100%;"></a>
+                                                                        <br />
                                                                         <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/php-lint.yml"><img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/php-lint.yml/badge.svg" alt="PHP Linting" style="max-width: 100%;"></a>
+                                                                        <br />
                                                                         <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/json-yaml-lint.yml"><img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/json-yaml-lint.yml/badge.svg" alt="JSON/YAML validation" style="max-width: 100%;"></a>
                                                                     </td>
                                                                 </tr>
