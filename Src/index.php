@@ -591,6 +591,53 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td align="center" valign="top">
+                                                        <table cellpadding="0" cellspacing="0" border="0" class="w95" bgcolor="#FFFFFF" width="100%">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td bgcolor="#ffffff" height="20" style="line-height: 20px; font-size: 20px;">
+                                                                        &nbsp;
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td align="center" class="w95">
+                                                                        <ul class="gh-links">
+                                                                            <li>
+                                                                                <a href="https://bot.straccini.com/status.php">
+                                                                                     Service Status
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="https://bot.straccini.com/privacy.php">
+                                                                                    Privacy notice
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>  
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td bgcolor="#ffffff" height="20" style="line-height: 20px; font-size: 20px;">
+                                                                        &nbsp;
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tbody>
+                                                <tr>
+                                                    <td bgcolor="#F5F6FB" height="20" style="line-height: 20px; font-size: 20px;">
+                                                        &nbsp;
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                         <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0" class="footerdevice">
                                             <tbody>
                                                 <tr>
