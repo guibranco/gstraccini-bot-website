@@ -506,6 +506,8 @@
                                                                         <br />
                                                                         <img src="https://healthchecks.io/b/2/05c48393-c700-45b4-880f-59cb7b9b9f25.svg" alt="GStraccini Bot - Pull Requests">
                                                                         <br />
+                                                                        <img src="https://healthchecks.io/b/2/1e8724fa-8361-47d7-a4f6-901e8d4ff265.svg" alt="GStraccini Bot - Pushes">
+                                                                        <br />
                                                                         <img src="https://healthchecks.io/b/2/8303206b-2f4c-4300-ac64-5e9cd342c164.svg" alt="GStraccini Bot - Signature">
                                                                     </td>
                                                                 </tr>
