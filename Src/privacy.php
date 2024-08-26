@@ -574,6 +574,11 @@
                                                                                     Privacy notice
                                                                                 </a>
                                                                             </li>
+                                                                            <li>
+                                                                                <a href="https://bot.straccini.com/tos.php">
+                                                                                    Terms of Service
+                                                                                </a>
+                                                                            </li>
                                                                         </ul>  
                                                                     </td>
                                                                 </tr>
