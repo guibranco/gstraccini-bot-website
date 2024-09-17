@@ -9,6 +9,26 @@
 
 ---
 
+## About the bot
+
+[GStraccini-bot](https://bot.straccini.com) keeps your repository organized and healthy by managing pull requests, issues, comments, and commits so you can focus on solving the real problems.
+
+---
+
+## About this repository
+
+This repository holds the landing page for the bot and future dashboard.
+
+---
+
+## How it works
+
+- [Core](https://github.com/guibranco/gstraccini-bot): The worker for the bot.
+- [Webhooks handler](https://github.com/guibranco/gstraccini-bot-handler): The webhooks received/handler.
+- [Website/Dashboard](https://github.com/guibranco/gstraccini-bot-website): The landing page and dashboard for the bot.
+
+---
+
 ## Links
 
 - [GitHub Marketplace](https://github.com/marketplace/gstraccini-bot)
