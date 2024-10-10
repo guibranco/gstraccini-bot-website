@@ -74,6 +74,11 @@
       .badges img {
         margin-right: 10px;
       }
+      .icon {
+                justify-content: center;
+                width: 20px;
+                height: 20px
+            }
     </style>
   </head>
   <body>
