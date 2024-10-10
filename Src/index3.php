@@ -73,6 +73,11 @@
             color: #4CAF50;
             text-decoration: none;
         }
+        .icon {
+                justify-content: center;
+                width: 20px;
+                height: 20px
+            }
     </style>
 </head>
 <body>
