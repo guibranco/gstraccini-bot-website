@@ -2,3 +2,5 @@ RewriteEngine On
 
 RewriteCond %{HTTP_HOST} !^bot\.straccini\.com$ [NC]
 RewriteRule ^(.*)$ https://bot.straccini.com/$1 [L,R=301]
+
+RewriteRule ^auth/callback$ https://straccini.com/webhooks/github-auth [P,L]
