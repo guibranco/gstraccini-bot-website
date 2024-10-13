@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Introducing Your GStraccini-bot - Automate GitHub tasks with ease.">
   <title>GStraccini-bot - Automate Your Workflow</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
-    /* Global Styles */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
@@ -16,7 +15,6 @@
       color: #333;
     }
 
-    /* Header */
     header {
       background-color: #007bff;
       color: white;
@@ -36,7 +34,6 @@
       margin: 10px 0;
     }
 
-    /* Hero Section */
     .hero {
       background: linear-gradient(to right, #0069d9, #0056b3);
       color: white;
@@ -69,7 +66,27 @@
       background-color: #0056b3;
     }
 
-    /* Features Section */
+    .github-button {
+      font-size: 1.2em;
+      padding: 15px 30px;
+      color: white;
+      background-color: #24292e;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .github-button:hover {
+      background-color: #171a1d;
+    }
+
+    .github-button img {
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
     .features {
       display: flex;
       justify-content: space-around;
@@ -97,7 +114,6 @@
       color: #555;
     }
 
-    /* Footer */
     footer {
       background-color: #f1f1f1;
       padding: 20px;
@@ -109,18 +125,23 @@
       color: #777;
     }
 
-    /* Animation */
     .fade-in {
       opacity: 0;
       animation: fadeIn 1.5s forwards;
     }
 
     @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>GStraccini-bot</h1>
@@ -131,6 +152,13 @@
     <h2>Boost Your GitHub Efficiency</h2>
     <p>Get more done by automating repetitive tasks.</p>
     <button class="cta-button">Get Started</button>
+
+    <form action="login.php" method="get">
+      <button type="submit" class="github-button">
+        <img src="GitHub.png" width="20" height="20" alt="GitHub logo" />
+        Login with GitHub
+      </button>
+    </form>
   </section>
 
   <section class="features fade-in">
@@ -155,4 +183,5 @@
     <p>© 2024 GStraccini-bot. All rights reserved.</p>
   </footer>
 </body>
+
 </html>
