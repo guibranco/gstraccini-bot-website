@@ -120,9 +120,9 @@
 <body>
 
   <header>
-    <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
-      alt="GStraccini-bot Logo">
-    <h1>GStraccini-bot</h1>
+    <a href="https://bot.straccini.com">
+      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo" >
+    </a>
     <p>The GitHub bot to keep your repository organized and healthy.</p>
   </header>
 
