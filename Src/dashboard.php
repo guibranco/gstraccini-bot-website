@@ -1,14 +1,60 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     header('Location: login.php');
     exit();
 }
 
-// Get user data from session
+$token = $_SESSION['token'];
 $user = $_SESSION['user'];
+
+$apiUrl = 'https://api.github.com/repositories?per_page=100';
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer ' . $token,
+    'User-Agent: GStraccini-bot-website/1.0'
+]);
+
+$reposData = curl_exec($ch);
+curl_close($ch);
+
+$repositories = [];
+if ($reposData) {
+    $repos = json_decode($reposData, true);
+    foreach ($repos as $repo) {
+        $repositories[] = [
+            'name' => $repo['name'],
+            'stars' => $repo['stargazers_count'],
+            'forks' => $repo['forks_count'],
+            'issues' => $repo['open_issues_count']
+        ];
+    }
+}
+
+$apiUrl = "https://api.github.com/issues?per_page=100";
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer ' . $token,
+    'User-Agent: GStraccini-bot-website/1.0'
+]);
+
+$issuesData = curl_exec($ch);
+curl_close($ch);
+
+$recentIssues = [];
+if ($issuesData) {
+    $issues = json_decode($issuesData, true);
+    foreach ($issues as $issue) {
+        $recentIssues[] = [
+            'title' => $issue['title'],
+            'created_at' => $issue['created_at']
+        ];
+    }
+}
+
 
 ?>
 

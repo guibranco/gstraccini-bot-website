@@ -37,6 +37,7 @@ if (isset($_GET['code'])) {
         curl_close($ch);
 
         $user = json_decode($userData, true);
+        $_SESSION['token'] = $token;
         $_SESSION['user'] = $user;
         header('Location: dashboard.php');
         exit();
