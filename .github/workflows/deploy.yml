@@ -32,6 +32,13 @@ jobs:
         with:
           useConfigFile: true
 
+      - name: Create github.secrets.php
+        run: |
+          echo "<?php" > Src/github.secrets.php
+          echo "\$gitHubClientId      = \"${{ secrets.GH_CLIENT_ID }}\";"" >> Src/github.secrets.php
+          echo "\$gitHubClientSecret  = \"${{ secrets.GH_CLIENT_SECRET }}\";"" >> Src/github.secrets.php
+          echo "\$gitHubRedirectUri   = \"${{ secrets.GH_REDIRECT_URL }}\";"" >> Src/github.secrets.php
+
       - name: Upload site
         uses: sebastianpopp/ftp-action@releases/v2
         with:
