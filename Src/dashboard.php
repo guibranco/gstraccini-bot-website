@@ -9,7 +9,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 $token = $_SESSION['token'];
 $user = $_SESSION['user'];
 
-$apiUrl = 'https://api.github.com/repositories?per_page=100';
+$apiUrl = 'https://api.github.com/user/repos?per_page=100';
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -26,6 +26,7 @@ if ($reposData) {
     foreach ($repos as $repo) {
         $repositories[] = [
             'name' => $repo['name'],
+            'url' => $repo['html_url'],
             'stars' => $repo['stargazers_count'],
             'forks' => $repo['forks_count'],
             'issues' => $repo['open_issues_count']
@@ -50,6 +51,7 @@ if ($issuesData) {
     foreach ($issues as $issue) {
         $recentIssues[] = [
             'title' => $issue['title'],
+            'url' => $repo['html_url'],
             'created_at' => $issue['created_at']
         ];
     }
@@ -90,7 +92,7 @@ if ($issuesData) {
                     <tbody>
                         <?php foreach ($repositories as $repo): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($repo['name']); ?></td>
+                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a></td>
                                 <td><?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['forks']; ?></td>
                                 <td><?php echo $repo['issues']; ?></td>
@@ -105,7 +107,7 @@ if ($issuesData) {
                 <ul class="list-group">
                     <?php foreach ($recentIssues as $issue): ?>
                         <li class="list-group-item">
-                            <strong><?php echo htmlspecialchars($issue['title']); ?></strong>
+                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>
