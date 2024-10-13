@@ -107,11 +107,9 @@
 
 <body>
   <header>
-    <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
-      alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo">
-    <h1>
-      <a href="https://bot.straccini.com">GStraccini-bot</a>
-    </h1>
+    <a href="https://bot.straccini.com">
+      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo" >
+    </a>
     <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat"
         class="octocat"> A GitHub bot that automates
       tasks, manages pull requests, issues, comments, and commits.</p>
