@@ -7,26 +7,28 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 }
 
 $user = $_SESSION['user'];
+$userData = ["auto_merge" => 0, "notify_issues" => 0];
+
+if (isset($_SESSION['user_data'])) {
+    $userData = $_SESSION['user_data'];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'];
-    $repo_visibility = $_POST['repo_visibility'];
     $auto_merge = isset($_POST['auto_merge']) ? 1 : 0;
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
 
     $_SESSION['user_data'] = [
-        'username' => $username,
-        'email' => $email,
         'auto_merge' => $auto_merge,
         'notify_issues' => $notify_issues
     ];
 
-    header("Location: dashboard.php?settings_updated=true");
+    header("Location: settings.php?settings_updated=true");
     exit();
 }
 
-$title = "Activity Dashboard";
+$title = "Settings";
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +48,15 @@ $title = "Activity Dashboard";
     <div class="container mt-5">
         <h1 class="text-center">Settings</h1>
         <p class="text-center">Manage your account and settings below.</p>
+
+        <?php if (isset($_GET['settings_updated'])): ?>
+
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Your settings have been updated successfully.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+        <?php endif; ?>
 
         <div class="row">
             <div class="col-md-8 offset-md-2">
