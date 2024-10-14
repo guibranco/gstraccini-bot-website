@@ -214,6 +214,8 @@ $title = "Activity Dashboard";
                     populateRecentIssuesList(data.recentIssues);
                 });
         }
+
+        window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 
