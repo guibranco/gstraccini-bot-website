@@ -130,6 +130,12 @@
       animation: fadeIn 1.5s forwards;
     }
 
+    img.octocat {
+      width: 20px;
+      vertical-align: middle;
+      margin-top: -2px;
+    }
+
     @keyframes fadeIn {
       0% {
         opacity: 0;
