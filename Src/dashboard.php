@@ -6,61 +6,15 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     exit();
 }
 
-$token = $_SESSION['token'];
 $user = $_SESSION['user'];
 
-$apiUrl = 'https://api.github.com/user/repos?per_page=100';
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $token,
-    'User-Agent: GStraccini-bot-website/1.0'
-]);
+$data = array("repositories" => [], "recentIssues" => []);
 
-$reposData = curl_exec($ch);
-curl_close($ch);
-
-$repositories = [];
-if ($reposData) {
-    $repos = json_decode($reposData, true);
-    foreach ($repos as $repo) {
-        $repositories[] = [
-            'name' => $repo['name'],
-            'full_name' => $repo['full_name'],
-            'url' => $repo['html_url'],
-            'stars' => $repo['stargazers_count'],
-            'forks' => $repo['forks_count'],
-            'issues' => $repo['open_issues_count']
-        ];
-    }
+if (isset($_SESSION["data"])) {
+    $data = $_SESSION["data"];
 }
 
-sort($repositories);
-
-$apiUrl = "https://api.github.com/issues?per_page=100";
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $token,
-    'User-Agent: GStraccini-bot-website/1.0'
-]);
-
-$issuesData = curl_exec($ch);
-curl_close($ch);
-
-$recentIssues = [];
-if ($issuesData) {
-    $issues = json_decode($issuesData, true);
-    foreach ($issues as $issue) {
-        $recentIssues[] = [
-            'title' => $issue['title'],
-            'url' => $issue['html_url'],
-            'created_at' => $issue['created_at']
-        ];
-    }
-}
-
-
+$title = "Activity Dashboard";
 ?>
 
 <!DOCTYPE html>
@@ -69,92 +23,13 @@ if ($issuesData) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GStraccini-bot | Activity Dashboard</title>
+    <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <Style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f4f4;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .user-info a {
-            color: white;
-            font-weight: bold;
-        }
-
-        .user-info img {
-            border-radius: 50%;
-            margin-right: 20px;
-        }
-
-        .user-info h2 {
-            margin: 0;
-            font-size: 2em;
-        }
-
-        .welcome-message {
-            font-size: 1.2em;
-            color: #f0f0f0;
-        }
-
-        .dropdown-item.logout {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .dropdown-item.logout:hover {
-            background-color: #c82333;
-        }
-    </style>
+    <link rel="stylesheet" href="user.css">
 </head>
 
 <body>
-    <header class="navbar navbar-dark bg-primary">
-        <div class="container-fluid">
-            <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
-                alt="Bot Logo" class="me-2">
-            <span class="navbar-brand">Activity Dashboard</span>
-            <div class="d-flex align-items-center">
-                <span class="text-white me-3">Welcome, <strong>guibranco</strong>!</span>
-                <img src="https://avatars.githubusercontent.com/u/3362854?v=4" alt="User Avatar" width="40" height="40"
-                    class="rounded-circle me-2">
-                <div class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                        <li><a class="dropdown-item" href="settings.php">Settings</a></li>
-                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                        <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item logout" href="logout.php">Logout</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php require_once 'header.php'; ?>
 
     <div class="container mt-5">
         <div class="user-info">
@@ -165,8 +40,9 @@ if ($issuesData) {
                 <p class="welcome-message">We're glad to have you back.</p>
             </div>
         </div>
+    </div>
 
-        <div class="container mt-4">
+    <div class="container mt-5">
         <div class="row">
             <section class="col-12">
                 <h2 class="mb-4">GitHub Bot Usage Statistics</h2>
@@ -256,6 +132,7 @@ if ($issuesData) {
         </div>
     </div>
 
+    <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
                 <h3>Your Repositories</h3>
@@ -268,7 +145,7 @@ if ($issuesData) {
                             <th>Open Issues</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="repositories">
                         <?php foreach ($repositories as $repo): ?>
                             <tr>
                                 <td><a
@@ -285,7 +162,7 @@ if ($issuesData) {
 
             <div class="col-md-6">
                 <h3>Recent Issues</h3>
-                <ul class="list-group">
+                <ul class="list-group" id="recentIssues">
                     <?php foreach ($recentIssues as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
@@ -298,7 +175,46 @@ if ($issuesData) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script>
+        function populateRepositoriesTable(repositories) {
+            const repositoriesTable = document.getElementById('repositories');
+            repositoriesTable.innerHTML = '';
+            repositories.forEach(repo => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td><a href='${repo.url}'>${repo.full_name}</a></td>
+                <td>${repo.stars}</td>
+                <td>${repo.forks}</td>
+                <td>${repo.issues}</td>
+            `;
+                repositoriesTable.appendChild(row);
+            });
+        }
+
+        function populateRecentIssuesList(recentIssues) {
+            const recentIssuesList = document.getElementById('recentIssues');
+            recentIssuesList.innerHTML = '';
+            recentIssues.forEach(issue => {
+                const item = document.createElement('li');
+                item.className = 'list-group-item';
+                item.innerHTML = `
+                <strong><a href='${issue.url}'>${issue.title}</a></strong>
+                <span class="text-muted">(Created at: ${issue.created_at})</span>
+            `;
+                recentIssuesList.appendChild(item);
+            });
+        }
+
+        function loadData() {
+            fetch('api.php')
+                .then(response => response.json())
+                .then(data => {
+                    populateRepositoriesTable(data.repositories);
+                    populateRecentIssuesList(data.recentIssues);
+                });
+        }
+    </script>
 </body>
 
 </html>
