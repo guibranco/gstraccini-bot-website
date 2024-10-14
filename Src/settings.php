@@ -6,8 +6,9 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     exit();
 }
 
+$user = $_SESSION['user'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = htmlspecialchars($_POST['username']);
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'];
     $repo_visibility = $_POST['repo_visibility'];
@@ -41,7 +42,7 @@ $title = "Activity Dashboard";
 
 <body>
     <?php require_once 'includes/header.php'; ?>
-    
+
     <div class="container mt-5">
         <h1 class="text-center">Settings</h1>
         <p class="text-center">Manage your account and settings below.</p>
@@ -57,7 +58,7 @@ $title = "Activity Dashboard";
                             <div class="mb-3">
                                 <label for="username" class="form-label">GitHub Username</label>
                                 <input type="text" class="form-control" id="username" name="username"
-                                    value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                                    value="<?php echo htmlspecialchars($user['login']); ?>" disabled>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
@@ -82,8 +83,9 @@ $title = "Activity Dashboard";
                                 <label for="auto_merge" class="form-label">Enable Auto-Merge</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="auto_merge" name="auto_merge"
-                                        <?php if ($user['auto_merge'])
-                                            echo 'checked'; ?>>
+                                        <?php if ($user['auto_merge']) {
+                                            echo 'checked';
+                                        } ?>>
                                     <label class="form-check-label" for="auto_merge">Automatically merge pull requests
                                         when all checks pass</label>
                                 </div>
@@ -92,8 +94,9 @@ $title = "Activity Dashboard";
                                 <label for="notify_issues" class="form-label">Issue Notification</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
-                                        name="notify_issues" <?php if ($user['notify_issues'])
-                                            echo 'checked'; ?>>
+                                        name="notify_issues" <?php if ($user['notify_issues']) {
+                                            echo 'checked';
+                                        } ?>>
                                     <label class="form-check-label" for="notify_issues">Notify me when new issues are
                                         created</label>
                                 </div>
