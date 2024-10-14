@@ -25,12 +25,6 @@
       width: 100px;
     }
 
-    img.octocat {
-      width: 20px;
-      vertical-align: middle;
-      margin-top: -2px;
-    }
-
     section {
       padding: 40px 20px;
       max-width: 1000px;
