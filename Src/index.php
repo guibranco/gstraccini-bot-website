@@ -1,3 +1,8 @@
+<?php
+session_start();
+$isAuthenticated = isset($_SESSION['user']);
+?>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -530,7 +535,6 @@
         [data-ogsc] .darkimage {
             display: block !important
         }
-        }
 
         [data-ogsc] .lightimage {
             display: none !important
@@ -671,13 +675,18 @@
                                                             <tr>
                                                                 <td align="center" class="w95">
 
-                                                                    <form action="login.php" method="get">
-                                                                        <button type="submit" class="github-button">
-                                                                            <img src="GitHub.png" width="20" height="20"
-                                                                                alt="GitHub logo" />
-                                                                            Login with GitHub
-                                                                        </button>
-                                                                    </form>
+                                                                    <?php if ($isAuthenticated): ?>
+                                                                        <a href="dashboard.php" class="dashboard-link">Go to
+                                                                            Dashboard</a>
+                                                                    <?php else: ?>
+                                                                        <form action="login.php" method="get">
+                                                                            <button type="submit" class="github-button">
+                                                                                <img src="GitHub.png" width="20" height="20"
+                                                                                    alt="GitHub logo" />
+                                                                                Login with GitHub
+                                                                            </button>
+                                                                        </form>
+                                                                    <?php endif; ?>
 
                                                                     <p dir="auto">That's what I can do <img
                                                                             title=":neckbeard:" alt=":neckbeard:"
