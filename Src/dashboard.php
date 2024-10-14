@@ -146,7 +146,7 @@ $title = "Activity Dashboard";
                         </tr>
                     </thead>
                     <tbody id="repositories">
-                        <?php foreach ($repositories as $repo): ?>
+                        <?php foreach ($data["repositories"] as $repo): ?>
                             <tr>
                                 <td><a
                                         href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a>
@@ -163,7 +163,7 @@ $title = "Activity Dashboard";
             <div class="col-md-6">
                 <h3>Recent Issues</h3>
                 <ul class="list-group" id="recentIssues">
-                    <?php foreach ($recentIssues as $issue): ?>
+                    <?php foreach ($data["recentIssues"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
                                     href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
@@ -214,6 +214,8 @@ $title = "Activity Dashboard";
                     populateRecentIssuesList(data.recentIssues);
                 });
         }
+
+        window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 
