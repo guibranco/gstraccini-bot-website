@@ -187,7 +187,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <img src="https://bot.straccini.com/gstraccini-bot.png" alt="GStraccini-bot" />
     <h2>Boost Your GitHub Efficiency</h2>
     <p>Get more done by automating repetitive tasks.</p>
-    <button class="cta-button">Get Started</button>
+    <button class="cta-button" onclick="window.location.href='https://github.com/marketplace/gstraccini-bot'">Get Started</button>
 
     <?php if ($isAuthenticated): ?>
       <button class="dashboard-button" onclick="window.location.href='dashboard.php'">
