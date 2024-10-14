@@ -26,6 +26,7 @@ if ($reposData) {
     foreach ($repos as $repo) {
         $repositories[] = [
             'name' => $repo['name'],
+            'full_name' => $repo['full_name'],
             'url' => $repo['html_url'],
             'stars' => $repo['stargazers_count'],
             'forks' => $repo['forks_count'],
@@ -33,6 +34,8 @@ if ($reposData) {
         ];
     }
 }
+
+sort($repositories);
 
 $apiUrl = "https://api.github.com/issues?per_page=100";
 $ch = curl_init($apiUrl);
@@ -51,7 +54,7 @@ if ($issuesData) {
     foreach ($issues as $issue) {
         $recentIssues[] = [
             'title' => $issue['title'],
-            'url' => $repo['html_url'],
+            'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
     }
@@ -91,6 +94,11 @@ if ($issuesData) {
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
+        }
+
+        .user-info a {
+            color: white;
+            font-weight: bold;
         }
 
         .user-info img {
@@ -136,7 +144,7 @@ if ($issuesData) {
                     <tbody>
                         <?php foreach ($repositories as $repo): ?>
                             <tr>
-                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a>
+                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a>
                                 </td>
                                 <td><?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['forks']; ?></td>
