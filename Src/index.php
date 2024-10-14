@@ -67,6 +67,10 @@ $isAuthenticated = isset($_SESSION['user']);
             outline: 0;
         }
 
+        .github-button img {
+            display: inline;
+        }
+
         a img {
             border: 0;
         }
