@@ -69,8 +69,8 @@ if ($issuesData) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GStraccini-bot Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <title>GStraccini-bot | Activity Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <Style>
         body {
             font-family: 'Arial', sans-serif;
@@ -115,10 +115,47 @@ if ($issuesData) {
             font-size: 1.2em;
             color: #f0f0f0;
         }
-    </Style>
+
+        .dropdown-item.logout {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .dropdown-item.logout:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 
 <body>
+    <header class="navbar navbar-dark bg-primary">
+        <div class="container-fluid">
+            <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
+                alt="Bot Logo" class="me-2">
+            <span class="navbar-brand">Activity Dashboard</span>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">Welcome, <strong>guibranco</strong>!</span>
+                <img src="https://avatars.githubusercontent.com/u/3362854?v=4" alt="User Avatar" width="40" height="40"
+                    class="rounded-circle me-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="settings.php">Settings</a></li>
+                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                        <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item logout" href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div class="container mt-5">
         <div class="user-info">
             <img src="<?php echo $user['avatar_url']; ?>" alt="User Avatar" width="80" height="80">
@@ -128,6 +165,96 @@ if ($issuesData) {
                 <p class="welcome-message">We're glad to have you back.</p>
             </div>
         </div>
+
+        <div class="container mt-4">
+        <div class="row">
+            <section class="col-12">
+                <h2 class="mb-4">GitHub Bot Usage Statistics</h2>
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Pull Requests</h5>
+                                <p class="card-text display-4">120</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Pull Requests Merged</h5>
+                                <p class="card-text display-4">85</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Commits Analyzed</h5>
+                                <p class="card-text display-4">320</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Issues Closed</h5>
+                                <p class="card-text display-4">42</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Average Time to Merge (hrs)</h5>
+                                <p class="card-text display-4">12</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Active Repositories</h5>
+                                <p class="card-text display-4">6</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <h3 class="mb-4">Recent Activities</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">Created PR #45 in repo1</li>
+                    <li class="list-group-item">Merged PR #44 in repo2</li>
+                    <li class="list-group-item">Closed issue #10 in repo1</li>
+                    <li class="list-group-item">Analyzed commits in repo3</li>
+                    <li class="list-group-item">Opened PR #12 in repo2</li>
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <h3 class="mb-4">Pending Actions</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">Review PR #43 in repo3</li>
+                    <li class="list-group-item">Close issue #11 in repo2</li>
+                    <li class="list-group-item">Merge PR #42 in repo1</li>
+                    <li class="list-group-item">Update README in repo2</li>
+                    <li class="list-group-item">Respond to issue #9 in repo1</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
         <div class="row">
             <div class="col-md-6">
@@ -144,7 +271,8 @@ if ($issuesData) {
                     <tbody>
                         <?php foreach ($repositories as $repo): ?>
                             <tr>
-                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a>
+                                <td><a
+                                        href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a>
                                 </td>
                                 <td><?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['forks']; ?></td>
@@ -168,15 +296,9 @@ if ($issuesData) {
                 </ul>
             </div>
         </div>
-
-        <div class="row mt-4">
-            <div class="col-md-12 text-center">
-                <a href="logout.php" class="btn btn-danger">Logout</a>
-            </div>
-        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
