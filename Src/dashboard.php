@@ -68,14 +68,58 @@ if ($issuesData) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GStraccini-bot Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <Style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .user-info img {
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+
+        .user-info h2 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .welcome-message {
+            font-size: 1.2em;
+            color: #f0f0f0;
+        }
+    </Style>
 </head>
 
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>"
-                target="_blank"><?php echo htmlspecialchars($user['login']); ?></a>!</h1>
-        <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="GitHub Avatar" width="100">
-        <p class="text-center">Here is an overview of your GitHub repositories and activities.</p>
+        <div class="user-info">
+            <img src="<?php echo $user['avatar_url']; ?>" alt="User Avatar" width="80" height="80">
+            <div>
+                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>"
+                        target="_blank"><?php echo htmlspecialchars($user['login']); ?></a>!</h2>
+                <p class="welcome-message">We're glad to have you back.</p>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-6">
@@ -92,7 +136,8 @@ if ($issuesData) {
                     <tbody>
                         <?php foreach ($repositories as $repo): ?>
                             <tr>
-                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a></td>
+                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a>
+                                </td>
                                 <td><?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['forks']; ?></td>
                                 <td><?php echo $repo['issues']; ?></td>
@@ -107,7 +152,8 @@ if ($issuesData) {
                 <ul class="list-group">
                     <?php foreach ($recentIssues as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <strong><a
+                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>

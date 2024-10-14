@@ -1,3 +1,7 @@
+<?php
+session_start();
+$isAuthenticated = isset($_SESSION['user']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -151,22 +155,29 @@
 <body>
   <header>
     <a href="https://bot.straccini.com">
-      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo" >
+      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
+        alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo">
     </a>
-    <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
+    <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat"
+        class="octocat"> Automate your GitHub workflow effortlessly.</p>
   </header>
 
   <section class="hero fade-in">
+    <img src="https://bot.straccini.com/gstraccini-bot.png" alt="GStraccini-bot" />
     <h2>Boost Your GitHub Efficiency</h2>
     <p>Get more done by automating repetitive tasks.</p>
     <button class="cta-button">Get Started</button>
 
-    <form action="login.php" method="get">
-      <button type="submit" class="github-button">
-        <img src="GitHub.png" width="20" height="20" alt="GitHub logo" />
-        Login with GitHub
-      </button>
-    </form>
+    <?php if ($isAuthenticated): ?>
+      <a href="dashboard.php" class="dashboard-link">Go to Dashboard</a>
+    <?php else: ?>
+      <form action="login.php" method="get">
+        <button type="submit" class="github-button">
+          <img src="GitHub.png" width="20" height="20" alt="GitHub logo" />
+          Login with GitHub
+        </button>
+      </form>
+    <?php endif; ?>
   </section>
 
   <section class="features fade-in">
