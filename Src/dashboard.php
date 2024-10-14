@@ -29,7 +29,7 @@ $title = "Activity Dashboard";
 </head>
 
 <body>
-    <?php require_once 'header.php'; ?>
+    <?php require_once 'includes/header.php'; ?>
 
     <div class="container mt-5">
         <div class="user-info">
