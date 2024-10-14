@@ -1,0 +1,52 @@
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  background-color: #007bff;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.user-info a {
+  color: white;
+  font-weight: bold;
+}
+
+.user-info img {
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.user-info h2 {
+  margin: 0;
+  font-size: 2em;
+}
+
+.welcome-message {
+  font-size: 1.2em;
+  color: #f0f0f0;
+}
+
+.dropdown-item.logout {
+  background-color: #dc3545;
+  color: white;
+}
+
+.dropdown-item.logout:hover {
+  background-color: #c82333;
+}
