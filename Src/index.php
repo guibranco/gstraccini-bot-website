@@ -674,7 +674,6 @@ $isAuthenticated = isset($_SESSION['user']);
                                                             </tr>
                                                             <tr>
                                                                 <td align="center" class="w95">
-
                                                                     <?php if ($isAuthenticated): ?>
                                                                         <a href="dashboard.php" class="dashboard-link">Go to
                                                                             Dashboard</a>
@@ -687,7 +686,6 @@ $isAuthenticated = isset($_SESSION['user']);
                                                                             </button>
                                                                         </form>
                                                                     <?php endif; ?>
-
                                                                     <p dir="auto">That's what I can do <img
                                                                             title=":neckbeard:" alt=":neckbeard:"
                                                                             src="https://github.githubassets.com/images/icons/emoji/neckbeard.png"
