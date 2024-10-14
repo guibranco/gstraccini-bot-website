@@ -674,7 +674,7 @@
                                                                     <form action="login.php" method="get">
                                                                         <button type="submit" class="github-button">
                                                                             <img src="GitHub.png" width="20" height="20"
-                                                                                alt="GitHub logo" />
+                                                                                alt="GitHub logo" style="display: inline;" />
                                                                             Login with GitHub
                                                                         </button>
                                                                     </form>
