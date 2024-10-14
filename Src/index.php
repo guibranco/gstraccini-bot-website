@@ -565,6 +565,27 @@ $isAuthenticated = isset($_SESSION['user']);
             vertical-align: middle;
             margin-right: 10px;
         }
+
+        .dashboard-button {
+            background: linear-gradient(135deg, #28a745, #17a2b8);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-button:hover {
+            background: linear-gradient(135deg, #218838, #138496);
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-button:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 
@@ -675,8 +696,10 @@ $isAuthenticated = isset($_SESSION['user']);
                                                             <tr>
                                                                 <td align="center" class="w95">
                                                                     <?php if ($isAuthenticated): ?>
-                                                                        <a href="dashboard.php" class="dashboard-link">Go to
-                                                                            Dashboard</a>
+                                                                        <button class="dashboard-button"
+                                                                            onclick="window.location.href='dashboard.php'">
+                                                                            Go to Dashboard
+                                                                        </button>
                                                                     <?php else: ?>
                                                                         <form action="login.php" method="get">
                                                                             <button type="submit" class="github-button">
