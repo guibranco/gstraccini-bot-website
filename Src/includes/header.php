@@ -1,23 +1,23 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
         <a href="https://bot.straccini.com/dashboard.php"><img src="logo-white.png" alt="Bot Logo" class="me-2"></a>
+        
+        <nav class="navbar-nav flex-row me-auto">
+            <a href="dashboard.php" class="nav-link text-white me-3">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="repositories.php" class="nav-link text-white me-3">
+                <i class="fas fa-folder-open"></i> Repositories
+            </a>
+            <a href="issues.php" class="nav-link text-white me-3">
+                <i class="fas fa-exclamation-circle"></i> Issues
+            </a>
+            <a href="pull-requests.php" class="nav-link text-white me-3">
+                <i class="fas fa-code-branch"></i> Pull Requests
+            </a>
+        </nav>
+
         <div class="d-flex align-items-center">
-
-            <nav class="navbar-nav me-auto">
-                <a href="dashboard.php" class="nav-link text-white me-3">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="repositories.php" class="nav-link text-white me-3">
-                    <i class="fas fa-folder-open"></i> Repositories
-                </a>
-                <a href="issues.php" class="nav-link text-white me-3">
-                    <i class="fas fa-exclamation-circle"></i> Issues
-                </a>
-                <a href="pull-requests.php" class="nav-link text-white me-3">
-                    <i class="fas fa-code-branch"></i> Pull Requests
-                </a>
-            </nav>
-
             <div class="dropdown me-3">
                 <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-bell text-white" style="font-size: 24px;"></i>
