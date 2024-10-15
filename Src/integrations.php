@@ -137,9 +137,10 @@ $title = "Integration Details";
                      </div>                  
                   </div>                  
                </div>
-               <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Save Integration Details</button>
-                  <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
+               
+               <div class="text-center mt-4">
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                  <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                </div>
             </form>
          </div>
