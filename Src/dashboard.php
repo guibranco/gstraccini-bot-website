@@ -8,13 +8,13 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 
 $user = $_SESSION['user'];
 
-$data = array("repositories" => [], "recentIssues" => []);
+$data = array("recentPullRequests" => [], "recentIssues" => [], "repositories" => []);
 
 if (isset($_SESSION["data"])) {
     $data = $_SESSION["data"];
 }
 
-$title = "Activity Dashboard";
+$title = "Dashboard";
 ?>
 
 <!DOCTYPE html>
@@ -192,7 +192,7 @@ $title = "Activity Dashboard";
 
     <?php require_once "includes/footer.php"; ?>    
     <script>
-        function showAjaxErrorAlert(message) {
+        function showErrorAlert(message) {
             var alertHtml = `
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Error!</strong> ${message}
@@ -210,14 +210,14 @@ $title = "Activity Dashboard";
             }, 15000);
         }
         
-        function populateIssues(items, type) {
-            const list = document.getElementById(type);
+        function populateIssues(items, id) {
+            const list = document.getElementById(id);
             list.innerHTML = '';
             items.forEach(item => {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
                 itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><span class="text-muted">(Created at: ${item.created_at})</span>`;
-                list.appendChild(item);
+                list.appendChild(itemLi);
             });
         }
 
@@ -239,10 +239,10 @@ $title = "Activity Dashboard";
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
-                .then(data => {
-                    populateRepositoriesTable(data.repositories);
-                    populateIssues(data.recentIssues, "recentIssues");
+                .then(data => {                    
                     populateIssues(data.recentPullRequests, "recentPullRequests");
+                    populateIssues(data.recentIssues, "recentIssues");
+                    populateRepositoriesTable(data.repositories);
                 })
                 .catch(error => {
                     console.error('Error:', error);
