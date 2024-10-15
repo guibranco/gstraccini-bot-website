@@ -45,7 +45,7 @@ $title = "Activity Dashboard";
     <div class="container mt-5">
         <div class="row">
             <section class="col-12">
-                <h2 class="mb-4">GitHub Bot Usage Statistics</h2>
+                <h2 class="mb-4">GStraccini-Bot Usage Statistics</h2>
                 <div class="row">
 
                     <div class="col-md-4">
