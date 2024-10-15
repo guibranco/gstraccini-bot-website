@@ -44,8 +44,8 @@ $issues = "https://api.github.com/issues?per_page=100";
 $issuesData = loadData($issues);
 
 
-$recentIssues = [];
-$recentPullRequests = [];
+$openPullRequests = [];
+$openIssues = [];
 if ($issuesData) {
     $issues = json_decode($issuesData, true);
     foreach ($issues as $issue) {
@@ -56,17 +56,17 @@ if ($issuesData) {
         ];
         
         if (isset($issue['pull_request']) === true) {
-            $recentPullRequests[] = $issueData;
+            $openPullRequests[] = $issueData;
         } else {
-            $recentIssues[] = $issueData;
+            $openIssues[] = $issueData;
         }
     }
 }
 
 $data = [
-    'repositories' => $repositories,
-    'recentIssues' => $recentIssues,
-    'recentPullRequests' => $recentPullRequests
+    'openPullRequests' => $openPullRequests,
+    'openIssues' => $openIssues,
+    'repositories' => $repositories
 ];
 
 $_SESSION['data'] = $data;
