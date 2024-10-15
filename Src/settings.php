@@ -101,7 +101,7 @@ $title = "Settings";
                                 <label for="githubUsername" class="form-label">GitHub Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-github"></i>
+                                        <i class="fa-brands fa-githubb"></i>
                                     </span>
                                     <input type="text" class="form-control" id="githubUsername"
                                         value="<?php echo htmlspecialchars($user['login']); ?>" disabled>
@@ -112,7 +112,7 @@ $title = "Settings";
                                 <label for="firstName" class="form-label">First Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-person"></i>
+                                        <i class="fas fa-user"></i>
                                     </span>
                                     <input type="text" class="form-control" id="firstName" name="firstName"
                                         value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
@@ -124,7 +124,7 @@ $title = "Settings";
                                 <label for="lastName" class="form-label">Last Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-person"></i>
+                                        <i class="fas fa-user"></i>
                                     </span>
                                     <input type="text" class="form-control" id="lastName" name="lastName"
                                         value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
@@ -136,7 +136,7 @@ $title = "Settings";
                                 <label for="email" class="form-label">Email Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-envelope"></i>
+                                        <i class="fas fa-envelope"></i>
                                     </span>
                                     <input type="email" class="form-control" id="email" name="email"
                                         value="<?php echo htmlspecialchars($user['email']); ?>" required>
@@ -148,7 +148,7 @@ $title = "Settings";
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-lock"></i>
+                                        <i class="fas fa-lock"></i>
                                     </span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         minlength="6">
@@ -161,7 +161,7 @@ $title = "Settings";
                                 <label for="passwordConfirm" class="form-label">Confirm Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-lock"></i>
+                                        <i class="fas fa-lock-check"></i>
                                     </span>
                                     <input type="password" class="form-control" id="passwordConfirm"
                                         name="passwordConfirm">
@@ -175,29 +175,27 @@ $title = "Settings";
 
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h3>Repository Settings</h3>
+                            <h3><i class="fas fa-folder-open"></i> Repository Settings</h3>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="create_labels" class="form-label">Create labels on new repository</label>
+                                <label for="create_labels" class="form-label"><i class="fas fa-tags"></i> Create labels on new repository</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="create_labels"
                                         name="create_labels" <?php if ($userData['create_labels']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="create_labels">Automatically create labels on
-                                        new repositories</label>
+                                    <label class="form-check-label" for="create_labels"><i class="fas fa-tags"></i> Automatically create labels on new repositories</label>
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="notify_issues" class="form-label">Issue Notification</label>
+                                <label for="notify_issues" class="form-label"><i class="fas fa-exclamation-circle"></i> Issue Notification</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
                                         name="notify_issues" <?php if ($userData['notify_issues']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="notify_issues">Notify me when new issues are
-                                        created</label>
+                                    <label class="form-check-label" for="notify_issues"><i class="fas fa-bell"></i> Notify me when new issues are created</label>
                                 </div>
                             </div>
                         </div>
@@ -205,7 +203,7 @@ $title = "Settings";
 
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h3>Pull Requests Settings</h3>
+                            <h3><i class="fas fa-code-branch"></i> Pull Requests Settings</h3>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -228,28 +226,26 @@ $title = "Settings";
                                         name="create_issue" <?php if ($userData['create_issue']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="create_issue">Automatically create issues for
-                                        specific keywords found in pull request content</label>
+                                    <label class="form-check-label" for="create_issue"><i class="fas fa-tasks"></i> Automatically create issues for specific keywords found in pull request content</label>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="notify_pull_requests" class="form-label">Pull Requests Notification</label>
+                                <label for="notify_pull_requests" class="form-label"><i class="fas fa-code-branch"></i> Pull Requests Notification</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="notify_pull_requests"
                                         name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="notify_pull_requests">Notify me when new pull
-                                        requests are created</label>
+                                    <label class="form-check-label" for="notify_pull_requests"><i class="fas fa-bell"></i> Notify me when new pull requests are created</label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
-                        <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                        <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
             </div>
