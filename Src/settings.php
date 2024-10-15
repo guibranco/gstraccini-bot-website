@@ -161,7 +161,7 @@ $title = "Settings";
                                 <label for="passwordConfirm" class="form-label">Confirm Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="fas fa-lock-check"></i>
+                                        <i class="fas fa-lock"></i>
                                     </span>
                                     <input type="password" class="form-control" id="passwordConfirm"
                                         name="passwordConfirm">
