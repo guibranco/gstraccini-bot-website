@@ -1,6 +1,6 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
-        <a href="https://bot.straccini.com/dashboard.php"><img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="Bot Logo" class="me-2"></a>
+        <a href="https://bot.straccini.com/dashboard.php"><img src="logo.png" alt="Bot Logo" class="me-2"></a>
         <div class="d-flex align-items-center">
             <div class="dropdown me-3">
                   <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -15,7 +15,7 @@
             <a href="https://docs.gstraccini.bot" class="me-3">
                   <i class="fas fa-question-circle text-white" style="font-size: 24px;"></i>
             </a>
-            <div class="dropdown">
+            <div class="dropdown me-3">
                 <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
