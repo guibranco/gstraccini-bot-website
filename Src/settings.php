@@ -21,7 +21,15 @@ if (isset($_SESSION['user_data'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+    $firstName = htmlspecialchars($_POST['firstName']);
+    $lastName = htmlspecialchars($_POST['lastName']);
     $password = $_POST['password'];
+    $passwordConfirm = $_POST['passwordConfirm'];
+
+    if ($password !== '' && $password !== $passwordConfirm) {
+        header("Location: settings.php?password_mismatch=true");
+        exit();
+    }
 
     $create_labels = isset($_POST['create_labels']) ? 1 : 0;
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
@@ -36,6 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'create_issue' => $create_issue,
         'notify_pull_requests' => $notify_pull_requests
     ];
+
+    $_SESSION['user']['first_name'] = $firstName;
+    $_SESSION['user']['last_name'] = $lastName;
+
 
     header("Location: settings.php?settings_updated=true");
     exit();
@@ -52,7 +64,8 @@ $title = "Settings";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <style>
         .input-group-text {
             width: 40px;
@@ -72,6 +85,13 @@ $title = "Settings";
         <?php if (isset($_GET['settings_updated'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Your settings have been updated successfully.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['password_mismatch'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Passwords do not match. Please try again.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
@@ -139,6 +159,7 @@ $title = "Settings";
                                     </span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         minlength="6">
+                                    <br />
                                     <small class="form-text text-muted">Leave blank if you don't want to change your
                                         password.</small>
                                     <div class="invalid-feedback">Password must be at least 6 characters long.</div>
@@ -153,6 +174,7 @@ $title = "Settings";
                                     </span>
                                     <input type="password" class="form-control" id="passwordConfirm"
                                         name="passwordConfirm">
+                                    <br />
                                     <small class="form-text text-muted">Leave blank if you don't want to change your
                                         password.</small>
                                     <div class="invalid-feedback">Passwords must match.</div>
