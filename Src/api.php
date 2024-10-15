@@ -42,21 +42,31 @@ sort($repositories);
 
 $issues = "https://api.github.com/issues?per_page=100";
 $issuesData = loadData($issues);
+
+
 $recentIssues = [];
+$recentPullRequests = [];
 if ($issuesData) {
     $issues = json_decode($issuesData, true);
     foreach ($issues as $issue) {
-        $recentIssues[] = [
+        $issueData = [
             'title' => $issue['title'],
             'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
+        
+        if (isset($issue['pull_request']) === true) {
+            $recentPullRequests[] = $issueData;
+        } else {
+            $recentIssues[] = $issueData;
+        }
     }
 }
 
 $data = [
     'repositories' => $repositories,
-    'recentIssues' => $recentIssues
+    'recentIssues' => $recentIssues,
+    'recentPullRequests' => $recentPullRequests
 ];
 
 $_SESSION['data'] = $data;
