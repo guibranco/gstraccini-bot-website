@@ -58,7 +58,7 @@ $title = "Settings";
 
     <div class="container mt-5">
         <h1 class="text-center">Settings</h1>
-        <p class="text-center">Manage your account and settings below.</p>
+        <p class="text-center">Manage your account below.</p>
 
         <?php if (isset($_GET['updated'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
