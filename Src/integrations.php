@@ -127,20 +127,20 @@ $title = "Integration Details";
    </div>
    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" data-auto-replace-svg="nest"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
    <script>
       $(document).ready(function () {
-         $('.toggle-visibility').on('click', function () {
-            const targetInputId = $(this).data('target');
+         $('input-group-text').on('click', function () {
+            const icon = $(this).find('[data-fa-i2svg]');
+            const targetInputId = icon.data('target');
             const inputField = $('#' + targetInputId);
-            const icon = $(this);
 
             if (inputField.attr('type') === 'password') {
                inputField.attr('type', 'text');
-               icon.removeClass('fa-eye').addClass('fa-eye-slash');
+               icon.toggleClass("fa-eye").toggleClass("fa-eye-slash");
             } else {
                inputField.attr('type', 'password');
-               icon.removeClass('fa-eye-slash').addClass('fa-eye');
+               icon.toggleClass("fa-eye-slash").toggleClass("fa-eye"));
             }
          });
 
