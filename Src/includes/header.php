@@ -19,9 +19,9 @@
 
         <div class="d-flex align-items-center">
             <div class="dropdown me-3">
-                <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <a href="#" id="notificationsDropdown" class="position-relative" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-bell text-white" style="font-size: 24px;"></i>
-                    <span id="notification-count" class="badge bg-danger"></span>
+                    <span id="notification-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"></span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" id="notificationsMenu">
                     <li class="dropdown-header">Notifications</li>
