@@ -49,18 +49,16 @@ $recentPullRequests = [];
 if ($issuesData) {
     $issues = json_decode($issuesData, true);
     foreach ($issues as $issue) {
-        if(isset($issue["pull_request"])) {
-            $recentIssues[] = [
-                'title' => $issue['title'],
-                'url' => $issue['html_url'],
-                'created_at' => $issue['created_at']
-            ];
+        $issueData = [
+            'title' => $issue['title'],
+            'url' => $issue['html_url'],
+            'created_at' => $issue['created_at']
+        ];
+        
+        if (isset($issue['pull_request']) === true) {
+            $recentPullRequests[] = $issueData;
         } else {
-            $recentIssues[] = [
-                'title' => $issue['title'],
-                'url' => $issue['html_url'],
-                'created_at' => $issue['created_at']
-            ];
+            $recentIssues[] = $issueData;
         }
     }
 }
