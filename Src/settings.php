@@ -7,7 +7,13 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 }
 
 $user = $_SESSION['user'];
-$userData = ["auto_merge" => 0, "notify_issues" => 0];
+$userData = [
+    'create_labels' => 1,
+    'notify_issues' => 1,
+    'auto_merge' => 1,
+    'create_issue' => 1,
+    'notify_pull_requests' => 1
+];
 
 if (isset($_SESSION['user_data'])) {
     $userData = $_SESSION['user_data'];
@@ -16,12 +22,19 @@ if (isset($_SESSION['user_data'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'];
-    $auto_merge = isset($_POST['auto_merge']) ? 1 : 0;
+
+    $create_labels = isset($_POST['create_labels']) ? 1 : 0;
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
+    $auto_merge = isset($_POST['auto_merge']) ? 1 : 0;
+    $create_issue = isset($_POST['create_issue']) ? 1 : 0;
+    $notify_pull_requests = isset($_POST['notify_pull_requests']) ? 1 : 0;
 
     $_SESSION['user_data'] = [
+        'create_labels' => $create_labels,
+        'notify_issues' => $notify_issues,
         'auto_merge' => $auto_merge,
-        'notify_issues' => $notify_issues
+        'create_issue' => $create_issue,
+        'notify_pull_requests' => $notify_pull_requests
     ];
 
     header("Location: settings.php?settings_updated=true");
@@ -87,29 +100,73 @@ $title = "Settings";
 
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h3>GitHub Bot Settings</h3>
+                            <h3>Repository Settings</h3>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="auto_merge" class="form-label">Enable Auto-Merge</label>
+                                <label for="create_labels" class="form-label">Create labels on new repository</label>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="auto_merge" name="auto_merge"
-                                        <?php if ($user['auto_merge']) {
+                                    <input class="form-check-input" type="checkbox" id="create_labels"
+                                        name="create_labels" <?php if ($userData['create_labels']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="auto_merge">Automatically merge pull requests
-                                        when all checks pass</label>
+                                    <label class="form-check-label" for="create_labels">Automatically create labels on
+                                        new repositories</label>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="notify_issues" class="form-label">Issue Notification</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
-                                        name="notify_issues" <?php if ($user['notify_issues']) {
+                                        name="notify_issues" <?php if ($userData['notify_issues']) {
                                             echo 'checked';
                                         } ?>>
                                     <label class="form-check-label" for="notify_issues">Notify me when new issues are
                                         created</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>Pull Requests Settings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="auto_merge" class="form-label">Enable Auto-Merge</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto_merge" name="auto_merge"
+                                        <?php if ($userData['auto_merge']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="auto_merge">Automatically merge pull requests
+                                        when all checks pass</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="create_issue" class="form-label">Create issues for: todo, fixme, bug
+                                    comments</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="create_issue"
+                                        name="create_issue" <?php if ($userData['create_issue']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="create_issue">Automatically create issues for
+                                        specific keywords found in pull request content</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="notify_pull_requests" class="form-label">Pull Requests Notification</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notify_pull_requests"
+                                        name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="notify_pull_requests">Notify me when new pull
+                                        requests are created</label>
                                 </div>
                             </div>
                         </div>
