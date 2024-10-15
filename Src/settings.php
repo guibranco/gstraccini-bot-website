@@ -159,11 +159,9 @@ $title = "Settings";
                                     </span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         minlength="6">
-                                    <br />
-                                    <small class="form-text text-muted">Leave blank if you don't want to change your
-                                        password.</small>
                                     <div class="invalid-feedback">Password must be at least 6 characters long.</div>
                                 </div>
+                                <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
                             </div>
 
                             <div class="mb-3">
@@ -174,11 +172,9 @@ $title = "Settings";
                                     </span>
                                     <input type="password" class="form-control" id="passwordConfirm"
                                         name="passwordConfirm">
-                                    <br />
-                                    <small class="form-text text-muted">Leave blank if you don't want to change your
-                                        password.</small>
                                     <div class="invalid-feedback">Passwords must match.</div>
                                 </div>
+                                <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
                             </div>
 
                         </div>
