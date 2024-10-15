@@ -1,6 +1,6 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
-        <a href="https://bot.straccini.com/dashboard.php"><img src="logo.png" alt="Bot Logo" class="me-2"></a>
+        <a href="https://bot.straccini.com/dashboard.php"><img src="logo-white.png" alt="Bot Logo" class="me-2"></a>
         <div class="d-flex align-items-center">
             <div class="dropdown me-3">
                   <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
