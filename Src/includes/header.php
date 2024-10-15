@@ -2,15 +2,31 @@
     <div class="container-fluid">
         <a href="https://bot.straccini.com/dashboard.php"><img src="logo-white.png" alt="Bot Logo" class="me-2"></a>
         <div class="d-flex align-items-center">
+
+            <nav class="navbar-nav me-auto">
+                <a href="dashboard.php" class="nav-link text-white me-3">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="repositories.php" class="nav-link text-white me-3">
+                    <i class="fas fa-folder-open"></i> Repositories
+                </a>
+                <a href="issues.php" class="nav-link text-white me-3">
+                    <i class="fas fa-exclamation-circle"></i> Issues
+                </a>
+                <a href="pull-requests.php" class="nav-link text-white me-3">
+                    <i class="fas fa-code-branch"></i> Pull Requests
+                </a>
+            </nav>
+
             <div class="dropdown me-3">
-                  <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="fas fa-bell text-white" style="font-size: 24px;"></i>
-                      <span id="notification-count" class="badge bg-danger"></span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" id="notificationsMenu">
-                      <li class="dropdown-header">Notifications</li>
-                      <li class="dropdown-item">Loading...</li>
-                  </ul>
+                <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell text-white" style="font-size: 24px;"></i>
+                    <span id="notification-count" class="badge bg-danger"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" id="notificationsMenu">
+                    <li class="dropdown-header">Notifications</li>
+                    <li class="dropdown-item">Loading...</li>
+                </ul>
             </div>
             <a href="https://docs.gstraccini.bot" class="me-3" target="_blank">
                 <i class="fas fa-question-circle text-white" style="font-size: 24px;"></i>
@@ -27,7 +43,6 @@
                     <li><a class="dropdown-item logout" href="logout.php">Logout</a></li>
                 </ul>
             </div>
-            
         </div>
     </div>
 </header>
