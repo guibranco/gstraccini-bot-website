@@ -6,49 +6,57 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-function loadData($url)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $_SESSION['token'],
-        'User-Agent: GStraccini-bot-website/1.0'
-    ]);
-    $data = curl_exec($ch);
-    curl_close($ch);
-    return $data;
+function fetchAllGitHubPages($url, $token) {
+    $results = [];
+
+    do {
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer $token",
+            "User-Agent: GStraccini-bot-website/1.0"
+        ]);
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            curl_close($ch);
+            break;
+        }
+
+        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($response, 0, $headerSize);
+        $body = json_decode(substr($response, $headerSize), true);
+        $results = array_merge($results, $body);
+        $linkHeader = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+
+        curl_close($ch);
+
+        $url = getNextPageUrl($linkHeader);
+    } while ($url);
+
+    return $results;
+}
+
+function getNextPageUrl($link_header) {
+    if (preg_match('/<([^>]+)>; rel="next"/', $link_header, $matches)) {
+        return $matches[1];
+    }
+    return null;
 }
 
 $token = $_SESSION['token'];
 
-$repos = 'https://api.github.com/user/repos?per_page=100';
-$reposData = loadData($repos);
-$repositories = [];
-if ($reposData) {
-    $repos = json_decode($reposData, true);
-    foreach ($repos as $repo) {
-        $repositories[] = [
-            'name' => $repo['name'],
-            'full_name' => $repo['full_name'],
-            'url' => $repo['html_url'],
-            'stars' => $repo['stargazers_count'],
-            'forks' => $repo['forks_count'],
-            'issues' => $repo['open_issues_count']
-        ];
-    }
-}
-
-sort($repositories);
-
-$issues = "https://api.github.com/issues?per_page=100";
-$issuesData = loadData($issues);
-
+$responseIssues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
+$responseRepositories = fetchAllGitHubPages('https://api.github.com/user/repos?per_page=100', $token);
 
 $openPullRequests = [];
 $openIssues = [];
-if ($issuesData) {
-    $issues = json_decode($issuesData, true);
-    foreach ($issues as $issue) {
+$repositories = [];
+
+if ($responseIssues !== null && is_array($responseIssues) === true && count($responseIssues) > 0) {
+    foreach ($responseIssues as $issue) {
         $issueData = [
             'title' => $issue['title'],
             'url' => $issue['html_url'],
@@ -62,6 +70,24 @@ if ($issuesData) {
         }
     }
 }
+
+if ($responseRepositories !== null && is_array($responseRepositories) === true && count($responseRepositories) > 0) {
+    foreach ($responseRepositories as $repo) {
+        $repositories[] = [
+            'name' => $repo['name'],
+            'full_name' => $repo['full_name'],
+            'url' => $repo['html_url'],
+            'fork' => $repo['fork'],
+            'stars' => $repo['stargazers_count'],
+            'forks' => $repo['forks_count'],
+            'issues' => $repo['open_issues_count'],
+            'language' => $repo['language'],
+            'visibility' => $repo['visibility']
+        ];
+    }
+}
+
+sort($repositories);
 
 $data = [
     'openPullRequests' => $openPullRequests,
