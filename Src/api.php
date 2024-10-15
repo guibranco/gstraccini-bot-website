@@ -45,7 +45,7 @@ $issuesData = loadData($issues);
 
 
 $recentIssues = [];
-$recentPullRequests = []
+$recentPullRequests = [];
 if ($issuesData) {
     $issues = json_decode($issuesData, true);
     foreach ($issues as $issue) {
