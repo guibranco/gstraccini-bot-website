@@ -43,9 +43,9 @@ $title = "Dashboard";
         </div>
     </div>
 
-    <div class="container mt-5 hide" id="alert-container"></div>
+    <div class="container mt-5 d-none" id="alert-container"></div>
 
-    <div class="container mt-5">
+    <div class="container">
         <div class="row">
             <section class="col-12">
                 <h2 class="mb-4">GStraccini-Bot Usage Statistics</h2>
@@ -198,7 +198,7 @@ $title = "Dashboard";
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`;
             
-            document.getElementById('alert-container').innerHTML = alertHtml;
+            $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
             
             setTimeout(function() {
                 var alertElement = document.querySelector('.alert');
