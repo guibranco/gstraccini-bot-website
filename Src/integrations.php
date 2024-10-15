@@ -130,17 +130,17 @@ $title = "Integration Details";
    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
    <script>
       $(document).ready(function () {
-         $('input-group-text').on('click', function () {
+         $('.input-group-text').on('click', function () {
             const icon = $(this).find('[data-fa-i2svg]');
             const targetInputId = icon.data('target');
             const inputField = $('#' + targetInputId);
 
             if (inputField.attr('type') === 'password') {
                inputField.attr('type', 'text');
-               icon.toggleClass("fa-eye").toggleClass("fa-eye-slash");
+               icon.toggleClass('fa-eye').toggleClass('fa-eye-slash');
             } else {
                inputField.attr('type', 'password');
-               icon.toggleClass("fa-eye-slash").toggleClass("fa-eye"));
+               icon.toggleClass('fa-eye-slash').toggleClass('fa-eye');
             }
          });
 
