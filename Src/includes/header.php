@@ -36,11 +36,11 @@
                     <img src="<?php echo $user['avatar_url']; ?>" alt="<?php echo $user['login']; ?> avatar" class="rounded-circle" width="40" height="40">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
-                    <li><a class="dropdown-item" href="settings.php">Settings</a></li>
-                    <li><a class="dropdown-item" href="integrations.php">Integrations</a></li>
+                    <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                    <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog me-2"></i> Settings</a></li>
+                    <li><a class="dropdown-item" href="integrations.php"><i class="fas fa-plug me-2"></i> Integrations</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item logout" href="logout.php">Logout</a></li>
+                    <li><a class="dropdown-item logout" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
             </div>
         </div>
