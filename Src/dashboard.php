@@ -43,9 +43,7 @@ $title = "Dashboard";
         </div>
     </div>
 
-    <div class="container mt-5">
-        <div id="alert-container"></div>
-    </div>
+    <div class="container mt-5 hide" id="alert-container"></div>
 
     <div class="container mt-5">
         <div class="row">
