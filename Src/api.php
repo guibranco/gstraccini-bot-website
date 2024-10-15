@@ -13,6 +13,7 @@ function fetchAllGitHubPages($url, $token) {
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "Authorization: Bearer $token",
             "User-Agent: GStraccini-bot-website/1.0"
