@@ -50,3 +50,8 @@ body {
 .dropdown-item.logout:hover {
   background-color: #c82333;
 }
+
+.input-group-text {
+  width: 40px;
+  justify-content: center;
+}

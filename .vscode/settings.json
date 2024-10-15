@@ -24,8 +24,12 @@
         "projectKey": "guibranco_gstraccini-bot-website"
     },
     "cSpell.words": [
+        "codacy",
+        "codecov",
+        "deepsource",
         "gstraccini",
         "guibranco",
-        "Octocat"
+        "Octocat",
+        "sonarcloud"
     ]    
 }
