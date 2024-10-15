@@ -7,6 +7,12 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 }
 
 $user = $_SESSION['user'];
+if (isset($user['first_name']) === false) {
+    $user['first_name'] = '';
+}
+if (isset($user['last_name']) === false) {
+    $user['last_name'] = '';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
@@ -148,7 +154,7 @@ $title = "Account Details";
                     </div>
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Account Details</button>
                         <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
