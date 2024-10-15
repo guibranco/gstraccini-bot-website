@@ -16,6 +16,7 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
                     <li><a class="dropdown-item" href="settings.php">Settings</a></li>
+                    <li><a class="dropdown-item" href="integrations.php">Integrations</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
