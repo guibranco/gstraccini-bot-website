@@ -138,7 +138,7 @@ $title = "Dashboard";
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-6">
-                <h3>Open Pull Requests <span class="badge badge-primary" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
+                <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
@@ -150,7 +150,7 @@ $title = "Dashboard";
             </div>
 
             <div class="col-md-6">
-                <h3>Open Issues <span class="badge badge-primary" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                <h3>Open Issues <span class="badge text-bg-warning rounded-pill" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
                     <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
@@ -164,7 +164,7 @@ $title = "Dashboard";
         
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Your Repositories <span class="badge badge-primary" id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
+                <h3>Your Repositories <span class="badge text-bg-warning rounded-pill" id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
