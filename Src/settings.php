@@ -95,7 +95,7 @@ $title = "Settings";
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="notify_issues" class="form-label"><i class="fas fa-exclamation-circle"></i> Issue Notification</label>
-                                <div class="form-check">
+                                <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
                                         name="notify_issues" <?php if ($userData['notify_issues']) {
                                             echo 'checked';
@@ -148,7 +148,7 @@ $title = "Settings";
                             <div class="mb-3">
                                 <label for="notify_pull_requests" class="form-label"><i class="fas fa-code-branch"></i> Pull Requests Notification</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="notify_pull_requests"
+                                    <input class="form-check-input form-switch" type="checkbox" id="notify_pull_requests"
                                         name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
                                             echo 'checked';
                                         } ?>>

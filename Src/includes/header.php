@@ -37,6 +37,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                    <li><a class="dropdown-item" href="account.php"><i class="fas fa-user me-2"></i> Account</a></li>
                     <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog me-2"></i> Settings</a></li>
                     <li><a class="dropdown-item" href="integrations.php"><i class="fas fa-plug me-2"></i> Integrations</a></li>
                     <li><hr class="dropdown-divider"></li>
