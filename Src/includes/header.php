@@ -1,8 +1,6 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
-        <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="Bot Logo"
-            class="me-2">
-        <span class="navbar-brand"><?php echo htmlspecialchars($title); ?></span>
+        <a href="https://bot.straccini.com/dashboard.php"><img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="Bot Logo" class="me-2"></a>
         <div class="d-flex align-items-center">            
             <div class="dropdown">
                 <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
