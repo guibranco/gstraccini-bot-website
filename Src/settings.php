@@ -188,6 +188,14 @@ $title = "Settings";
                                     <label class="form-check-label" for="create_labels"><i class="fas fa-tags"></i> Automatically create labels on new repositories</label>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exclamation-circle"></i> Issues Settings</h3>
+                        </div>
+                        <div class="card-body">
                             <div class="mb-3">
                                 <label for="notify_issues" class="form-label"><i class="fas fa-exclamation-circle"></i> Issue Notification</label>
                                 <div class="form-check">
@@ -219,14 +227,24 @@ $title = "Settings";
                             </div>
 
                             <div class="mb-3">
-                                <label for="create_issue" class="form-label">Create issues for: todo, fixme, bug
-                                    comments</label>
+                                <label for="create_issue" class="form-label">
+                                    Create issues for pending tasks in code comments
+                                    <span style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                      <i class="fas fa-wrench"></i> Fixme
+                                    </span>
+                                    <span style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                      <i class="fas fa-tasks"></i> Todo
+                                    </span>
+                                    <span style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                      <i class="fas fa-bug"></i> Bug
+                                    </span>
+                                </label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="create_issue"
                                         name="create_issue" <?php if ($userData['create_issue']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="create_issue"><i class="fas fa-tasks"></i> Automatically create issues for specific keywords found in pull request content</label>
+                                    <label class="form-check-label" for="create_issue"><i class="fas fa-tasks"></i> Automatically create issues for specific keywords found in pull request content</label>                                    
                                 </div>
                             </div>
 
