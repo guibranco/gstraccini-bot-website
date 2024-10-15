@@ -8,13 +8,13 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 
 $user = $_SESSION['user'];
 
-$data = array("repositories" => [], "recentIssues" => []);
+$data = array("recentPullRequests" => [], "recentIssues" => [], "repositories" => []);
 
 if (isset($_SESSION["data"])) {
     $data = $_SESSION["data"];
 }
 
-$title = "Activity Dashboard";
+$title = "Dashboard";
 ?>
 
 <!DOCTYPE html>
@@ -43,11 +43,9 @@ $title = "Activity Dashboard";
         </div>
     </div>
 
-    <div class="container mt-5">
-        <div id="alert-container"></div>
-    </div>
+    <div class="container mt-5 d-none" id="alert-container"></div>
 
-    <div class="container mt-5">
+    <div class="container">
         <div class="row">
             <section class="col-12">
                 <h2 class="mb-4">GStraccini-Bot Usage Statistics</h2>
@@ -138,7 +136,7 @@ $title = "Activity Dashboard";
     </div>
 
     <div class="container mt-5">
-        <div class="row">
+        <div class="row mt-5">
             <div class="col-md-6">
                 <h3>Recent Pull Requests</h3>
                 <ul class="list-group" id="recentPullRequests">
@@ -163,7 +161,8 @@ $title = "Activity Dashboard";
                 </ul>
             </div>
         </div>
-        <div class="row">
+        
+        <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Your Repositories</h3>
                 <table class="table table-striped">
@@ -192,14 +191,14 @@ $title = "Activity Dashboard";
 
     <?php require_once "includes/footer.php"; ?>    
     <script>
-        function showAjaxErrorAlert(message) {
+        function showErrorAlert(message) {
             var alertHtml = `
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Error!</strong> ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`;
             
-            document.getElementById('alert-container').innerHTML = alertHtml;
+            $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
             
             setTimeout(function() {
                 var alertElement = document.querySelector('.alert');
@@ -210,14 +209,14 @@ $title = "Activity Dashboard";
             }, 15000);
         }
         
-        function populateIssues(items, type) {
-            const list = document.getElementById(type);
+        function populateIssues(items, id) {
+            const list = document.getElementById(id);
             list.innerHTML = '';
             items.forEach(item => {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
                 itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><span class="text-muted">(Created at: ${item.created_at})</span>`;
-                list.appendChild(item);
+                list.appendChild(itemLi);
             });
         }
 
@@ -239,10 +238,10 @@ $title = "Activity Dashboard";
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
-                .then(data => {
-                    populateRepositoriesTable(data.repositories);
-                    populateIssues(data.recentIssues, "recentIssues");
+                .then(data => {                    
                     populateIssues(data.recentPullRequests, "recentPullRequests");
+                    populateIssues(data.recentIssues, "recentIssues");
+                    populateRepositoriesTable(data.repositories);
                 })
                 .catch(error => {
                     console.error('Error:', error);
