@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 
 $user = $_SESSION['user'];
 
-$data = array("recentPullRequests" => [], "recentIssues" => [], "repositories" => []);
+$data = array("openPullRequests" => [], "openIssues" => [], "repositories" => []);
 
 if (isset($_SESSION["data"])) {
     $data = $_SESSION["data"];
@@ -138,9 +138,9 @@ $title = "Dashboard";
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-6">
-                <h3>Recent Pull Requests</h3>
-                <ul class="list-group" id="recentPullRequests">
-                    <?php foreach ($data["recentPullRequests"] as $issue): ?>
+                <h3>Open Pull Requests <span class="badge badge-primary" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
+                <ul class="list-group" id="openPullRequests">
+                    <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
@@ -150,9 +150,9 @@ $title = "Dashboard";
             </div>
 
             <div class="col-md-6">
-                <h3>Recent Issues</h3>
-                <ul class="list-group" id="recentIssues">
-                    <?php foreach ($data["recentIssues"] as $issue): ?>
+                <h3>Open Issues <span class="badge badge-primary" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                <ul class="list-group" id="openIssues">
+                    <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
@@ -164,7 +164,7 @@ $title = "Dashboard";
         
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Your Repositories</h3>
+                <h3>Your Repositories <span class="badge badge-primary" id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -210,6 +210,7 @@ $title = "Dashboard";
         }
         
         function populateIssues(items, id) {
+            $(`#${id}Count`).text(items.length);
             const list = document.getElementById(id);
             list.innerHTML = '';
             items.forEach(item => {
@@ -221,6 +222,7 @@ $title = "Dashboard";
         }
 
         function populateRepositoriesTable(repositories) {
+            $("#repositoriesCount").text(repositories.length);
             const repositoriesTable = document.getElementById('repositories');
             repositoriesTable.innerHTML = '';
             repositories.forEach(repo => {
@@ -239,8 +241,8 @@ $title = "Dashboard";
             fetch('api.php')
                 .then(response => response.json())
                 .then(data => {                    
-                    populateIssues(data.recentPullRequests, "recentPullRequests");
-                    populateIssues(data.recentIssues, "recentIssues");
+                    populateIssues(data.openPullRequests, "openPullRequests");
+                    populateIssues(data.openIssues, "openIssues");
                     populateRepositoriesTable(data.repositories);
                 })
                 .catch(error => {
