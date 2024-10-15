@@ -101,7 +101,7 @@ $title = "Settings";
                                 <label for="githubUsername" class="form-label">GitHub Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="fa-brands fa-githubb"></i>
+                                        <i class="fab fa-github"></i>
                                     </span>
                                     <input type="text" class="form-control" id="githubUsername"
                                         value="<?php echo htmlspecialchars($user['login']); ?>" disabled>
