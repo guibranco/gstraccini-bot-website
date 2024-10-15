@@ -44,6 +44,10 @@ $title = "Activity Dashboard";
     </div>
 
     <div class="container mt-5">
+        <div id="alert-container"></div>
+    </div>
+
+    <div class="container mt-5">
         <div class="row">
             <section class="col-12">
                 <h2 class="mb-4">GStraccini-Bot Usage Statistics</h2>
@@ -136,6 +140,31 @@ $title = "Activity Dashboard";
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
+                <h3>Recent Pull Requests</h3>
+                <ul class="list-group" id="recentPullRequests">
+                    <?php foreach ($data["recentPullRequests"] as $issue): ?>
+                        <li class="list-group-item">
+                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Recent Issues</h3>
+                <ul class="list-group" id="recentIssues">
+                    <?php foreach ($data["recentIssues"] as $issue): ?>
+                        <li class="list-group-item">
+                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
                 <h3>Your Repositories</h3>
                 <table class="table table-striped">
                     <thead>
@@ -149,9 +178,7 @@ $title = "Activity Dashboard";
                     <tbody id="repositories">
                         <?php foreach ($data["repositories"] as $repo): ?>
                             <tr>
-                                <td><a
-                                        href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a>
-                                </td>
+                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a></td>
                                 <td><?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['forks']; ?></td>
                                 <td><?php echo $repo['issues']; ?></td>
@@ -160,24 +187,40 @@ $title = "Activity Dashboard";
                     </tbody>
                 </table>
             </div>
-
-            <div class="col-md-6">
-                <h3>Recent Issues</h3>
-                <ul class="list-group" id="recentIssues">
-                    <?php foreach ($data["recentIssues"] as $issue): ?>
-                        <li class="list-group-item">
-                            <strong><a
-                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
-                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
         </div>
     </div>
 
     <?php require_once "includes/footer.php"; ?>    
     <script>
+        function showAjaxErrorAlert(message) {
+            var alertHtml = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+            
+            document.getElementById('alert-container').innerHTML = alertHtml;
+            
+            setTimeout(function() {
+                var alertElement = document.querySelector('.alert');
+                if (alertElement) {
+                    var alertInstance = new bootstrap.Alert(alertElement);
+                    alertInstance.close();
+                }
+            }, 15000);
+        }
+        
+        function populateIssues(items, type) {
+            const list = document.getElementById(type);
+            list.innerHTML = '';
+            items.forEach(item => {
+                const itemLi = document.createElement('li');
+                itemLi.className = 'list-group-item';
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><span class="text-muted">(Created at: ${item.created_at})</span>`;
+                list.appendChild(item);
+            });
+        }
+
         function populateRepositoriesTable(repositories) {
             const repositoriesTable = document.getElementById('repositories');
             repositoriesTable.innerHTML = '';
@@ -193,26 +236,17 @@ $title = "Activity Dashboard";
             });
         }
 
-        function populateRecentIssuesList(recentIssues) {
-            const recentIssuesList = document.getElementById('recentIssues');
-            recentIssuesList.innerHTML = '';
-            recentIssues.forEach(issue => {
-                const item = document.createElement('li');
-                item.className = 'list-group-item';
-                item.innerHTML = `
-                <strong><a href='${issue.url}'>${issue.title}</a></strong>
-                <span class="text-muted">(Created at: ${issue.created_at})</span>
-            `;
-                recentIssuesList.appendChild(item);
-            });
-        }
-
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
-                    populateRecentIssuesList(data.recentIssues);
+                    populateIssues(data.recentIssues, "recentIssues");
+                    populateIssues(data.recentPullRequests, "recentPulLRequests");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorAlert('Failed to complete the request. Please try again later.');;
                 });
         }
 
