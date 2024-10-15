@@ -52,6 +52,13 @@ $title = "Settings";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        .input-group-text {
+            width: 40px;
+            justify-content: center;
+        }
+    </style>
     <link rel="stylesheet" href="user.css">
 </head>
 
@@ -63,38 +70,95 @@ $title = "Settings";
         <p class="text-center">Manage your account and settings below.</p>
 
         <?php if (isset($_GET['settings_updated'])): ?>
-
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Your settings have been updated successfully.
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-
         <?php endif; ?>
 
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <form action="settings.php" method="POST">
+                <form action="settings.php" method="POST" id="settingsForm" novalidate>
                     <div class="card mb-4">
                         <div class="card-header">
                             <h3>Account Settings</h3>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="username" class="form-label">GitHub Username</label>
-                                <input type="text" class="form-control" id="username" name="username"
-                                    value="<?php echo htmlspecialchars($user['login']); ?>" disabled>
+                                <label for="githubUsername" class="form-label">GitHub Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-github"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="githubUsername"
+                                        value="<?php echo htmlspecialchars($user['login']); ?>" disabled>
+                                </div>
                             </div>
+
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                <label for="firstName" class="form-label">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="firstName" name="firstName"
+                                        value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+                                    <div class="invalid-feedback">First name is required.</div>
+                                </div>
                             </div>
+
                             <div class="mb-3">
-                                <label for="password" class="form-label">Change Password</label>
-                                <input type="password" class="form-control" id="password" name="password">
-                                <small class="form-text text-muted">Leave blank if you don't want to change your
-                                    password.</small>
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="lastName" name="lastName"
+                                        value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                                    <div class="invalid-feedback">Last name is required.</div>
+                                </div>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        minlength="6">
+                                    <small class="form-text text-muted">Leave blank if you don't want to change your
+                                        password.</small>
+                                    <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="passwordConfirm" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="passwordConfirm"
+                                        name="passwordConfirm">
+                                    <small class="form-text text-muted">Leave blank if you don't want to change your
+                                        password.</small>
+                                    <div class="invalid-feedback">Passwords must match.</div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -182,6 +246,31 @@ $title = "Settings";
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('settingsForm');
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const password = document.getElementById('password').value;
+                const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+                if (password !== passwordConfirm) {
+                    document.getElementById('passwordConfirm').setCustomValidity("Passwords don't match");
+                } else {
+                    document.getElementById('passwordConfirm').setCustomValidity("");
+                }
+                if (form.checkValidity() === false) {
+                    form.classList.add('was-validated');
+                } else {
+                    form.classList.remove('was-validated');
+                    form.submit();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
