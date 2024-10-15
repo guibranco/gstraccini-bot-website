@@ -1,7 +1,20 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
         <a href="https://bot.straccini.com/dashboard.php"><img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="Bot Logo" class="me-2"></a>
-        <div class="d-flex align-items-center">            
+        <div class="d-flex align-items-center">
+            <div class="dropdown me-3">
+                  <a href="#" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fas fa-bell text-white" style="font-size: 24px;"></i>
+                      <span id="notification-count" class="badge bg-danger"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" id="notificationsMenu">
+                      <li class="dropdown-header">Notifications</li>
+                      <li class="dropdown-item">Loading...</li>
+                  </ul>
+            </div>
+            <a href="https://docs.gstraccini.bot" class="me-3">
+                  <i class="fas fa-question-circle text-white" style="font-size: 24px;"></i>
+            </a>
             <div class="dropdown">
                 <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-bs-toggle="dropdown" aria-expanded="false">
