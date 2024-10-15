@@ -115,6 +115,16 @@ $title = "Integration Details";
                            </span>
                         </div>
                      </div>
+                     <div class="mb-3 position-relative">
+                        <label for="codeclimate" class="form-label">OpenAI API Key</label>
+                        <div class="input-group">
+                           <input type="password" class="form-control" id="openai"
+                              placeholder="Enter OpenAI API Key">
+                           <span class="input-group-text">
+                              <i class="fas fa-eye toggle-visibility" data-target="openai"></i>
+                           </span>
+                        </div>
+                     </div>
                   </div>
                </div>
                <div class="text-center">
