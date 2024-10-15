@@ -125,8 +125,7 @@ $title = "Integration Details";
                            </span>
                         </div>
                      </div>
-                  </div>
-                  <div class="mb-3 position-relative">
+                     <div class="mb-3 position-relative">
                         <label for="codeclimate" class="form-label">CPanel API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="cpanel"
@@ -135,8 +134,8 @@ $title = "Integration Details";
                               <i class="fas fa-eye toggle-visibility" data-target="cpanel"></i>
                            </span>
                         </div>
-                     </div>
-                  </div>
+                     </div>                  
+                  </div>                  
                </div>
                <div class="text-center">
                   <button type="submit" class="btn btn-primary">Save Integration Details</button>
