@@ -130,7 +130,7 @@ $title = "Integration Details";
    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
    <script>
       $(document).ready(function () {
-         $('.toggle-visibility').on('click', function () {
+         $('.toggle-visibility').live('click', function () {
             const targetInputId = $(this).data('target');
             const inputField = $('#' + targetInputId);
             const icon = $(this);
@@ -147,6 +147,8 @@ $title = "Integration Details";
          $('#integrationsForm').on('submit', function (event) {
             event.preventDefault();
             event.stopPropagation();
+
+            const form = $(this);
 
             if (form.checkValidity() === false) {
                form.classList.add('was-validated');
