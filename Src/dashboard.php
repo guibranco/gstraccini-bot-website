@@ -164,7 +164,7 @@ $title = "Activity Dashboard";
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <h3>Your Repositories</h3>
                 <table class="table table-striped">
                     <thead>
@@ -242,7 +242,7 @@ $title = "Activity Dashboard";
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
                     populateIssues(data.recentIssues, "recentIssues");
-                    populateIssues(data.recentPullRequests, "recentPulLRequests");
+                    populateIssues(data.recentPullRequests, "recentPullRequests");
                 })
                 .catch(error => {
                     console.error('Error:', error);
