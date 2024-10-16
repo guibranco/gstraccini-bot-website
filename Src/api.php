@@ -1,4 +1,13 @@
 <?php
+$cookie_lifetime = 604800;
+session_set_cookie_params([
+    'lifetime' => $cookie_lifetime,
+    'path' => '/',
+    'domain' => 'bot.straccini.com',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
 session_start();
 
 $data = ['error' => 'Unauthorized'];
@@ -62,6 +71,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         $issueData = [
             'title' => $issue['title'],
             'repository' => $issue['repository']['name'],
+            'full_name' => $issue['repository']['full_name'],
             'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
