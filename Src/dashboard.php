@@ -140,6 +140,11 @@ $title = "Dashboard";
             <div class="col-md-6">
                 <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
+                    <?php if (count($data["openPullRequests"]) === 0) : ?>
+                        <li class="list-group-item">
+                            <i class="fas fa-spinner fa-spin"></i> Loading data...
+                        </li>
+                    <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
@@ -152,6 +157,11 @@ $title = "Dashboard";
             <div class="col-md-6">
                 <h3>Open Issues <span class="badge text-bg-warning rounded-pill" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
+                    <?php if (count($data["openIssues"]) === 0) : ?>
+                        <li class="list-group-item">
+                            <i class="fas fa-spinner fa-spin"></i> Loading data...
+                        </li>
+                    <?php endif; ?>
                     <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
@@ -175,6 +185,11 @@ $title = "Dashboard";
                         </tr>
                     </thead>
                     <tbody id="repositories">
+                        <?php if (count($data["repositories"]) === 0) : ?>
+                            <tr>
+                                <td colspan="4"><i class="fas fa-spinner fa-spin"></i> Loading data...</td>
+                            </tr>
+                        <?php endif; ?>
                         <?php foreach ($data["repositories"] as $repo): ?>
                             <tr>
                                 <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a></td>
@@ -213,6 +228,15 @@ $title = "Dashboard";
             $(`#${id}Count`).text(items.length);
             const list = document.getElementById(id);
             list.innerHTML = '';
+
+            if (items.length === 0) {
+                onst itemLi = document.createElement('li');
+                itemLi.className = 'list-group-item list-group-item-warning';
+                itemLi.innerHTML = `<strong>No items found!</strong>`;
+                list.appendChild(itemLi);
+                return;
+            }
+            
             items.forEach(item => {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
@@ -244,6 +268,7 @@ $title = "Dashboard";
                     populateIssues(data.openPullRequests, "openPullRequests");
                     populateIssues(data.openIssues, "openIssues");
                     populateRepositoriesTable(data.repositories);
+                    setTimout(loadData, 1000 * 60 * 5);
                 })
                 .catch(error => {
                     console.error('Error:', error);
