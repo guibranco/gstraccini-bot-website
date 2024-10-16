@@ -71,7 +71,7 @@ $title = "Account Details";
 
         <div class="row">
             <div class="col-md-8 offset-md-2">
-                <form action="settings.php" method="POST" id="settingsForm" novalidate>
+                <form action="account.php" method="POST" id="settingsForm" novalidate>
                     <div class="card mb-4">
                         <div class="card-header">
                             <h3>Account Details</h3>
