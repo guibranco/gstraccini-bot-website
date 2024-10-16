@@ -230,7 +230,7 @@ $title = "Dashboard";
             list.innerHTML = '';
 
             if (items.length === 0) {
-                onst itemLi = document.createElement('li');
+                const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item list-group-item-warning';
                 itemLi.innerHTML = `<strong>No items found!</strong>`;
                 list.appendChild(itemLi);
