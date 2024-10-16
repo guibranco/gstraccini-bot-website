@@ -41,7 +41,7 @@ function loadData($url, $token) {
         
         curl_close($ch);
 
-    return ["headers" => $header, "body" => $body);
+    return ["headers" => $header, "body" => $body];
 }
 
 function fetchAllGitHubPages($url, $token) {
@@ -49,7 +49,7 @@ function fetchAllGitHubPages($url, $token) {
 
     do {
         $result = loadData($url, $token);
-        if($result === null){
+        if($result === null || isseT($result["body"]) === null){
             break;
         }
         $results = array_merge($results, $result["body"]);
