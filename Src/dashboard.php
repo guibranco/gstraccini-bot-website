@@ -158,7 +158,16 @@ $title = "Dashboard";
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
-                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>                            
+                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
+                            <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
+                                <i class=`fas fa-check-circle text-bg-success`></i> Success
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "failure" ) { ?>
+                                <i class="fas fa-times text-bg-danger"></i> Failure
+                            <?php } else if (isset($issue["state"])) { ?>
+                                <i class="fas fa-exclamation-triangle bg-text-warning"></i> <?php echo $issue["state"]; ?>
+                            <?php } else { ?>
+                                <i class="fas fa-ban text-bg-danger"></i> No state
+                            <?php } ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -251,7 +260,15 @@ $title = "Dashboard";
             items.forEach(item => {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span>`;
+                let state = "";
+                if(id === "openPullRequests") {
+                    switch(item.state) {
+                        case "success": state = "<i class='fas fa-check-circle text-bg-success'></i> Success"; break;
+                        case "failure": state = "<i class='fas fa-times text-bg-danger'></i> Failure"; break;
+                        default: state = "<i class='fas fa-exclamation-triangle bg-text-warning'></i> " + item.state; break;                            
+                    }
+                }
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
                 list.appendChild(itemLi);
             });
         }
