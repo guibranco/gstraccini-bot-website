@@ -63,6 +63,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
     foreach ($responseIssues as $issue) {
         $issueData = [
             'title' => $issue['title'],
+            'repository' => $issue['repository']['name'],
             'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
