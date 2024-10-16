@@ -140,7 +140,7 @@ $title = "Dashboard";
             <div class="col-md-6">
                 <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
-                    <?php if (count($data["openPullRequests"]) === 0): ?>
+                    <?php if (count($data["openPullRequests"]) === 0) : ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
@@ -157,7 +157,7 @@ $title = "Dashboard";
             <div class="col-md-6">
                 <h3>Open Issues <span class="badge text-bg-warning rounded-pill" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
-                    <?php if (count($data["openIssues"]) === 0): ?>
+                    <?php if (count($data["openIssues"]) === 0) : ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
@@ -185,7 +185,7 @@ $title = "Dashboard";
                         </tr>
                     </thead>
                     <tbody id="repositories">
-                        <?php if (count($data["repositories"]) === 0): ?>
+                        <?php if (count($data["repositories"]) === 0) : ?>
                             <tr>
                                 <td colspan="4"><i class="fas fa-spinner fa-spin"></i> Loading data...</td>
                             </tr>
