@@ -55,7 +55,6 @@ $userData = curl_exec($ch);
 curl_close($ch);
 
 $user = json_decode($userData, true);
-session_regenerate_id(true);
 $_SESSION['token'] = $token;
 $_SESSION['user'] = $user;
 header('Location: dashboard.php');
