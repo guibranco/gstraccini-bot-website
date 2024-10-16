@@ -1,5 +1,5 @@
 <?php
-$cookie_lifetime = 604800; // 7 days in seconds
+$cookie_lifetime = 604800;
 session_set_cookie_params([
     'lifetime' => $cookie_lifetime,
     'path' => '/',
