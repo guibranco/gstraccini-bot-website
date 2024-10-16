@@ -187,7 +187,7 @@ $title = "Dashboard";
                     <tbody id="repositories">
                         <?php if (count($data["repositories"]) === 0) : ?>
                             <tr>
-                                <td colspan="4"><i class="fas fa-spinner fa-spin"></i> Loading data...</td>
+                                <td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading data...</td>
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($data["repositories"] as $repo): ?>
@@ -268,7 +268,7 @@ $title = "Dashboard";
                     populateIssues(data.openPullRequests, "openPullRequests");
                     populateIssues(data.openIssues, "openIssues");
                     populateRepositoriesTable(data.repositories);
-                    setTimout(loadData, 1000 * 60 * 5);
+                    setTimeout(loadData, 1000 * 60 * 5);
                 })
                 .catch(error => {
                     console.error('Error:', error);
