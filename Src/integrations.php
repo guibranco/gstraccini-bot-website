@@ -52,7 +52,7 @@ $title = "Integration Details";
                   </div>
                   <div class="card-body">
                      <div class="mb-3 position-relative">
-                        <label for="sonarcloud" class="form-label">SonarCloud API Key</label>
+                        <label for="sonarcloud" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Sonarcloud" /> SonarCloud API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="sonarcloud"
                               placeholder="Enter SonarCloud API Key">
@@ -62,7 +62,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="appveyor" class="form-label">AppVeyor
+                        <label for="appveyor" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Appveyor" /> AppVeyor
                            API Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="appveyor"
@@ -73,7 +73,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codacy" class="form-label">Codacy
+                        <label for="codacy" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Codacy" /> Codacy
                            Project Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codacy"
@@ -84,7 +84,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codecov" class="form-label">Codecov
+                        <label for="codecov" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Codecov" /> Codecov
                            Upload Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codecov"
@@ -105,7 +105,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label">CodeClimate Test Reporter
+                        <label for="codeclimate" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Codeclimate" /> CodeClimate Test Reporter
                            ID</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codeclimate"
@@ -116,7 +116,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label">OpenAI API Key</label>
+                        <label for="codeclimate" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Openai" /> OpenAI API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="openai"
                               placeholder="Enter OpenAI API Key">
@@ -126,7 +126,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label">CPanel API Key</label>
+                        <label for="codeclimate" class="form-label"><img height="32" width="32" src="https://cdn.simpleicons.org/Cpanel" /> CPanel API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="cpanel"
                               placeholder="Enter CPanel API Key">
