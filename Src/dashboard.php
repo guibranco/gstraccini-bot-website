@@ -157,7 +157,8 @@ $title = "Dashboard";
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
-                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
+                            <br />
+                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>                            
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -174,6 +175,7 @@ $title = "Dashboard";
                     <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <br />
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>
@@ -249,7 +251,7 @@ $title = "Dashboard";
             items.forEach(item => {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><span class="text-muted">(Created at: ${item.created_at})</span>`;
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span>`;
                 list.appendChild(itemLi);
             });
         }
