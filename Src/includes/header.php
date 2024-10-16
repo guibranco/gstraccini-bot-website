@@ -28,7 +28,7 @@
                     <li class="dropdown-item">Loading...</li>
                 </ul>
             </div>
-            <a href="https://docs.gstraccini.bot" class="me-3" target="_blank">
+            <a href="https://docs.bot.straccini.com" class="me-3" target="_blank">
                 <i class="fas fa-question-circle text-white" style="font-size: 24px;"></i>
             </a>
             <div class="dropdown me-3">
