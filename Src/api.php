@@ -33,11 +33,9 @@ function fetchAllGitHubPages($url, $token) {
         $header = substr($response, 0, $headerSize);
         $body = json_decode(substr($response, $headerSize), true);
         $results = array_merge($results, $body);
-        $linkHeader = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-
         curl_close($ch);
 
-        $url = getNextPageUrl($linkHeader);
+        $url = getNextPageUrl($header);
     } while ($url);
 
     return $results;
