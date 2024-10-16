@@ -10,13 +10,18 @@ session_set_cookie_params([
 ]);
 session_start();
 
-require_once "github.secrets.php";
+if (isset($_GET['state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
+    header('Location: index.php?error=Invalid+state+parameter');
+    exit();
+}
 
 if (isset($_GET['code']) === false) {
     header('Location: index.php?error=Authorization+code+not+found');
     exit();
 }
- 
+
+require_once "github.secrets.php";
+
 $code = $_GET['code'];
 $tokenUrl = 'https://github.com/login/oauth/access_token';
 $postFields = [
@@ -30,7 +35,7 @@ $ch = curl_init($tokenUrl);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)']);
 $response = curl_exec($ch);
 curl_close($ch);
 
@@ -47,8 +52,10 @@ $apiUrl = 'https://api.github.com/user';
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $token,
-    'User-Agent: GStraccini-bot-website/1.0'
+    "Authorization: Bearer $token",
+    "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+    "Accept: application/vnd.github+json",
+    "X-GitHub-Api-Version: 2022-11-28"
 ]);
 
 $userData = curl_exec($ch);
