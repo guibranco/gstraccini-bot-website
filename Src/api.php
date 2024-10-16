@@ -15,10 +15,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-function fetchAllGitHubPages($url, $token) {
-    $results = [];
-
-    do {
+function loadData($url, $token) {
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -35,16 +32,28 @@ function fetchAllGitHubPages($url, $token) {
 
         if (curl_errno($ch)) {
             curl_close($ch);
-            break;
+            return null;
         }
 
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($response, 0, $headerSize);
         $body = json_decode(substr($response, $headerSize), true);
-        $results = array_merge($results, $body);
+        
         curl_close($ch);
 
-        $url = getNextPageUrl($header);
+    return ["headers" => $header, "body" => $body);
+}
+
+function fetchAllGitHubPages($url, $token) {
+    $results = [];
+
+    do {
+        $result = loadData($url, $token);
+        if($result === null){
+            break;
+        }
+        $results = array_merge($results, $result["body"]);
+        $url = getNextPageUrl($result["header"]);
     } while ($url);
 
     return $results;
@@ -77,6 +86,14 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         ];
         
         if (isset($issue['pull_request']) === true) {
+            $pullRequest = loadData($issue['pull_request']['url'], $token);
+            if ($pullRequest !== null) {
+                $branch = $pullRequest["head"]["ref"];
+                $state = loadData($pullRequest["head"["repo"]["url"]."/".urlencode($branch)."/status", $token);
+                if ($state !== null) {
+                    $issueData["state"] = $state["state"];
+                }
+            }
             $openPullRequests[] = $issueData;
         } else {
             $openIssues[] = $issueData;
