@@ -71,6 +71,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         $issueData = [
             'title' => $issue['title'],
             'repository' => $issue['repository']['name'],
+            'full_name' => $issue['repository']['full_name'],
             'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
