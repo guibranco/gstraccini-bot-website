@@ -82,7 +82,7 @@ $title = "Settings";
                                         name="create_labels" <?php if ($userData['create_labels']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="create_labels"><i class="fas fa-tags"></i> Automatically create labels on new repositories</label>
+                                    <label class="form-check-label" for="create_labels">Automatically create labels on new repositories</label>
                                 </div>
                             </div>
                         </div>
@@ -94,13 +94,13 @@ $title = "Settings";
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="notify_issues" class="form-label"><i class="fas fa-exclamation-circle"></i> Issue Notification</label>
+                                <label for="notify_issues" class="form-label"><i class="fas fa-bell"></i> Issue Notification</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
                                         name="notify_issues" <?php if ($userData['notify_issues']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="notify_issues"><i class="fas fa-bell"></i> Notify me when new issues are created</label>
+                                    <label class="form-check-label" for="notify_issues">Notify me when new issues are created</label>
                                 </div>
                             </div>
                         </div>
@@ -112,19 +112,19 @@ $title = "Settings";
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="auto_merge" class="form-label">Enable Auto-Merge</label>
+                                <label for="auto_merge" class="form-label"><i class="fas fa-code-merge"></i> Enable Auto-Merge</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="auto_merge" name="auto_merge"
                                         <?php if ($userData['auto_merge']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="auto_merge">Automatically merge pull requests
-                                        when all checks pass</label>
+                                    <label class="form-check-label" for="auto_merge">Automatically merge pull requests when all checks pass</label>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="create_issue" class="form-label">
+                                    <i class="fas fa-tasks"></i>
                                     Create issues for pending tasks in code comments
                                     <span style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
                                       <i class="fas fa-wrench"></i> Fixme
@@ -141,18 +141,18 @@ $title = "Settings";
                                         name="create_issue" <?php if ($userData['create_issue']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="create_issue"><i class="fas fa-tasks"></i> Automatically create issues for specific keywords found in pull request content</label>                                    
+                                    <label class="form-check-label" for="create_issue">Automatically create issues for specific keywords found in pull request content</label>                                    
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="notify_pull_requests" class="form-label"><i class="fas fa-code-branch"></i> Pull Requests Notification</label>
-                                <div class="form-check">
-                                    <input class="form-check-input form-switch" type="checkbox" id="notify_pull_requests"
+                                <label for="notify_pull_requests" class="form-label"><i class="fas fa-bell"></i> Pull Requests Notification</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="notify_pull_requests"
                                         name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="notify_pull_requests"><i class="fas fa-bell"></i> Notify me when new pull requests are created</label>
+                                    <label class="form-check-label" for="notify_pull_requests">Notify me when new pull requests are created</label>
                                 </div>
                             </div>
                         </div>
