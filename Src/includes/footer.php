@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.error) {
                     console.error('Error fetching notifications:', data.error);
-                    document.getElementById('notificationsMenu').innerHTML = `<li class="dropdown-item">${data.error}</li>`;
+                    document.getElementById('notificationsMenu').innerHTML = `<li class="dropdown-item text-bg-danger">${data.error}</li>`;
                 } else {
                     processNotifications(data);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item">Failed to load notifications.</li>';
+                document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
             });
     }
 
@@ -44,6 +44,15 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.innerHTML = `<a href="${url}" target="_blank">${title} - ${repo}</a>`;
             notificationsMenu.appendChild(listItem);
         });
+
+        const listDivider = document.createElement('li');
+        listDivider.innerHTML = '<hr class="dropdown-divider">';
+        notificationsMenu.appendChild(listDivider);
+
+        const listViewAll = document.createElement('li');
+        listViewAll.classList.add('dropdown-item');
+        listViewAll.innerHTML = '<a href="view_notifications.php">View all notifications</a>';
+        notificationsMenu.appendChild(listViewAll);
      
         notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
     }
