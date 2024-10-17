@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
-            });
+            })
+            .finally(() => { createViewAll(); });
     }
 
     function processNotifications(notifications) {
@@ -44,7 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.innerHTML = `<a href="${url}" target="_blank">${title} - ${repo}</a>`;
             notificationsMenu.appendChild(listItem);
         });
+        notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
+    }
 
+    function createViewAll() {
+        const notificationsMenu = document.getElementById('notificationsMenu');
+        
         const listDivider = document.createElement('li');
         listDivider.innerHTML = '<hr class="dropdown-divider">';
         notificationsMenu.appendChild(listDivider);
@@ -53,8 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         listViewAll.classList.add('dropdown-item');
         listViewAll.innerHTML = '<a href="view_notifications.php">View all notifications</a>';
         notificationsMenu.appendChild(listViewAll);
-     
-        notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
     }
 
     const notificationsDropdown = document.getElementById('notificationsDropdown');
