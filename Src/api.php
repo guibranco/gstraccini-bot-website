@@ -15,10 +15,12 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > time()-600) {
+if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time()-600)) {
     header("X-Cache: hit");
     echo json_encode($_SESSION['data']);
+    exit();
 }
+
 function loadData($url, $token) {
         $ch = curl_init($url);
 
