@@ -52,6 +52,7 @@ function fetchAllGitHubPages($url, $token) {
         if($result === null || isseT($result["body"]) === null){
             break;
         }
+        
         $results = array_merge($results, $result["body"]);
         $url = getNextPageUrl($result["headers"]);
     } while ($url);
