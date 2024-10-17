@@ -90,7 +90,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             if ($pullRequest !== null && $pullRequest["body"] !== null) {
                 $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
                 $branch = $pullRequest["body"]["head"]["ref"];
-                $state = loadData($repoUrl."/".urlencode($branch)."/status", $token);
+                $state = loadData($repoUrl."/commits/".urlencode($branch)."/status", $token);
                 if ($state !== null && $state["body"] !== null) {
                     $issueData["state"] = $state["body"]["state"];
                 }
