@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['user']['first_name'] = $firstName;
     $_SESSION['user']['last_name'] = $lastName;
 
-    header("Location: acount.php?updated=true");
+    header("Location: account.php?updated=true");
     exit();
 }
 
