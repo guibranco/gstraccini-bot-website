@@ -185,15 +185,12 @@ $isAuthenticated = isset($_SESSION['user']);
 <body>
   <header>
     <a href="https://bot.straccini.com">
-      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png"
-        alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo">
+      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo">
     </a>
-    <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat"
-        class="octocat"> Automate your GitHub workflow effortlessly.</p>
+    <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
   </header>
 
-  <section class="hero fade-in">
-    <img src="https://bot.straccini.com/gstraccini-bot.png" alt="GStraccini-bot" />
+  <section class="hero fade-in">    
     <h2>Boost Your GitHub Efficiency</h2>
     <p>Get more done by automating repetitive tasks.</p>
     <button class="cta-button" onclick="window.location.href='https://github.com/marketplace/gstraccini-bot'">Get
