@@ -53,7 +53,7 @@ function fetchAllGitHubPages($url, $token) {
             break;
         }
         $results = array_merge($results, $result["body"]);
-        $url = getNextPageUrl($result["header"]);
+        $url = getNextPageUrl($result["headers"]);
     } while ($url);
 
     return $results;
@@ -87,11 +87,12 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         
         if (isset($issue['pull_request']) === true) {
             $pullRequest = loadData($issue['pull_request']['url'], $token);
-            if ($pullRequest !== null) {
-                $branch = $pullRequest["head"]["ref"];
-                $state = loadData($pullRequest["head"]["repo"]["url"]."/".urlencode($branch)."/status", $token);
-                if ($state !== null) {
-                    $issueData["state"] = $state["state"];
+            if ($pullRequest !== null && $pullRequest["body"] !== null) {
+                $repoUrl = $pullRequest["body"]["head"]["repo"]["URL"];
+                $branch = $pullRequest["body"]["head"]["ref"];
+                $state = loadData($repoUrl."/".urlencode($branch)."/status", $token);
+                if ($state !== null $state["body"] !== null) {
+                    $issueData["state"] = $state["body"]["state"];
                 }
             }
             $openPullRequests[] = $issueData;
