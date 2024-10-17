@@ -45,10 +45,7 @@ $title = "Dashboard";
         <div class="user-info">
             <img src="<?php echo $user['avatar_url']; ?>" alt="User Avatar" width="80" height="80">
             <div>
-                <h2>Welcome, 
-                    <a href="<?php echo htmlspecialchars($user['html_url']); ?>" target="_blank">
-                        <?php echo htmlspecialchars(isset($user["first_name"]) ? $user["first_name"] : $user['login']); ?>
-                    </a>!
+                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>" target="_blank"><?php echo htmlspecialchars(isset($user["first_name"]) ? $user["first_name"] : $user['login']); ?></a>!
                 </h2>
                 <p class="welcome-message">We're glad to have you back.</p>
             </div>
