@@ -319,7 +319,7 @@ $title = "Dashboard";
                     populateIssues(data.openPullRequests, "openPullRequests");
                     populateIssues(data.openIssues, "openIssues");
                     populateRepositoriesTable(data.repositories);
-                    setTimeout(loadData, 1000 * 60 * 5);
+                    setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
                     console.error('Error:', error);
