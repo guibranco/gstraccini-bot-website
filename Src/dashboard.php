@@ -270,9 +270,13 @@ $title = "Dashboard";
             }
             
             items.forEach(item => {
+                let state = "";
+                if (id === "openPullRequests") {
+                   state = getStateBadge(item.state); 
+                }
                 const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item';                
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${getStateBadge(item.status)}`;
+                itemLi.className = 'list-group-item';           
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
                 list.appendChild(itemLi);
             });
         }
