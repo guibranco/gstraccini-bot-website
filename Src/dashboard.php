@@ -155,18 +155,30 @@ $title = "Dashboard";
                         </li>
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
-                        <li class="list-group-item">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
-                                <i class=`fas fa-check-circle text-bg-success`></i> Success
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Success
+                                </span>
                             <?php } else if (isset($issue["state"]) && $issue["state"] === "failure" ) { ?>
-                                <i class="fas fa-times text-bg-danger"></i> Failure
-                            <?php } else if (isset($issue["state"])) { ?>
-                                <i class="fas fa-exclamation-triangle bg-text-warning"></i> <?php echo $issue["state"]; ?>
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times-circle"></i> Failure
+                                </span>
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "pending" ) { ?>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-hourglass-half"></i> Pending
+                                </span>
+                            <?php } else if (isset($issue["state"])&& $issue["state"] === "error" ) { ?>
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i> Error
+                                </span>
                             <?php } else { ?>
-                                <i class="fas fa-ban text-bg-danger"></i> No state
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-question-circle"></i> Empty
+                                </span>
                             <?php } ?>
                         </li>
                     <?php endforeach; ?>
@@ -259,16 +271,8 @@ $title = "Dashboard";
             
             items.forEach(item => {
                 const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item';
-                let state = "";
-                if(id === "openPullRequests") {
-                    switch(item.state) {
-                        case "success": state = "<i class='fas fa-check-circle text-bg-success'></i> Success"; break;
-                        case "failure": state = "<i class='fas fa-times text-bg-danger'></i> Failure"; break;
-                        default: state = "<i class='fas fa-exclamation-triangle bg-text-warning'></i> " + item.state; break;                            
-                    }
-                }
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
+                itemLi.className = 'list-group-item d-flex justify-content-between align-items-center';                
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${getStatusBadge(item.status)}`;
                 list.appendChild(itemLi);
             });
         }
@@ -287,6 +291,21 @@ $title = "Dashboard";
             `;
                 repositoriesTable.appendChild(row);
             });
+        }
+
+        function getStateBadge(state) {
+            switch(state) {
+                case 'success':
+                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Success</span>';
+                case 'failure':
+                    return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Failure</span>';
+                case 'pending':
+                    return '<span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> Pending</span>';
+                case 'error':
+                    return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>';
+                default:
+                    return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Empty</span>';
+            }
         }
 
         function loadData() {
