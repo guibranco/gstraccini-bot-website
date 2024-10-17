@@ -155,7 +155,7 @@ $title = "Dashboard";
                         </li>
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item">
                             <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
@@ -271,8 +271,8 @@ $title = "Dashboard";
             
             items.forEach(item => {
                 const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item d-flex justify-content-between align-items-center';                
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${getStatusBadge(item.status)}`;
+                itemLi.className = 'list-group-item';                
+                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${getStateBadge(item.status)}`;
                 list.appendChild(itemLi);
             });
         }
