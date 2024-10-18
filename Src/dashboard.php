@@ -242,11 +242,11 @@ $title = "Dashboard";
                                 </td>
                                 <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-star"></i> <?php echo $repo['stars']; ?></td>
-                                <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks_count']; ?></td>
-                                <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['open_issues_count']; ?></td>
-                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['open_prs']; ?></td>
+                                <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
+                                <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
+                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['pull_requests']; ?></td>
                                 <td><?php echo $repo['language']; ?></td>
-                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['visibility']; ?></td>
+                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>
                                 <td>
                                     <i class="fas fa-circle-check status-success"></i>
                                     <i class="fas fa-circle-xmark status-failed"></i>
@@ -312,10 +312,22 @@ $title = "Dashboard";
             repositories.forEach(repo => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                <td><a href='${repo.url}'>${repo.full_name}</a></td>
-                <td>${repo.stars}</td>
-                <td>${repo.forks}</td>
-                <td>${repo.issues}</td>
+                <td>${repo.organization}</td>
+                <td><a href='${repo.url}'>${repo.full_name}</a></a>
+                </td>
+                <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
+                </td>
+                <td><i class="fas fa-star"></i> ${repo.stars}</td>
+                <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
+                <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
+                <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
+                <td>${repo.language}/td>
+                <td><i class="fas fa-eye"></i> ${repo.visibility}</td>
+                <td>
+                    <i class="fas fa-circle-check status-success"></i>
+                    <i class="fas fa-circle-xmark status-failed"></i>
+                    ${repo.main_branch_status}
+                </td>
             `;
                 repositoriesTable.appendChild(row);
             });
