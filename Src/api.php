@@ -119,7 +119,7 @@ if ($responseRepositories !== null && is_array($responseRepositories) === true &
             'url' => $repo['html_url'],
             'fork' => $repo['fork'],
             'stars' => $repo['stargazers_count'],
-            'forks' => $repo['forks_count'],
+            'forks' => $repo['forks'],
             'issues' => $repo['open_issues_count'],
             'pull_requests' => 0,
             'language' => $repo['language'],
