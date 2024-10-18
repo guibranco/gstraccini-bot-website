@@ -323,7 +323,7 @@ $title = "Dashboard";
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
                 <td>${repo.language??'-'}</td>
-                <td><i class="fas fa-eye"></i> ${repo.visibility ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
+                <td><i class="fas fa-eye"></i> ${repo.visibility}
                 <td>
                     <i class="fas fa-circle-check status-success"></i>
                     <i class="fas fa-circle-xmark status-failed"></i>
