@@ -17,6 +17,8 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 
 if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time()-60)) {
     header("X-Cache: hit");
+    $cacheReset = date(constant("DATE_RFC2822"), $_SESSION['last_api_call'] + 60);
+    header("X-Cache-Reset: {$cacheReset}");
     echo json_encode($_SESSION['data']);
     exit();
 }
