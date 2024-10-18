@@ -218,7 +218,6 @@ $title = "Dashboard";
                         <tr>
                             <th scope="col">Organization</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Private</th>
                             <th scope="col">Stars</th>
                             <th scope="col">Fork</th>
                             <th scope="col">Forks</th>
@@ -241,14 +240,13 @@ $title = "Dashboard";
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
                                 <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a>
                                 </td>
-                                <td><?php echo $repo['private'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-star"></i> <?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
                                 <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['pull_requests']; ?></td>
                                 <td><?php echo $repo['language']; ?></td>
-                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>
+                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td>
                                     <i class="fas fa-circle-check status-success"></i>
                                     <i class="fas fa-circle-xmark status-failed"></i>
@@ -317,15 +315,15 @@ $title = "Dashboard";
                 <td>${repo.organization}</td>
                 <td><a href='${repo.url}'>${repo.name}</a></a>
                 </td>
-                <td>${repo.private ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
+                
                 </td>
                 <td><i class="fas fa-star"></i> ${repo.stars}</td>
                 <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
-                <td>${repo.language}</td>
-                <td><i class="fas fa-eye"></i> ${repo.visibility}</td>
+                <td>${repo.language??''}</td>
+                <td><i class="fas fa-eye"></i> ${repo.visibility ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td>
                     <i class="fas fa-circle-check status-success"></i>
                     <i class="fas fa-circle-xmark status-failed"></i>
