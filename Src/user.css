@@ -55,3 +55,13 @@ body {
   width: 40px;
   justify-content: center;
 }
+
+.status-success {
+  color: #28a745;
+}
+.status-failed {
+  color: #dc3545;
+}
+.status-pending {
+  color: #ffc107;
+}

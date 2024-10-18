@@ -45,7 +45,8 @@ $title = "Dashboard";
         <div class="user-info">
             <img src="<?php echo $user['avatar_url']; ?>" alt="User Avatar" width="80" height="80">
             <div>
-                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>" target="_blank"><?php echo htmlspecialchars(isset($user["first_name"]) ? $user["first_name"] : $user['login']); ?></a>!
+                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>"
+                        target="_blank"><?php echo htmlspecialchars(isset($user["first_name"]) ? $user["first_name"] : $user['login']); ?></a>!
                 </h2>
                 <p class="welcome-message">We're glad to have you back.</p>
             </div>
@@ -147,38 +148,40 @@ $title = "Dashboard";
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-6">
-                <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
+                <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill"
+                        id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
-                    <?php if (count($data["openPullRequests"]) === 0) : ?>
+                    <?php if (count($data["openPullRequests"]) === 0): ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <strong><a
+                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
                                     <i class="fas fa-check-circle"></i> Success
                                 </span>
-                            <?php } else if (isset($issue["state"]) && $issue["state"] === "failure" ) { ?>
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-times-circle"></i> Failure
-                                </span>
-                            <?php } else if (isset($issue["state"]) && $issue["state"] === "pending" ) { ?>
-                                <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-hourglass-half"></i> Pending
-                                </span>
-                            <?php } else if (isset($issue["state"])&& $issue["state"] === "error" ) { ?>
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-exclamation-triangle"></i> Error
-                                </span>
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "failure") { ?>
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle"></i> Failure
+                                    </span>
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "pending") { ?>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-hourglass-half"></i> Pending
+                                        </span>
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "error") { ?>
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-exclamation-triangle"></i> Error
+                                            </span>
                             <?php } else { ?>
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-question-circle"></i> Empty
-                                </span>
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-question-circle"></i> Empty
+                                            </span>
                             <?php } ?>
                         </li>
                     <?php endforeach; ?>
@@ -186,16 +189,18 @@ $title = "Dashboard";
             </div>
 
             <div class="col-md-6">
-                <h3>Open Issues <span class="badge text-bg-warning rounded-pill" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                <h3>Open Issues <span class="badge text-bg-warning rounded-pill"
+                        id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
-                    <?php if (count($data["openIssues"]) === 0) : ?>
+                    <?php if (count($data["openIssues"]) === 0): ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
                     <?php endif; ?>
                     <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <strong><a
+                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
@@ -203,31 +208,50 @@ $title = "Dashboard";
                 </ul>
             </div>
         </div>
-        
+
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Your Repositories <span class="badge text-bg-warning rounded-pill" id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
+                <h3>Your Repositories <span class="badge text-bg-warning rounded-pill"
+                        id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Repository</th>
-                            <th>Stars</th>
-                            <th>Forks</th>
-                            <th>Open Issues</th>
+                            <th scope="col">Organization</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Private</th>
+                            <th scope="col">Stars</th>
+                            <th scope="col">Fork</th>
+                            <th scope="col">Forks</th>
+                            <th scope="col">Open Issues</th>
+                            <th scope="col">Open PRs</th>
+                            <th scope="col">Languages</th>
+                            <th scope="col">Main Branch Status</th>
                         </tr>
                     </thead>
                     <tbody id="repositories">
-                        <?php if (count($data["repositories"]) === 0) : ?>
+                        <?php if (count($data["repositories"]) === 0): ?>
                             <tr>
-                                <td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading data...</td>
+                                <td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading data...
+                                </td>
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($data["repositories"] as $repo): ?>
                             <tr>
-                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['full_name']); ?></a></td>
-                                <td><?php echo $repo['stars']; ?></td>
-                                <td><?php echo $repo['forks']; ?></td>
-                                <td><?php echo $repo['issues']; ?></td>
+                                <td><?php echo htmlspecialchars($repo['organization']) ?></td>
+                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a>
+                                </td>
+                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
+                                <td><i class="fas fa-star"></i> <?php echo $repo['stars']; ?></td>
+                                <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks_count']; ?></td>
+                                <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['open_issues_count']; ?></td>
+                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['open_prs']; ?></td>
+                                <td><?php echo $repo['language']; ?></td>
+                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['visibility']; ?></td>
+                                <td>
+                                    <i class="fas fa-circle-check status-success"></i>
+                                    <i class="fas fa-circle-xmark status-failed"></i>
+                                    <?php echo $repo['main_branch_status']; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -236,7 +260,7 @@ $title = "Dashboard";
         </div>
     </div>
 
-    <?php require_once "includes/footer.php"; ?>    
+    <?php require_once "includes/footer.php"; ?>
     <script>
         function showErrorAlert(message) {
             var alertHtml = `
@@ -244,10 +268,10 @@ $title = "Dashboard";
                 <strong>Error!</strong> ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`;
-            
+
             $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 var alertElement = document.querySelector('.alert');
                 if (alertElement) {
                     var alertInstance = new bootstrap.Alert(alertElement);
@@ -255,7 +279,7 @@ $title = "Dashboard";
                 }
             }, 15000);
         }
-        
+
         function populateIssues(items, id) {
             $(`#${id}Count`).text(items.length);
             const list = document.getElementById(id);
@@ -268,14 +292,14 @@ $title = "Dashboard";
                 list.appendChild(itemLi);
                 return;
             }
-            
+
             items.forEach(item => {
                 let state = "";
                 if (id === "openPullRequests") {
-                   state = getStateBadge(item.state); 
+                    state = getStateBadge(item.state);
                 }
                 const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item';           
+                itemLi.className = 'list-group-item';
                 itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
                 list.appendChild(itemLi);
             });
@@ -298,7 +322,7 @@ $title = "Dashboard";
         }
 
         function getStateBadge(state) {
-            switch(state) {
+            switch (state) {
                 case 'success':
                     return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Success</span>';
                 case 'failure':
@@ -315,7 +339,7 @@ $title = "Dashboard";
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
-                .then(data => {                    
+                .then(data => {
                     populateIssues(data.openPullRequests, "openPullRequests");
                     populateIssues(data.openIssues, "openIssues");
                     populateRepositoriesTable(data.repositories);
