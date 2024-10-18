@@ -115,12 +115,13 @@ if ($responseRepositories !== null && is_array($responseRepositories) === true &
     foreach ($responseRepositories as $repo) {
         $repositories[] = [
             'name' => $repo['name'],
-            'full_name' => $repo['full_name'],
+            'organization' => $repo['owner']['login'],
             'url' => $repo['html_url'],
             'fork' => $repo['fork'],
             'stars' => $repo['stargazers_count'],
             'forks' => $repo['forks_count'],
             'issues' => $repo['open_issues_count'],
+            'pull_requests' => 0,
             'language' => $repo['language'],
             'visibility' => $repo['visibility']
         ];
