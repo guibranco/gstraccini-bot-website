@@ -107,9 +107,7 @@ $title = "Settings";
                                 <div class="form-check form-switch">
                                   <input class="form-check-input" type="checkbox" id="reminder_issues">
                                   <label class="form-check-label" for="reminder_issues">
-                                    Reminder the assigned user when the issue has been assigned for 
-                                    <input type="number" class="form-control d-inline-block text-center" id="daysInput" min="1" max="99" style="width: 60px;" disabled>
-                                    days and no activity (no pull requests or comments).
+                                      Remind the assigned user when the issue has been inactive (no pull request and no comments) for at least <input type="number" class="form-control d-inline-block text-center" id="daysInput" min="1" max="99" style="width: 60px;" disabled> days
                                   </label>
                                 </div>
                             </div>
