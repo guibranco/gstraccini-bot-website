@@ -103,6 +103,17 @@ $title = "Settings";
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
+                                <label for="reminder_issues" class="form-label"><i class="fas fa-calendar-alt"></i> Issues Reminder</label>
+                                <div class="form-check form-switch">
+                                  <input class="form-check-input" type="checkbox" id="reminder_issues">
+                                  <label class="form-check-label" for="reminder_issues">
+                                    Reminder the assigned user when the issue has been assigned for 
+                                    <input type="number" class="form-control d-inline-block text-center" id="daysInput" min="1" max="99" style="width: 60px;" disabled>
+                                    days and no activity (no pull requests or comments).
+                                  </label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="notify_issues" class="form-label"><i class="fas fa-bell"></i> Issues Notification</label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="notify_issues"
@@ -191,6 +202,16 @@ $title = "Settings";
                     form.classList.remove('was-validated');
                     form.submit();
                 }
+            });
+
+            const reminder_issues = document.getElementById('reminder_issues');
+            const daysInput = document.getElementById('daysInput');
+
+            reminder_issues.addEventListener('change', function() {
+              daysInput.disabled = !this.checked;
+              if (!this.checked) {
+                daysInput.value = ''; // Clear the input when the switch is off
+              }
             });
         });
     </script>
