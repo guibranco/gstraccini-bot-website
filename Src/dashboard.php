@@ -249,7 +249,7 @@ $title = "Dashboard";
                                 <td><?php echo $repo['language']; ?></td>
                                 <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>
                                 <td>
-                                    <i class="fas fa-warning-triangle status-pending"></i>
+                                    <i class="fas fa-triangle-exclamation status-pending"></i>
                                     <?php echo $repo['main_branch_status']; ?>
                                 </td>
                             </tr>
@@ -325,7 +325,7 @@ $title = "Dashboard";
                 <td>${repo.language ?? '-'}</td>
                 <td><i class="fas fa-eye"></i> ${repo.visibility}
                 <td>
-                    <i class="fas fa-warning-triangle status-pending"></i>
+                    <i class="fas fa-triangle-exclamation status-pending"></i>
                     ${repo.main_branch_status}
                 </td>
             `;
