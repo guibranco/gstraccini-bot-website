@@ -322,7 +322,7 @@ $title = "Dashboard";
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
-                <td>${repo.language}/td>
+                <td>${repo.language}</td>
                 <td><i class="fas fa-eye"></i> ${repo.visibility}</td>
                 <td>
                     <i class="fas fa-circle-check status-success"></i>
