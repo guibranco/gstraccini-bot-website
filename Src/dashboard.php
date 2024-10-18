@@ -225,6 +225,7 @@ $title = "Dashboard";
                             <th scope="col">Open Issues</th>
                             <th scope="col">Open PRs</th>
                             <th scope="col">Languages</th>
+                            <th scope="col">Visibility</th>
                             <th scope="col">Main Branch Status</th>
                         </tr>
                     </thead>
@@ -313,7 +314,7 @@ $title = "Dashboard";
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${repo.organization}</td>
-                <td><a href='${repo.url}'>${repo.full_name}</a></a>
+                <td><a href='${repo.url}'>${repo.name}</a></a>
                 </td>
                 <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 </td>
@@ -321,7 +322,7 @@ $title = "Dashboard";
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
-                <td>${repo.language}/td>
+                <td>${repo.language}</td>
                 <td><i class="fas fa-eye"></i> ${repo.visibility}</td>
                 <td>
                     <i class="fas fa-circle-check status-success"></i>
