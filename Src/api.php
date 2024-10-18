@@ -123,7 +123,8 @@ if ($responseRepositories !== null && is_array($responseRepositories) === true &
             'issues' => $repo['open_issues_count'],
             'pull_requests' => 0,
             'language' => $repo['language'],
-            'visibility' => $repo['visibility']
+            'visibility' => $repo['visibility'],
+            'main_branch_status' => 'unknown'
         ];
     }
 }

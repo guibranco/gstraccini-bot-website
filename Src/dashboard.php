@@ -246,7 +246,7 @@ $title = "Dashboard";
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
                                 <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['pull_requests']; ?></td>
                                 <td><?php echo $repo['language']; ?></td>
-                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
+                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>
                                 <td>
                                     <i class="fas fa-circle-check status-success"></i>
                                     <i class="fas fa-circle-xmark status-failed"></i>
@@ -322,7 +322,7 @@ $title = "Dashboard";
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
-                <td>${repo.language??''}</td>
+                <td>${repo.language??'-'}</td>
                 <td><i class="fas fa-eye"></i> ${repo.visibility ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td>
                     <i class="fas fa-circle-check status-success"></i>
