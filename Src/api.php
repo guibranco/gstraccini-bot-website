@@ -1,4 +1,5 @@
 <?php
+$expires = 60;
 $cookie_lifetime = 604800;
 session_set_cookie_params([
     'lifetime' => $cookie_lifetime,
@@ -16,9 +17,12 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 }
 
 if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time()-60)) {
+    $time = $_SESSION['last_api_call'];
+    header('Content-Type: application/json');
+    header('Cache-Control: public, max-age=' . $expires);
+    header('Pragma: cache');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
     header("X-Cache: hit");
-    $cacheReset = date(constant("DATE_RFC2822"), $_SESSION['last_api_call'] + 60);
-    header("X-Cache-Reset: {$cacheReset}");
     echo json_encode($_SESSION['data']);
     exit();
 }
@@ -134,7 +138,14 @@ $data = [
     'openIssues' => $openIssues,
     'repositories' => $repositories
 ];
+
+
+$time = time();
+header('Content-Type: application/json');
+header('Cache-Control: public, max-age=' . $expires);
+header('Pragma: cache');
+header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
 header("X-Cache: miss");
 $_SESSION['data'] = $data;
-$_SESSION['last_api_call'] = time();
+$_SESSION['last_api_call'] = $time;
 echo json_encode($data);
