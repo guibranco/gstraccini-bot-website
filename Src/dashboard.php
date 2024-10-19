@@ -222,10 +222,8 @@ $title = "Dashboard";
                             <th scope="col">Fork</th>
                             <th scope="col">Forks</th>
                             <th scope="col">Open Issues</th>
-                            <th scope="col">Open PRs</th>
                             <th scope="col">Languages</th>
                             <th scope="col">Visibility</th>
-                            <th scope="col">Main Branch Status</th>
                         </tr>
                     </thead>
                     <tbody id="repositories">
@@ -245,13 +243,8 @@ $title = "Dashboard";
                                 </td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
-                                <td><i class="fas fa-code-pull-request"></i> <?php echo $repo['pull_requests']; ?></td>
                                 <td><?php echo $repo['language']; ?></td>
-                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>
-                                <td>
-                                    <i class="fas fa-triangle-exclamation status-pending"></i>
-                                    <?php echo $repo['main_branch_status']; ?>
-                                </td>
+                                <td><i class="fas fa-eye"></i> <?php echo $repo['visibility']; ?></td>                                
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -321,13 +314,8 @@ $title = "Dashboard";
                 <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
-                <td><i class="fas fa-code-pull-request"></i> ${repo.pull_requests}</td>
                 <td>${repo.language ?? '-'}</td>
-                <td><i class="fas fa-eye"></i> ${repo.visibility}
-                <td>
-                    <i class="fas fa-triangle-exclamation status-pending"></i>
-                    ${repo.main_branch_status}
-                </td>
+                <td><i class="fas fa-eye"></i> ${repo.visibility}                
             `;
                 repositoriesTable.appendChild(row);
             });
