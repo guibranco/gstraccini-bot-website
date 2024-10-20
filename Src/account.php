@@ -20,10 +20,11 @@ if (isset($user['first_name']) === false || $user['first_name'] === '') {
     $user['first_name'] = '';
 
     if (isset($user['name']) === true && 
-        preg_match('/^(\w+)\s+(\w+)$/', $user['name'], $matches)
+        preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $user['name'], $matches)
     ) {
         $user['first_name'] = $matches[1];
         $user['last_name'] = $matches[2];
+        $_SESSION['user'] = $user;
     }
 }
 if (isset($user['last_name']) === false) {
