@@ -166,6 +166,9 @@ if (isset($user["first_name"])) {
                             <strong><a
                                     href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
+                            <span class="text-muted">
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchar($issue['repository']); ?></a>
+                            </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
@@ -206,7 +209,10 @@ if (isset($user["first_name"])) {
                         <li class="list-group-item">
                             <strong><a
                                     href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
-                            <br />
+                            <br />                            
+                            <span class="text-muted">
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchar($issue['repository']); ?></a>
+                            </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>
@@ -298,7 +304,11 @@ if (isset($user["first_name"])) {
                 }
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
-                itemLi.innerHTML = `<strong><a href='${item.url}'>${item.title}</a></strong><br /><span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
+                let content = '';
+                content += `<strong><a href='${item.url}'>${item.title}</a></strong><br />`;
+                content += `<span class="text-muted"><a href='https://github.com/${item.full_name}'>${item.repository}</a></span> - `;
+                content += `<span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
+                itemLi.innerHTML = content;
                 list.appendChild(itemLi);
             });
         }
