@@ -167,7 +167,7 @@ if (isset($user["first_name"])) {
                                     href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchar($issue['repository']); ?></a>
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
@@ -211,7 +211,7 @@ if (isset($user["first_name"])) {
                                     href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />                            
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchar($issue['repository']); ?></a>
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
