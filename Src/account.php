@@ -18,6 +18,13 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 $user = $_SESSION['user'];
 if (isset($user['first_name']) === false) {
     $user['first_name'] = '';
+
+    if (isseT($user['name']) === true && 
+        preg_match('/^(\w+)\s+(\w+)$/', $user['name'], $matches)
+    ) {
+        $user['first_name'] = $matches[1];
+        $user['last_name'] = $matches[2];
+    }
 }
 if (isset($user['last_name']) === false) {
     $user['last_name'] = '';
