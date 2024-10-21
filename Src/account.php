@@ -95,6 +95,17 @@ $title = "Account Details";
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
+                                <label for="githubUserId" class="form-label">GitHub User ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fab fa-github"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="githubUserId"
+                                        value="<?php echo htmlspecialchars($user['id']); ?>" disabled>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="githubUsername" class="form-label">GitHub Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text">

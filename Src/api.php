@@ -154,6 +154,8 @@ header('Cache-Control: public, max-age=' . $expires);
 header('Pragma: cache');
 header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
 header("X-Cache: miss");
-$_SESSION['data'] = $data;
-$_SESSION['last_api_call'] = $time;
+if (!isset($_GET['page'])) {
+    $_SESSION['data'] = $data;
+    $_SESSION['last_api_call'] = $time;
+}
 echo json_encode($data);
