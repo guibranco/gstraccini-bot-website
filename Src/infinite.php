@@ -83,6 +83,11 @@ if (isset($user["first_name"])) {
         fetch(`${apiUrl}?page=${page}`)
             .then(response => response.json())
             .then(data => {
+                if(data.openIssues.length === 0) {
+                    loadMoreLink.style.display = 'none';
+                    return;
+                }
+
                 data.openIssues.forEach(item => {
                     const listItem = document.createElement('a');
                     listItem.href = '#';
