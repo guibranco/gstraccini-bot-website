@@ -248,11 +248,11 @@ if (isset($user["first_name"])) {
                             <tr>
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
                                 <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a></td>
-                                <td><i class="fas fa-star"></i> <?php echo $repo['stars']; ?></td>
+                                <td><i class="fas fa-star text-pending"></i> <?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
-                                <td><?php echo $repo['language']; ?></td>
+                                <td><span class="badge bg-primary"><?php echo empty($repo['language'])?'-':$repo['language']; ?></span></td>
                                 <td><i class="fas fa-eye<?php echo ($repo['visibility']==='private')?'-slash':'';?>"></i> <?php echo $repo['visibility']; ?></td>                                
                             </tr>
                         <?php endforeach; ?>
@@ -321,11 +321,11 @@ if (isset($user["first_name"])) {
                 row.innerHTML = `
                 <td>${repo.organization}</td>
                 <td><a href='${repo.url}'>${repo.name}</a></a></td>
-                <td><i class="fas fa-star"></i> ${repo.stars}</td>
+                <td><i class="fas fa-star text-pending"></i> ${repo.stars}</td>
                 <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
-                <td>${repo.language ?? '-'}</td>
+                <td><span class="badge bg-primary">${repo.language ?? '-'}</span></td>
                 <td><i class="fas fa-eye${slash}"></i> ${repo.visibility}                
             `;
                 repositoriesTable.appendChild(row);
