@@ -87,7 +87,7 @@ if (isset($user["first_name"])) {
                     const listItem = document.createElement('a');
                     listItem.href = '#';
                     listItem.className = 'list-group-item list-group-item-action';
-                    listItem.textContent = item.name;
+                    listItem.textContent = item.title;
                     scrollableList.appendChild(listItem);
                 });
                 page++;
