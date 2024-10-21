@@ -16,7 +16,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time()-60)) {
+if (isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time() - 60)) {
     $time = $_SESSION['last_api_call'];
     header('Content-Type: application/json');
     header('Cache-Control: public, max-age=' . $expires);
@@ -27,44 +27,46 @@ if(isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time()-60)
     exit();
 }
 
-function loadData($url, $token) {
-        $ch = curl_init($url);
+function loadData($url, $token)
+{
+    $ch = curl_init($url);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);        
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer $token",
-            "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
-            "Accept: application/vnd.github+json",
-            "X-GitHub-Api-Version: 2022-11-28"
-        ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $token",
+        "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+        "Accept: application/vnd.github+json",
+        "X-GitHub-Api-Version: 2022-11-28"
+    ]);
 
-        $response = curl_exec($ch);
+    $response = curl_exec($ch);
 
-        if (curl_errno($ch)) {
-            curl_close($ch);
-            return null;
-        }
-
-        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($response, 0, $headerSize);
-        $body = json_decode(substr($response, $headerSize), true);
-        
+    if (curl_errno($ch)) {
         curl_close($ch);
+        return null;
+    }
+
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $header = substr($response, 0, $headerSize);
+    $body = json_decode(substr($response, $headerSize), true);
+
+    curl_close($ch);
 
     return ["headers" => $header, "body" => $body];
 }
 
-function fetchAllGitHubPages($url, $token) {
+function fetchAllGitHubPages($url, $token)
+{
     $results = [];
 
     do {
         $result = loadData($url, $token);
-        if($result === null || isseT($result["body"]) === null){
+        if ($result === null || isset($result["body"]) === null) {
             break;
         }
-        
+
         $results = array_merge($results, $result["body"]);
         $url = getNextPageUrl($result["headers"]);
     } while ($url);
@@ -72,7 +74,8 @@ function fetchAllGitHubPages($url, $token) {
     return $results;
 }
 
-function getNextPageUrl($link_header) {
+function getNextPageUrl($link_header)
+{
     if (preg_match('/<([^>]+)>; rel="next"/', $link_header, $matches)) {
         return $matches[1];
     }
@@ -81,8 +84,13 @@ function getNextPageUrl($link_header) {
 
 $token = $_SESSION['token'];
 
-$responseIssues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
-$responseRepositories = fetchAllGitHubPages('https://api.github.com/user/repos?per_page=100', $token);
+if (isset($_GET['page'])) {
+    $responseIssues = loadData('https://api.github.com/issues?per_page=10&page=' . intval($_GET['page']), $token)["body"];
+    $responseRepositories = null;
+} else {
+    $responseIssues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
+    $responseRepositories = fetchAllGitHubPages('https://api.github.com/user/repos?per_page=100', $token);
+}
 
 $openPullRequests = [];
 $openIssues = [];
@@ -97,13 +105,13 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             'url' => $issue['html_url'],
             'created_at' => $issue['created_at']
         ];
-        
-        if (isset($issue['pull_request']) === true) {
+
+        if (isset($issue['pull_request']) === true && isset($_GET['page']) === false) {
             $pullRequest = loadData($issue['pull_request']['url'], $token);
             if ($pullRequest !== null && $pullRequest["body"] !== null) {
                 $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
                 $branch = $pullRequest["body"]["head"]["ref"];
-                $state = loadData($repoUrl."/commits/".urlencode($branch)."/status", $token);
+                $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
                 if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
                     $issueData["state"] = $state["body"]["state"];
                 }
