@@ -16,7 +16,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-if (isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time() - 60)) {
+if (!isset($_GET['page']) && isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time() - 60)) {
     $time = $_SESSION['last_api_call'];
     header('Content-Type: application/json');
     header('Cache-Control: public, max-age=' . $expires);

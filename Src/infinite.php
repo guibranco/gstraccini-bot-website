@@ -83,7 +83,7 @@ if (isset($user["first_name"])) {
         fetch(`${apiUrl}?page=${page}`)
             .then(response => response.json())
             .then(data => {
-                data.items.forEach(item => {
+                data.openIssues.forEach(item => {
                     const listItem = document.createElement('a');
                     listItem.href = '#';
                     listItem.className = 'list-group-item list-group-item-action';
