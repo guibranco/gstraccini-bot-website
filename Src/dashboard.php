@@ -153,7 +153,7 @@ if (isset($user["first_name"])) {
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-6">
-                <h3>Open Pull Requests <span class="badge text-bg-warning rounded-pill"
+                <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill"
                         id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
                     <?php if (count($data["openPullRequests"]) === 0): ?>
@@ -197,7 +197,7 @@ if (isset($user["first_name"])) {
             </div>
 
             <div class="col-md-6">
-                <h3>Open Issues <span class="badge text-bg-warning rounded-pill"
+                <h3>Assigned Issues <span class="badge text-bg-warning rounded-pill"
                         id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
                     <?php if (count($data["openIssues"]) === 0): ?>
