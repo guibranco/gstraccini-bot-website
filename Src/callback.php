@@ -68,8 +68,8 @@ $body = json_decode(substr($response, $headerSize), true);
 
 curl_close($ch);
 
-if (isset($body["message"]) {
-    header("signin.php?error=" + urlencode($body["message"]));
+if (isset($body["message"])) {
+    header("Location: signin.php?error=" . urlencode($body["message"]));
     exit();
 }
 
