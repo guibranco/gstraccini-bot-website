@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .input-group-6digit input {
@@ -76,10 +76,17 @@
 
     <div class="container my-5">
         <div class="row justify-content-center">
+
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_GET['error']) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+            
             <div class="col-md-6">
                 <h2 class="text-center mb-4">Login</h2>
 
-                <!-- GitHub Login -->
                 <div class="mb-4">
                     <a href="https://bot.straccini.com/login.php" class="btn btn-dark w-100">
                         <i class="fab fa-github"></i> Login with GitHub
@@ -88,7 +95,6 @@
 
                 <div class="text-center mb-3">OR</div>
 
-                <!-- Email/Password Login Form -->
                 <form id="loginForm">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -100,7 +106,6 @@
                             required>
                     </div>
                     <div class="mb-3 text-end">
-                        <!-- Password Recovery Link -->
                         <a href="#" data-bs-toggle="modal" data-bs-target="#recoverModal">Forgot Password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
@@ -109,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Modal for Forgot Password Code -->
     <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -138,7 +142,6 @@
         </div>
     </div>
 
-    <!-- Modal for Authentication Options -->
     <div class="modal fade" id="authOptionsModal" tabindex="-1" aria-labelledby="authOptionsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -189,16 +192,14 @@
         <p>© 2024 GStraccini-bot. All rights reserved.</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // User account settings
-        const fidoEnabled = true; // Replace with actual user account setting
-        const authAppEnabled = true; // Replace with actual user account setting
+        const fidoEnabled = true;
+        const authAppEnabled = true;
         let timer;
-        let countdown = 300; // 5 minutes in seconds
+        let countdown = 300;
 
-        // Update FIDO and Auth App links based on user settings
         if (fidoEnabled) {
             $('#fidoLink').removeClass('disabled-link').addClass('link').text('Select');
         }
@@ -206,17 +207,13 @@
             $('#authAppLink').removeClass('disabled-link').addClass('link').text('Select');
         }
 
-        // Handle Email/Password login submission
         $('#loginForm').submit(function (event) {
             event.preventDefault();
             const email = $('#email').val();
             const password = $('#password').val();
-
-            // Show authentication options modal
             $('#authOptionsModal').modal('show');
         });
 
-        // Handle Forgot Password
         $('#forgotPasswordLink').click(function (event) {
             event.preventDefault();
             const email = $('#email').val();
@@ -228,7 +225,6 @@
             }
         });
 
-        // Verify 6-Digit Code in Forgot Password
         $('#verifyCodeBtn').click(function () {
             const code = $('#code1').val() + $('#code2').val() + $('#code3').val() + $('#code4').val() + $('#code5').val() + $('#code6').val();
             if (code.length === 6) {
@@ -240,18 +236,14 @@
             }
         });
 
-        // Handle Authentication Method Selection
         $('#authOptionsModal').on('click', '.link', function (event) {
             const selectedLink = $(this).attr('id');
             $('#authMethodInput').removeClass('d-none');
-
-            // Clear previous input fields
             $('#dynamicInputContainer').empty();
             $('#authError').text('');
 
             if (selectedLink === 'fidoLink') {
                 alert('Requesting FIDO validation...');
-                // Request FIDO validation logic here
                 $('#authOptionsModal').modal('hide');
             } else if (selectedLink === 'authAppLink') {
                 $('#dynamicInputContainer').append(`
@@ -306,21 +298,18 @@
                 const length = $inputs.length;
                 const pasteData = (e.originalEvent || e).clipboardData.getData('text/plain');
 
-                // Ensure the pasted data is exactly 6 digits
                 if (pasteData.length === length && /^[0-9]+$/.test(pasteData)) {
                     $inputs.each(function (index) {
-                        if (index < length) {  // Only fill the first N inputs
+                        if (index < length) {
                             $(this).val(pasteData[index]);
                         }
                     });
                 }
 
-                // Prevent default paste behavior
                 e.preventDefault();
             });
         });
 
-        // Handle Authentication Button
         $('#authenticateBtn').click(function () {
             const authCode = $('#dynamicInputContainer').find('input').map(function () {
                 return $(this).val();
@@ -328,17 +317,15 @@
 
             if (authCode.length === 6 || authCode.length === 10) {
                 alert('Authenticating with code: ' + authCode);
-                // Proceed with authentication logic
             } else {
                 $('#authError').text('Please enter a valid code.');
             }
         });
 
-        // Countdown Timer for Resending Code
         function startCountdown() {
             $('#timer').text('You can resend the code in 5:00');
             $('#resendCodeBtn').prop('disabled', true);
-            countdown = 300; // Reset countdown to 5 minutes
+            countdown = 300;
 
             timer = setInterval(function () {
                 const minutes = Math.floor(countdown / 60);
@@ -355,5 +342,4 @@
         }
     </script>
 </body>
-
 </html>
