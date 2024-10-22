@@ -51,6 +51,8 @@ $apiUrl = 'https://api.github.com/user';
 
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+curl_setopt($ch, CURLOPT_HEADER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer $token",
     "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
@@ -58,18 +60,26 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "X-GitHub-Api-Version: 2022-11-28"
 ]);
 
-$userData = curl_exec($ch);
+$response = curl_exec($ch);
+
+$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+$headers = substr($response, 0, $headerSize);
+$body = json_decode(substr($response, $headerSize), true);
+
 curl_close($ch);
 
-$user = json_decode($userData, true);
+if (isset($body["message"])) {
+    header("Location: signin.php?error=" . urlencode($body["message"]));
+    exit();
+}
 
-if (isset($user['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $user['name'], $matches)) {
+if (isset($body['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $body['name'], $matches)) {
     $user['first_name'] = $matches[1];
     $user['last_name'] = $matches[2];
 }
 
 $_SESSION['token'] = $token;
-$_SESSION['user'] = $user;
+$_SESSION['user'] = $body;
 
 header('Location: dashboard.php');
 exit();
