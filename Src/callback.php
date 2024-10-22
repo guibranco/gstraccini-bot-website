@@ -62,7 +62,14 @@ $userData = curl_exec($ch);
 curl_close($ch);
 
 $user = json_decode($userData, true);
+
+if (isset($user['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $user['name'], $matches)) {
+    $user['first_name'] = $matches[1];
+    $user['last_name'] = $matches[2];
+}
+
 $_SESSION['token'] = $token;
 $_SESSION['user'] = $user;
+
 header('Location: dashboard.php');
 exit();
