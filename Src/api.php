@@ -16,7 +16,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
 }
 
-if (!isset($_GET['page']) && isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time() - 60)) {
+if (!isset($_GET['page']) && isset($_SESSION['last_api_call']) && $_SESSION['last_api_call'] > (time() - 180)) {
     $time = $_SESSION['last_api_call'];
     header('Content-Type: application/json');
     header('Cache-Control: public, max-age=' . $expires);
@@ -26,6 +26,11 @@ if (!isset($_GET['page']) && isset($_SESSION['last_api_call']) && $_SESSION['las
     echo json_encode($_SESSION['data']);
     exit();
 }
+
+$time = time();
+$_SESSION['last_api_call'] = $time;
+$token = $_SESSION['token'];
+session_write_close();
 
 function loadData($url, $token)
 {
@@ -81,8 +86,6 @@ function getNextPageUrl($link_header)
     }
     return null;
 }
-
-$token = $_SESSION['token'];
 
 if (isset($_GET['page'])) {
     $responseIssues = loadData('https://api.github.com/issues?per_page=10&page=' . intval($_GET['page']), $token)["body"];
@@ -147,7 +150,7 @@ $data = [
     'repositories' => $repositories
 ];
 
-
+session_start();
 $time = time();
 header('Content-Type: application/json');
 header('Cache-Control: public, max-age=' . $expires);
