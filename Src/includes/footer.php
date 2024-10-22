@@ -65,5 +65,6 @@
         notificationsDropdown.addEventListener('click', function () {
             fetchNotifications();
         });
+        fetchNotifications();
     });
 </script>
