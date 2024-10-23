@@ -78,13 +78,32 @@ if (isset($user["first_name"])) {
     const loadMoreLink = document.getElementById('loadMoreLink');
     const count = document.getElementById("count");
 
+    function appendLoadingItem() {
+        const loadingItem = document.createElement('a');
+        loadingItem.href = '#';
+        loadingItem.className = 'list-group-item list-group-item-action';
+        loadingItem.id = 'loading-item'; // Set an ID to easily identify and remove later
+        loadingItem.textContent = 'Loading...';
+        scrollableList.appendChild(loadingItem);
+    }
+
+    function removeLoadingItem() {
+        const loadingItem = document.getElementById('loading-item');
+        if (loadingItem) {
+            loadingItem.remove();
+        }
+    }
+
     function loadItems() {
         if (loading) return;
         loading = true;
 
+        appendLoadingItem();
+
         fetch(`${apiUrl}?page=${page}`)
             .then(response => response.json())
             .then(data => {
+                removeLoadingItem();
                 if(data.openIssues.length === 0) {
                     loadMoreLink.style.display = 'none';
                     return;
