@@ -88,7 +88,7 @@ function getNextPageUrl($link_header)
 }
 
 if (isset($_GET['page'])) {
-    $responseIssues = loadData('https://api.github.com/issues?per_page=10&page=' . intval($_GET['page']), $token)["body"];
+    $responseIssues = loadData('https://api.github.com/issues?per_page=50&page=' . intval($_GET['page']), $token)["body"];
     $responseRepositories = null;
 } else {
     $responseIssues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
