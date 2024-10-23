@@ -74,8 +74,8 @@ if (isset($body["message"])) {
 }
 
 if (isset($body['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $body['name'], $matches)) {
-    $user['first_name'] = $matches[1];
-    $user['last_name'] = $matches[2];
+    $body['first_name'] = $matches[1];
+    $body['last_name'] = $matches[2];
 }
 
 $_SESSION['token'] = $token;
