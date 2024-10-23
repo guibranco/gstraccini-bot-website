@@ -82,8 +82,8 @@ if (isset($user["first_name"])) {
         const loadingItem = document.createElement('a');
         loadingItem.href = '#';
         loadingItem.className = 'list-group-item list-group-item-action';
-        loadingItem.id = 'loading-item'; // Set an ID to easily identify and remove later
-        loadingItem.textContent = 'Loading...';
+        loadingItem.id = 'loading-item';
+        loadingItem.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading data...';
         scrollableList.appendChild(loadingItem);
     }
 
