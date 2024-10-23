@@ -22,6 +22,9 @@ if (isset($user['first_name']) === false) {
 if (isset($user['last_name']) === false) {
     $user['last_name'] = '';
 }
+if (isset($user['email']) === false) {
+    $user['email'] = '';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
