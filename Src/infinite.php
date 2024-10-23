@@ -90,7 +90,7 @@ if (isset($user["first_name"])) {
                     return;
                 }
                 total += data.openIssues.length;
-                count.innerHTML = totalLoaded;
+                count.innerHTML = total;
 
                 data.openIssues.forEach(item => {
                     const listItem = document.createElement('a');
