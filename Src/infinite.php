@@ -59,7 +59,7 @@ if (isset($user["first_name"])) {
     <?php require_once 'includes/header.php'; ?>
 
     <div class="container mt-5">
-        <h1 class="mb-4">Infinite Scroll List Group</h1>
+        <h1 class="mb-4">Infinite Scroll List Group <span class="badge text-bg-warning rounded-pill" id="count">0</span></h1>
         <div id="scrollable-list" class="list-group">
             <!-- Items will be appended here dynamically -->
         </div>
@@ -72,9 +72,11 @@ if (isset($user["first_name"])) {
     let loading = false;
     let infiniteScrollCount = 0;
     const maxInfiniteScrolls = 10;
+    let total = 0;
 
     const scrollableList = document.getElementById('scrollable-list');
     const loadMoreLink = document.getElementById('loadMoreLink');
+    const count = document.getElementById("count");
 
     function loadItems() {
         if (loading) return;
@@ -87,6 +89,8 @@ if (isset($user["first_name"])) {
                     loadMoreLink.style.display = 'none';
                     return;
                 }
+                total += data.openIssues.length;
+                count.innerHTML = totalLoaded;
 
                 data.openIssues.forEach(item => {
                     const listItem = document.createElement('a');
