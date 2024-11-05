@@ -19,6 +19,8 @@ $user = $_SESSION['user'];
 $userData = [
     'create_labels' => 1,
     'notify_issues' => 1,
+    'reminder_issues' => 1,
+    'reminder_issues_days' => 10,
     'auto_merge' => 1,
     'create_issue' => 1,
     'notify_pull_requests' => 1
@@ -31,6 +33,8 @@ if (isset($_SESSION['user_data'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $create_labels = isset($_POST['create_labels']) ? 1 : 0;
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
+    $reminder_issues = isset($_POST['reminder_issues']) ? 1: 0;
+    $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
     $auto_merge = isset($_POST['auto_merge']) ? 1 : 0;
     $create_issue = isset($_POST['create_issue']) ? 1 : 0;
     $notify_pull_requests = isset($_POST['notify_pull_requests']) ? 1 : 0;
@@ -38,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['user_data'] = [
         'create_labels' => $create_labels,
         'notify_issues' => $notify_issues,
+        'reminder_issues' => $reminder_issues,
+        'reminder_issues_days' => $reminder_issues_days,
         'auto_merge' => $auto_merge,
         'create_issue' => $create_issue,
         'notify_pull_requests' => $notify_pull_requests
@@ -105,9 +111,15 @@ $title = "Settings";
                             <div class="mb-3">
                                 <label for="reminder_issues" class="form-label"><i class="fas fa-calendar-alt"></i> Issues Reminder</label>
                                 <div class="form-check form-switch">
-                                  <input class="form-check-input" type="checkbox" id="reminder_issues">
+                                  <input class="form-check-input" type="checkbox" id="reminder_issues" <?php if ($userData['reminder_issues']) {
+                                            echo 'checked';
+                                        } ?>>
                                   <label class="form-check-label" for="reminder_issues">
-                                      Remind the assigned user when the issue has been inactive (no pull request and no comments) for at least <input type="number" class="form-control d-inline-block text-center" id="daysInput" min="1" max="99" style="width: 60px;" disabled> days
+                                      Remind the assigned user when the issue has been inactive (no pull request and no comments) for at least <input type="number" class="form-control d-inline-block text-center" id="reminder_issues_days" min="1" max="99" style="width: 60px;" <?php if ($userData['reminder_issues_days']) {
+                                            echo 'value="'.$userData["reminder_issues_days"].'"';
+                                        } else {
+                                            echo "disabled";
+                                        }?>> days
                                   </label>
                                 </div>
                             </div>
@@ -203,12 +215,12 @@ $title = "Settings";
             });
 
             const reminder_issues = document.getElementById('reminder_issues');
-            const daysInput = document.getElementById('daysInput');
+            const reminder_issues_days = document.getElementById('reminder_issues_days');
 
             reminder_issues.addEventListener('change', function() {
-              daysInput.disabled = !this.checked;
+              reminder_issues_days.disabled = !this.checked;
               if (!this.checked) {
-                daysInput.value = ''; // Clear the input when the switch is off
+                reminder_issues_days.value = '';
               }
             });
         });
