@@ -111,11 +111,11 @@ $title = "Settings";
                             <div class="mb-3">
                                 <label for="reminder_issues" class="form-label"><i class="fas fa-calendar-alt"></i> Issues Reminder</label>
                                 <div class="form-check form-switch">
-                                  <input class="form-check-input" type="checkbox" id="reminder_issues" <?php if ($userData['reminder_issues']) {
+                                  <input class="form-check-input" type="checkbox" id="reminder_issues" name="reminder_issues" <?php if ($userData['reminder_issues']) {
                                             echo 'checked';
                                         } ?>>
                                   <label class="form-check-label" for="reminder_issues">
-                                      Remind the assigned user when the issue has been inactive (no pull request and no comments) for at least <input type="number" class="form-control d-inline-block text-center" id="reminder_issues_days" min="1" max="99" style="width: 60px;" <?php if ($userData['reminder_issues_days']) {
+                                      Remind the assigned user when the issue has been inactive (no pull request and no comments) for at least <input type="number" class="form-control d-inline-block text-center" id="reminder_issues_days" name="reminder_issues_days" min="1" max="99" style="width: 60px;" <?php if ($userData['reminder_issues_days']) {
                                             echo 'value="'.$userData["reminder_issues_days"].'"';
                                         } else {
                                             echo "disabled";
