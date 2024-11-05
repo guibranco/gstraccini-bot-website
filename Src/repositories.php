@@ -78,7 +78,7 @@ if (isset($user["first_name"])) {
                         <?php foreach ($data["repositories"] as $repo): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
-                                <td><a href='<?php echo $repo['url']; ?>'><?php echo htmlspecialchars($repo['name']); ?></a></td>
+                                <td><a href='<?php echo $repo['url']; ?>' target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
                                 <td><i class="fas fa-star status-pending"></i> <?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
@@ -122,7 +122,7 @@ if (isset($user["first_name"])) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${repo.organization}</td>
-                <td><a href='${repo.url}'>${repo.name}</a></a></td>
+                <td><a href='${repo.url}' target='_blank'>${repo.name}</a></a></td>
                 <td><i class="fas fa-star status-pending"></i> ${repo.stars}</td>
                 <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
