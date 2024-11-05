@@ -103,6 +103,8 @@ $openPullRequests = [];
 $openIssues = [];
 $repositories = [];
 
+$count = 0;
+
 if ($responseIssues !== null && is_array($responseIssues) === true && count($responseIssues) > 0) {
     foreach ($responseIssues as $issue) {
         $issueData = [
@@ -114,13 +116,16 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         ];
 
         if (isset($issue['pull_request']) === true && isset($_GET['page']) === false) {
-            $pullRequest = loadData($issue['pull_request']['url'], $token);
-            if ($pullRequest !== null && $pullRequest["body"] !== null) {
-                $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
-                $branch = $pullRequest["body"]["head"]["ref"];
-                $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
-                if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
-                    $issueData["state"] = $state["body"]["state"];
+            if ($count < 10) {
+                $count++;
+                $pullRequest = loadData($issue['pull_request']['url'], $token);
+                if ($pullRequest !== null && $pullRequest["body"] !== null) {
+                    $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
+                    $branch = $pullRequest["body"]["head"]["ref"];
+                    $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
+                    if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
+                        $issueData["state"] = $state["body"]["state"];
+                    }
                 }
             }
             $openPullRequests[] = $issueData;
