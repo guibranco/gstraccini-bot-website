@@ -164,10 +164,10 @@ if (isset($user["first_name"])) {
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
-                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                                    href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchars($issue['repository']); ?></a>
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
@@ -208,10 +208,10 @@ if (isset($user["first_name"])) {
                     <?php foreach ($data["openIssues"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
-                                    href='<?php echo $issue['url']; ?>'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                                    href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />                            
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'><?php echo htmlspecialchars($issue['repository']); ?></a>
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> - 
                             <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
                         </li>
@@ -262,8 +262,8 @@ if (isset($user["first_name"])) {
                 const itemLi = document.createElement('li');
                 itemLi.className = 'list-group-item';
                 let content = '';
-                content += `<strong><a href='${item.url}'>${item.title}</a></strong><br />`;
-                content += `<span class="text-muted"><a href='https://github.com/${item.full_name}'>${item.repository}</a></span> - `;
+                content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
+                content += `<span class="text-muted"><a href='https://github.com/${item.full_name}' target='_blank'>${item.repository}</a></span> - `;
                 content += `<span class="text-muted">(Created at: ${item.created_at})</span> ${state}`;
                 itemLi.innerHTML = content;
                 list.appendChild(itemLi);
