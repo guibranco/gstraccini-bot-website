@@ -96,7 +96,7 @@ if (isset($_GET['page'])) {
     $responseIssues = loadData('https://api.github.com/issues?per_page=50&page=' . intval($_GET['page']), $token)["body"];
     $responseRepositories = null;
 } else if (isset($_GET['dashboard'])) {
-    $responseIssues = loadData('https://api.github.com/issues?per_page=50&page=1', $token)["body"];
+    $responseIssues = loadData('https://api.github.com/issues?per_page=100&page=1', $token)["body"];
     $responseRepositories = null;
 } else {
     $responseIssues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
@@ -160,7 +160,7 @@ sort($repositories);
 if (isset($_GET['dashboard'])) {
     $data = [
         'openPullRequestsDashboard' => $openPullRequests,
-        'openPullRequestsDashboard' => $openIssues,
+        'openIssuesDashboard' => $openIssues,
     ];
     $_SESSION['data_dashboard'] = $data;
 } else {
