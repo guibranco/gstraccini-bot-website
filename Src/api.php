@@ -161,7 +161,8 @@ if (isset($_GET['dashboard'])) {
     $data = [
         'openPullRequestsDashboard' => $openPullRequests,
         'openPullRequestsDashboard' => $openIssues,
-    ];    
+    ];
+    $_SESSION['data_dashboard'] = $data;
 } else {
     $data = [
         'openPullRequests' => $openPullRequests,
