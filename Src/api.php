@@ -160,7 +160,7 @@ sort($repositories);
 if (isset($_GET['dashboard'])) {
     $data = [
         'openPullRequestsDashboard' => $openPullRequests,
-        'openPullRequestsDashboard' => $openIssues,
+        'openIssuesDashboard' => $openIssues,
     ];
     $_SESSION['data_dashboard'] = $data;
 } else {
