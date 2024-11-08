@@ -17,7 +17,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 
 $user = $_SESSION['user'];
 
-$data = array("openPullRequests" => [], "openIssues" => []);
+$data = array("openPullRequestsDashboard" => [], "openIssuesDashboard" => []);
 
 if (isset($_SESSION["data"])) {
     $data = $_SESSION["data"];
@@ -154,14 +154,14 @@ if (isset($user["first_name"])) {
         <div class="row mt-5">
             <div class="col-md-6">
                 <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill"
-                        id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
+                        id="openPullRequestsCount"><?php echo count($data["openPullRequestsDashboard"]); ?></span></h3>
                 <ul class="list-group" id="openPullRequests">
-                    <?php if (count($data["openPullRequests"]) === 0): ?>
+                    <?php if (count($data["openPullRequestsDashboard"]) === 0): ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
                     <?php endif; ?>
-                    <?php foreach ($data["openPullRequests"] as $issue): ?>
+                    <?php foreach ($data["openPullRequestsDashboard"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
                                     href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
@@ -198,14 +198,14 @@ if (isset($user["first_name"])) {
 
             <div class="col-md-6">
                 <h3>Assigned Issues <span class="badge text-bg-warning rounded-pill"
-                        id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                        id="openIssuesCount"><?php echo count($data["openIssuesDashboard"]); ?></span></h3>
                 <ul class="list-group" id="openIssues">
-                    <?php if (count($data["openIssues"]) === 0): ?>
+                    <?php if (count($data["openIssuesDashboard"]) === 0): ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
                     <?php endif; ?>
-                    <?php foreach ($data["openIssues"] as $issue): ?>
+                    <?php foreach ($data["openIssuesDashboard"] as $issue): ?>
                         <li class="list-group-item">
                             <strong><a
                                     href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
@@ -286,11 +286,11 @@ if (isset($user["first_name"])) {
         }
 
         function loadData() {
-            fetch('api.php')
+            fetch('api.php?dashboard=true')
                 .then(response => response.json())
                 .then(data => {
-                    populateIssues(data.openPullRequests, "openPullRequests");
-                    populateIssues(data.openIssues, "openIssues");                    
+                    populateIssues(data.openPullRequestsDashboard, "openPullRequests");
+                    populateIssues(data.openIssuesDashboard, "openIssues");                    
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
