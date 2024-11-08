@@ -19,8 +19,8 @@ $user = $_SESSION['user'];
 
 $data = array("openPullRequestsDashboard" => [], "openIssuesDashboard" => []);
 
-if (isset($_SESSION["data"])) {
-    $data = $_SESSION["data"];
+if (isset($_SESSION["data_dashboard"])) {
+    $data = $_SESSION["data_dashboard"];
 }
 
 $title = "Dashboard";
