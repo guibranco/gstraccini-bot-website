@@ -17,6 +17,7 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
 }
 
 if (!isset($_GET['page']) && 
+    !isset($_GET['dashboard']) &&
     isset($_SESSION['last_api_call']) && 
     $_SESSION['last_api_call'] > (time() - 180) &&
     isset($_SESSION['data'])
@@ -156,11 +157,18 @@ if ($responseRepositories !== null && is_array($responseRepositories) === true &
 
 sort($repositories);
 
-$data = [
-    'openPullRequests' => $openPullRequests,
-    'openIssues' => $openIssues,
-    'repositories' => $repositories
-];
+if (isset($_GET['dashboard'])) {
+    $data = [
+        'openPullRequestsDashboard' => $openPullRequests,
+        'openPullRequestsDashboard' => $openIssues,
+    ];    
+} else {
+    $data = [
+        'openPullRequests' => $openPullRequests,
+        'openIssues' => $openIssues,
+        'repositories' => $repositories
+    ];
+}
 
 session_start();
 $time = time();
@@ -169,7 +177,7 @@ header('Cache-Control: public, max-age=' . $expires);
 header('Pragma: cache');
 header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
 header("X-Cache: miss");
-if (!isset($_GET['page'])) {
+if (!isset($_GET['page']) && !isset($_GET['dashboard'])) {
     $_SESSION['data'] = $data;
     $_SESSION['last_api_call'] = $time;
 }
