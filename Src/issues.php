@@ -69,7 +69,7 @@ if (isset($user["first_name"])) {
                             <span class="text-muted">
                                 <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> - 
-                            <span class="text-muted">(Created at: <?php echo $issue['created_at']; ?>)</span>
+                            <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -116,7 +116,7 @@ if (isset($user["first_name"])) {
                 let content = '';
                 content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
                 content += `<span class="text-muted"><a href='https://github.com/${item.full_name}' target='_blank'>${item.repository}</a></span> - `;
-                content += `<span class="text-muted">(Created at: ${item.created_at})</span>`;
+                content += `<span class="text-muted">(🕐 ${item.created_at})</span>`;
                 itemLi.innerHTML = content;
                 list.appendChild(itemLi);
             });
