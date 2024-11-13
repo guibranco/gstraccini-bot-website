@@ -89,7 +89,7 @@ $isAuthenticated = isset($_SESSION['user']);
 
   <div class="content">
     <h1>Terms of Service</h1>
-    <p><strong>Effective Date:</strong> [Insert Date]</p>
+    <p><strong>Effective Date:</strong> 13/11/2024</p>
     <p>Welcome to GStraccini-bot! These Terms of Service ("Terms") govern your use of our GitHub App/Bot, which provides free automated actions for pull requests, issues, and repositories. By installing or using our app, you agree to these Terms.</p>
 
     <h2>1. Acceptance of Terms</h2>
