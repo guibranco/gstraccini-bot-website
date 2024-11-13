@@ -25,6 +25,42 @@ body {
       margin: 10px 0;
     }
 
+      .navbar {
+        background-color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: top 0.3s ease;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 999;
+        padding: 10px 0;
+      }
+      
+      .navbar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 30px;
+      }
+      
+      .navbar ul li {
+        display: inline-block;
+      }
+      
+      .navbar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.2em;
+      }
+      
+      .navbar ul li a:hover {
+        color: #ffdb58;
+      }
+
+
     .hero {
       background: linear-gradient(to right, #0069d9, #0056b3);
       color: white;
@@ -252,6 +288,26 @@ footer nav ul li a:hover {
 }
 
 @media (max-width: 768px) {
+      
+.navbar {
+    top: -60px;
+  }
+
+  .navbar.show {
+    top: 0;
+  }
+
+  .navbar ul {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .navbar ul li a {
+    padding: 10px;
+    font-size: 1.5em;
+  }
+
+      
   footer nav ul {
     flex-direction: column;
     align-items: center;
