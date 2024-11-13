@@ -70,8 +70,8 @@ $isAuthenticated = isset($_SESSION['user']);
   </header>
 
   <section>
-    <h2>Service Status</h2>
-    <p>Welcome to the GStraccini-bot Service Status page. Below, you can find real-time updates about our system health and service availability.</p>
+    <h1>Service Status</h1>
+    <p>Welcome to the GStraccini-bot Service Status page. Below, you can find real-time updates about our system's health and service availability.</p>
 
     <div class="badges">
 
