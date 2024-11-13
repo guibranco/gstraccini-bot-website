@@ -232,8 +232,9 @@ footer nav ul {
   flex-wrap: wrap;
   justify-content: center;
   gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
-
 footer nav ul li {
   display: inline-block;
 }
@@ -243,6 +244,7 @@ footer nav ul li a {
   color: #007bff;
   font-weight: bold;
   display: block;
+  padding: 5px 0;
 }
 
 footer nav ul li a:hover {
@@ -253,6 +255,12 @@ footer nav ul li a:hover {
   footer nav ul {
     flex-direction: column;
     align-items: center;
+    padding: 0;
+  }
+
+  footer nav ul li {
+    width: 100%;
+    text-align: center;
   }
 
   footer p {
