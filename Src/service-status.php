@@ -69,7 +69,7 @@ $isAuthenticated = isset($_SESSION['user']);
      <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
   </header>
 
-  <section>
+  <section class="content">
     <h1>Service Status</h1>
     <p>Welcome to the GStraccini-bot Service Status page. Below, you can find real-time updates about our system's health and service availability.</p>
 

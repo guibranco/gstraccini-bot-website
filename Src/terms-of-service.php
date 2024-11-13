@@ -30,7 +30,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
   </header>
 
-  <div class="content">
+  <section class="content">
     <h1>Terms of Service</h1>
     <p><strong>Effective Date:</strong> 13/11/2024</p>
     <p>Welcome to GStraccini-bot! These Terms of Service ("Terms") govern your use of our GitHub App/Bot, which provides free automated actions for pull requests, issues, and repositories. By installing or using our app, you agree to these Terms.</p>
@@ -76,7 +76,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <h2>9. Contact Information</h2>
     <p>If you have questions or concerns about these Terms, please contact us at <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
     <p>Thank you for using GStraccini-bot!</p>
-  </div>
+  </section>
 
   <?php include_once "includes/footer-public.php"; ?>
 </body>
