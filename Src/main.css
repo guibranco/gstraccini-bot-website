@@ -180,7 +180,7 @@ body {
       text-decoration: underline;
     }
 
-.commands {
+    .commands {
         padding: 20px;
         max-width: 800px;
         margin: 0 auto;
@@ -225,3 +225,23 @@ body {
         margin: 0;
         color: #555;
       }
+
+    section.middle {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    section.middle h2 {
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    section.middle p, section.middle ul {
+      margin: 10px 0;
+      line-height: 1.6;
+      color: #555;
+    }
