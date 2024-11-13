@@ -180,6 +180,53 @@ $isAuthenticated = isset($_SESSION['user']);
       transform: scale(0.98);
     }
   </style>
+<style>
+  .commands {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .commands h2 {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 20px;
+  }
+
+  .commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .command-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .command-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .command-card strong {
+    display: block;
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+  }
+
+  .command-card p {
+    margin: 0;
+    color: #555;
+  }
+</style>
 </head>
 
 <body>
@@ -228,93 +275,87 @@ $isAuthenticated = isset($_SESSION['user']);
     </div>
   </section>
 
-  <section class="features fade-in">
-  <h2>Available Commands</h2>
-    <ul>
-      <li>
-        <strong>@gstraccini help</strong>: Shows available commands.
-      </li>
-      <li>
-        <strong>@gstraccini hello</strong>: Greets the invoker.
-      </li>
-      <li>
-        <strong>@gstraccini thank you</strong>: Replies with a
-        "You're welcome" message.
-      </li>
-      <li>
-        <strong>@gstraccini add project &lt;projectPath&gt;</strong>: Adds a
-        project to the solution file (for .NET projects).
-      </li>
-      <li>
-        <strong>@gstraccini appveyor build &lt;type&gt;</strong>: Runs an
-        AppVeyor build for a target commit/pull request.
-      </li>
-      <li>
-        <strong>@gstraccini appveyor bump version &lt;component&gt;</strong>:
-        Bumps the version in AppVeyor.
-      </li>
-      <li>
-        <strong>@gstraccini appveyor register</strong>: Registers the
-        repository in AppVeyor.
-      </li>
-      <li>
-        <strong>@gstraccini appveyor reset</strong>: Resets the AppVeyor build
-        number for a repository.
-      </li>
-      <li>
-        <strong>@gstraccini bump version &lt;version&gt;
-          &lt;project&gt;</strong>: Bumps the .NET version in .csproj files.
-      </li>
-      <li>
-        <strong>@gstraccini change runner &lt;runner&gt; &lt;workflow&gt;
-          &lt;jobs&gt;</strong>: Changes the GitHub Actions runner in a
-        workflow file.
-      </li>
-      <li>
-        <strong>@gstraccini csharpier</strong>: Formats C# code using
-        CSharpier.
-      </li>
-      <li>
-        <strong>@gstraccini fix csproj</strong>: Updates the .csproj file with
-        NuGet package versions (for .NET Framework projects).
-      </li>
-      <li>
-        <strong>@gstraccini prettier</strong>: Formats code using Prettier.
-      </li>
-      <li>
-        <strong>@gstraccini rerun failed checks</strong>: Reruns failed checks
-        in the target pull request.
-      </li>
-      <li>
-        <strong>@gstraccini rerun failed workflows</strong>: Reruns failed
-        GitHub Actions workflows in the target pull request.
-      </li>
-      <li>
-        <strong>@gstraccini review</strong>: Enables review for the target
-        pull request.
-      </li>
-      <li>
-        <strong>@gstraccini track</strong>: Tracks a pull request, queues a
-        build, and synchronizes merge branches.
-      </li>
-      <li>
-        <strong>@gstraccini update snapshot</strong>: Updates test snapshots
-        for Node.js projects.
-      </li>
-    </ul>
-    <p>
-      <strong>Note:</strong> If you are not allowed to use the bot, a
-      thumbs-down reaction will be added to your comment.
-    </p>
-    <p>
-      <strong>Tip:</strong> You can trigger commands with a ✅ tick (beta
-      feature).
-    </p>
-  </section>
+  <section class="commands fade-in">
+      <h2>Available Commands</h2>
+      <div class="commands-grid">
+        <div class="command-card">
+          <strong>@gstraccini help</strong>
+          <p>Shows available commands.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini hello</strong>
+          <p>Greets the invoker.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini thank you</strong>
+          <p>Replies with a "You're welcome" message.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini add project &lt;projectPath&gt;</strong>
+          <p>Adds a project to the solution file (for .NET projects).</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini appveyor build &lt;type&gt;</strong>
+          <p>Runs an AppVeyor build for a target commit/pull request.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini appveyor bump version &lt;component&gt;</strong>
+          <p>Bumps the version in AppVeyor.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini appveyor register</strong>
+          <p>Registers the repository in AppVeyor.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini appveyor reset</strong>
+          <p>Resets the AppVeyor build number for a repository.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini bump version &lt;version&gt; &lt;project&gt;</strong>
+          <p>Bumps the .NET version in .csproj files.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini change runner &lt;runner&gt; &lt;workflow&gt; &lt;jobs&gt;</strong>
+          <p>Changes the GitHub Actions runner in a workflow file.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini csharpier</strong>
+          <p>Formats C# code using CSharpier.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini fix csproj</strong>
+          <p>Updates the .csproj file with NuGet package versions (for .NET Framework projects).</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini prettier</strong>
+          <p>Formats code using Prettier.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini rerun failed checks</strong>
+          <p>Reruns failed checks in the target pull request.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini rerun failed workflows</strong>
+          <p>Reruns failed GitHub Actions workflows in the target pull request.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini review</strong>
+          <p>Enables review for the target pull request.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini track</strong>
+          <p>Tracks a pull request, queues a build, and synchronizes merge branches.</p>
+        </div>
+        <div class="command-card">
+          <strong>@gstraccini update snapshot</strong>
+          <p>Updates test snapshots for Node.js projects.</p>
+        </div>
+      </div>
+      <p><strong>Note:</strong> If you are not allowed to use the bot, a thumbs-down reaction will be added to your comment.</p>
+      <p><strong>Tip:</strong> You can trigger commands with a ✅ tick (beta feature).</p>
+    </section>
 
-  <footer>
-    <p>© 2024 GStraccini-bot. All rights reserved.</p>
-  </footer>
+  <?php include_once "includes/footer_public.php"; ?>
 </body>
 
 </html>
