@@ -18,7 +18,7 @@ $isAuthenticated = isset($_SESSION['user']);
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="GStraccini-bot Terms of Service">
-  <title>Terms of Service - GStraccini-bot</title>
+  <title>GStraccini-bot Terms of Service</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
