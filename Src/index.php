@@ -23,12 +23,7 @@ $isAuthenticated = isset($_SESSION['user']);
 </head>
 
 <body>
-  <header>
-    <a href="https://bot.straccini.com">
-      <img src="https://raw.githubusercontent.com/guibranco/gstraccini-bot-website/main/Src/logo.png" alt="GStraccini-bot Logo" class="logo" alt="GStraccini-bot logo">
-    </a>
-    <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
-  </header>
+  <?php include_once "includes/header-public.php"; ?>
 
   <section class="hero fade-in">    
     <h2>Boost Your GitHub Efficiency</h2>
