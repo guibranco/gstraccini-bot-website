@@ -89,7 +89,7 @@ $isAuthenticated = isset($_SESSION['user']);
   </header>
 
   <section>
-    <h2>Privacy Notice</h2>
+    <h1>Privacy Notice</h1>
     <p><strong>General Information:</strong></p>
     <p>GStraccini-bot is owned and operated by GuiBranco. This Privacy Notice ("Notice") explains how GStraccini-bot ("we," "us," or "our") collects, uses, and protects information provided by the Subscriber ("you" or "your"). By using GStraccini-bot, you consent to the practices outlined in this Notice.</p>
     <h3>Information Gathering and Usage</h3>
