@@ -105,17 +105,6 @@ body {
       color: #555;
     }
 
-    footer {
-      background-color: #f1f1f1;
-      padding: 20px;
-      text-align: center;
-    }
-
-    footer p {
-      margin: 0;
-      color: #777;
-    }
-
     .fade-in {
       opacity: 0;
       animation: fadeIn 1.5s forwards;
@@ -157,7 +146,7 @@ body {
     .dashboard-button:active {
       transform: scale(0.98);
     }
-  
+
     footer {
       background-color: #f1f1f1;
       padding: 20px;
