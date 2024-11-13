@@ -76,6 +76,39 @@ $isAuthenticated = isset($_SESSION['user']);
       margin: 0;
       color: #777;
     }
+
+      footer p {
+      margin: 5px 0;
+      color: #777;
+    }
+
+    footer nav ul {
+      list-style: none;
+      margin: 10px 0 0;
+      padding: 0;
+      display: inline-flex;
+      gap: 15px;
+    }
+
+    footer nav ul li {
+      display: inline;
+    }
+
+    footer nav ul li a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    footer nav ul li a:hover {
+      text-decoration: underline;
+    }
+    
+    img.octocat {
+      width: 20px;
+      vertical-align: middle;
+      margin-top: -2px;
+    }
   </style>
 </head>
 
@@ -137,6 +170,16 @@ $isAuthenticated = isset($_SESSION['user']);
 
   <footer>
     <p>© 2024 GStraccini-bot. All rights reserved.</p>
+    <nav>
+      <ul>
+        <li><a href="privacy-policy.php">Privacy Policy</a></li>
+        <li><a href="terms-of-service.php">Terms of Service</a></li>
+        <li><a href="service-status.php">Service Status</a></li>
+        <li><a href="https://docs.bot.straccini.com" target="_blank">Documentation</a></li>
+        <li><a href="https://github.com/marketplace/gstraccini-bot" target="_blank">GitHub Marketplace</a></li>
+        <li><a href="https://github.com/guibranco/gstraccini-bot" target="_blank">GitHub Repository</a></li>
+      </ul>
+    </nav>
   </footer>
 </body>
 
