@@ -19,48 +19,8 @@ $isAuthenticated = isset($_SESSION['user']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="GStraccini-bot Service Status - Check real-time updates about system health and uptime.">
   <title>GStraccini-bot Service Status</title>
+  <link rel="stylesheet" href="main.css" />
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-      color: #333;
-    }
-
-    header {
-      background-color: #007bff;
-      color: white;
-      padding: 20px 0;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    header h1 {
-      font-size: 2.5em;
-      margin: 0;
-    }
-
-    header p {
-      margin: 10px 0;
-    }
-
-    section {
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-      background: #ffffff;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-    }
-
-    section h2 {
-      color: #007bff;
-      margin-bottom: 15px;
-    }
-
     .status-table {
       width: 100%;
       border-collapse: collapse;
@@ -97,17 +57,6 @@ $isAuthenticated = isset($_SESSION['user']);
     .badges {
       text-align: center;
       margin: 20px 0;
-    }
-
-    footer {
-      background-color: #f1f1f1;
-      padding: 20px;
-      text-align: center;
-    }
-
-    footer p {
-      margin: 0;
-      color: #777;
     }
   </style>
 </head>
@@ -188,7 +137,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <p><strong>Note:</strong> If you are experiencing issues not listed above, please contact us at <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
   </section>
 
-  <?php include_once "includes/footer_public.php"; ?>
+  <?php include_once "includes/footer-public.php"; ?>
 </body>
 
 </html>
