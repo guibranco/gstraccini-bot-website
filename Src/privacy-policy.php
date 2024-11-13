@@ -30,7 +30,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
   </header>
 
-  <section>
+  <section class="content">
     <h1>Privacy Notice</h1>
     <p><strong>General Information:</strong></p>
     <p>GStraccini-bot is owned and operated by GuiBranco. This Privacy Notice ("Notice") explains how GStraccini-bot ("we," "us," or "our") collects, uses, and protects information provided by the Subscriber ("you" or "your"). By using GStraccini-bot, you consent to the practices outlined in this Notice.</p>
