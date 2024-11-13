@@ -34,7 +34,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <h1>Privacy Notice</h1>
     <p><strong>General Information:</strong></p>
     <p>GStraccini-bot is owned and operated by GuiBranco. This Privacy Notice ("Notice") explains how GStraccini-bot ("we," "us," or "our") collects, uses, and protects information provided by the Subscriber ("you" or "your"). By using GStraccini-bot, you consent to the practices outlined in this Notice.</p>
-    <h3>Information Gathering and Usage</h3>
+    <h2>Information Gathering and Usage</h2>
     <p>We collect only minimal data necessary for functionality:</p>
     <ul>
       <li>Repository names where GStraccini-bot is installed.</li>
@@ -47,17 +47,17 @@ $isAuthenticated = isset($_SESSION['user']);
       <li>To comply with legal requirements or prevent harm.</li>
       <li>If GStraccini-bot merges or is acquired by another entity.</li>
     </ul>
-    <h3>Cookies</h3>
+    <h2>Cookies</h2>
     <p>We use cookies to manage session information and track analytics. These cookies are non-permanent and essential for service functionality. You may disable non-essential cookies through your browser settings.</p>
-    <h3>Data Storage</h3>
+    <h2>Data Storage</h2>
     <p>Your data is stored securely using third-party vendors and partners. You retain ownership of your data, while GStraccini-bot owns the application code and databases.</p>
-    <h3>Source Code</h3>
+    <h2>Source Code</h2>
     <p>GStraccini-bot does not store user source code unless explicitly permitted. We do not store GitHub credentials and use temporary tokens for limited interactions.</p>
-    <h3>Security</h3>
+    <h2>Security</h2>
     <p>We prioritize security but cannot guarantee data protection against all risks. Please report vulnerabilities to <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
-    <h3>Changes</h3>
+    <h2>Changes</h2>
     <p>This policy may be updated without notice. Users should review it periodically. Continued use of the service implies acceptance of any changes.</p>
-    <h3>Questions</h3>
+    <h2>Questions</h2>
     <p>For inquiries, contact us at <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
   </section>
 
