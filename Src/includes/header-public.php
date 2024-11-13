@@ -5,7 +5,6 @@
   <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
 </header>
 
-<!-- Navigation Menu -->
 <nav class="navbar">
   <ul>
     <li><a href="index.php">Home</a></li>
@@ -18,13 +17,12 @@
 window.addEventListener('scroll', function() {
   const navbar = document.querySelector('.navbar');
   if (window.scrollY > document.querySelector('header').offsetHeight) {
-    navbar.classList.add('show'); // Shows the navbar after scrolling
+    navbar.classList.add('show');
   } else {
-    navbar.classList.remove('show'); // Hides the navbar when at the top of the page
+    navbar.classList.remove('show'); 
   }
 });
 
-// Optional: Add a toggle button for mobile screens to manually show/hide the menu
 const menuToggle = document.createElement('button');
 menuToggle.textContent = '☰';
 menuToggle.style.position = 'absolute';
