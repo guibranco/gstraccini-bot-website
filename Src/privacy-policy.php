@@ -119,9 +119,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <p>For inquiries, contact us at <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
   </section>
 
-  <footer>
-    <p>© 2024 GStraccini-bot. All rights reserved.</p>
-  </footer>
+  <?php include_once "includes/footer_public.php"; ?>
 </body>
 
 </html>
