@@ -20,53 +20,6 @@ $isAuthenticated = isset($_SESSION['user']);
   <meta name="description" content="Introducing Your GStraccini-bot - Automate GitHub tasks with ease.">
   <title>GStraccini-bot - Automate Your Workflow</title>
   <link rel="stylesheet" href="main.css" />
-  <style>
-      .commands {
-        padding: 20px;
-        max-width: 800px;
-        margin: 0 auto;
-        background: #ffffff;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-      }
-    
-      .commands h2 {
-        text-align: center;
-        color: #007bff;
-        margin-bottom: 20px;
-      }
-    
-      .commands-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-      }
-    
-      .command-card {
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-    
-      .command-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-      }
-    
-      .command-card strong {
-        display: block;
-        color: #007bff;
-        margin-bottom: 10px;
-        font-size: 1.1em;
-      }
-    
-      .command-card p {
-        margin: 0;
-        color: #555;
-      }
-  </style>
 </head>
 
 <body>
