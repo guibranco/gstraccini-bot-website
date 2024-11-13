@@ -177,7 +177,7 @@ $isAuthenticated = isset($_SESSION['user']);
         <li><a href="service-status.php">Service Status</a></li>
         <li><a href="https://docs.bot.straccini.com" target="_blank">Documentation</a></li>
         <li><a href="https://github.com/marketplace/gstraccini-bot" target="_blank">GitHub Marketplace</a></li>
-        <li><a href="https://github.com/guibranco/gstraccini-bot" target="_blank">GitHub Repository</a></li>
+        <li><a href="https://github.com/guibranco/gstraccini-bot-service" target="_blank">GitHub Repository</a></li>
       </ul>
     </nav>
   </footer>
