@@ -168,7 +168,7 @@ $isAuthenticated = isset($_SESSION['user']);
     <p>Thank you for using GStraccini-bot!</p>
   </div>
 
-  <?php include_once "includes/footer_public.php"; ?>
+  <?php include_once "includes/footer-public.php"; ?>
 </body>
 
 </html>
