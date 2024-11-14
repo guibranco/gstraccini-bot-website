@@ -9,10 +9,10 @@
   <ul>
     <li><a href="/">Home</a></li>
     <li><a href="<?php echo ($isAuthenticated) ? '/dashboard.php' : '/signin.php'; ?>">
-        <?php echo ($isAuthenticated) ? 'Dashboard' : 'Sign-In'; ?>
+        <?php echo ($isAuthenticated) ? 'Dashboard' : 'Sign-In/Sign-Up'; ?>
       </a>
     </li>
-    <li><a href="https://docs.bot.straccini.com" target="_blank">Docs</a></li>
+    <li><a href="https://docs.bot.straccini.com" target="_blank">Documentation</a></li>
   </ul>
 </nav>
 
