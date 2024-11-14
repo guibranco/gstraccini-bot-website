@@ -7,6 +7,7 @@
     <title>Login Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="main.css" />
     <style>
         .input-group-6digit input {
             width: 40px;
@@ -28,51 +29,12 @@
         #resendCodeBtn:disabled {
             background-color: lightgray;
             cursor: not-allowed;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f4f4f4;
-            color: #333;
-        }
-
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin: 0;
-        }
-
-        header p {
-            margin: 10px 0;
-        }
-
-        img.octocat {
-            width: 20px;
-            vertical-align: middle;
-            margin-top: -2px;
-        }
+        }       
     </style>
 </head>
 
 <body>
-    <header>
-        <a href="https://bot.straccini.com">
-            <img src="https://bot.straccini.com/logo.png" alt="GStraccini-bot Logo" class="img-fluid" width="150">
-        </a>
-        <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat"
-                class="octocat"> Automate your GitHub workflow effortlessly.</p>
-    </header>
+    <?php include_once "includes/header-public.php"; ?>
 
     <div class="container my-5">
         <div class="row justify-content-center">
@@ -188,9 +150,7 @@
         </div>
     </div>
 
-    <footer>
-        <p>© 2024 GStraccini-bot. All rights reserved.</p>
-    </footer>
+    <?php include_once "includes/footer-public.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
