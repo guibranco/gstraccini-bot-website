@@ -65,3 +65,58 @@ body {
 .status-pending {
   color: #ffc107;
 }
+
+footer {
+  background-color: #f1f1f1;
+  padding: 20px;
+  text-align: center;
+}
+
+footer p {
+  margin: 5px 0;
+  color: #777;
+}
+
+footer nav ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+footer nav ul li {
+  display: inline-block;
+}
+
+footer nav ul li a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+  display: block;
+  padding: 5px 0;
+}
+
+footer nav ul li a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  footer nav ul {
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  footer nav ul li {
+    width: 100%;
+    text-align: center;
+  }
+
+  footer p {
+    font-size: 0.9em;
+  }
+}
