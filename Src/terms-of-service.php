@@ -49,7 +49,7 @@ $isAuthenticated = isset($_SESSION['user']);
     </ul>
 
     <h2>4. Data Collection and Usage</h2>
-    <p>We value your privacy and do not collect or store personal data beyond what is necessary to provide the app’s functionality. For more details, please review our <a href="#">Privacy Policy</a>.</p>
+    <p>We value your privacy and do not collect or store personal data beyond what is necessary to provide the app’s functionality. For more details, please review our <a href="privacy-policy.php">Privacy Policy</a>.</p>
 
     <h2>5. Limitations of Liability</h2>
     <p>To the fullest extent permitted by law, GStraccini-bot is provided "as is" without warranties of any kind, express or implied. We are not liable for any damages arising from:</p>
