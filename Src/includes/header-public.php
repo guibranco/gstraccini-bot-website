@@ -4,3 +4,29 @@
   </a>
   <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
 </header>
+
+<nav class="menu">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="<?php echo ($isAuthenticated) ? '/dashboard.php' : '/signin.php'; ?>">
+        <?php echo ($isAuthenticated) ? 'Dashboard' : 'Sign-In'; ?>
+      </a>
+    </li>
+    <li><a href="https://docs.bot.straccini.com" target="_blank">Docs</a></li>
+  </ul>
+</nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  const menu = document.querySelector('.menu');
+  const headerHeight = document.querySelector('header').offsetHeight;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > headerHeight) {
+      menu.classList.add('hidden');
+    } else {
+      menu.classList.remove('hidden');
+    }
+  });
+});
+</script>
