@@ -150,7 +150,7 @@ $isAuthenticated = isset($_SESSION['user']);
           <td>2024-11-14 19:45 PM UTC</td>
         </tr>
         <tr>
-          <td>GitHub Integration</td>
+          <td>GitHub Integration (Service)</td>
           <td class="status-up">Operational</td>
           <td>2024-11-14 19:45 PM UTC</td>
         </tr>
