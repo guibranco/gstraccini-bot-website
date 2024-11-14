@@ -139,8 +139,6 @@ $isAuthenticated = isset($_SESSION['user']);
           <p>Updates test snapshots for Node.js projects.</p>
         </div>
       </div>
-      <p><strong>Note:</strong> If you are not allowed to use the bot, a thumbs-down reaction will be added to your comment.</p>
-      <p><strong>Tip:</strong> You can trigger commands with a ✅ tick (beta feature).</p>
     </section>
 
   <?php include_once "includes/footer-public.php"; ?>
