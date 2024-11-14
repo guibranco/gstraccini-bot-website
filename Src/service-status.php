@@ -132,27 +132,32 @@ $isAuthenticated = isset($_SESSION['user']);
         <tr>
           <td>API</td>
           <td class="status-up">Operational</td>
-          <td>2024-11-13 10:00 AM UTC</td>
+          <td>2024-11-14 19:45 PM UTC</td>
         </tr>
         <tr>
           <td>Webhook Processing</td>
           <td class="status-up">Operational</td>
-          <td>2024-11-13 10:00 AM UTC</td>
+          <td>2024-11-14 19:45 PM UTC</td>
         </tr>
         <tr>
           <td>Dashboard</td>
-          <td class="status-maintenance">Under Maintenance</td>
-          <td>2024-11-13 9:00 AM UTC</td>
+          <td class="status-up">Operational</td>
+          <td>2024-11-14 19:45 PM UTC</td>
         </tr>
         <tr>
           <td>Documentation</td>
           <td class="status-up">Operational</td>
-          <td>2024-11-13 10:00 AM UTC</td>
+          <td>2024-11-14 19:45 PM UTC</td>
         </tr>
         <tr>
           <td>GitHub Integration</td>
-          <td class="status-down">Outage</td>
-          <td>2024-11-13 9:30 AM UTC</td>
+          <td class="status-up">Operational</td>
+          <td>2024-11-14 19:45 PM UTC</td>
+        </tr>
+        <tr>
+          <td>GitHub Workflows</td>
+          <td class="status-up">Operational</td>
+          <td>2024-11-14 19:45 PM UTC</td>
         </tr>
       </tbody>
     </table>
