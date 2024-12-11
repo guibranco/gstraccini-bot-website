@@ -1,3 +1,5 @@
+<?php
+
 $cookie_lifetime = 604800;
 session_set_cookie_params([
     'lifetime' => $cookie_lifetime,
@@ -13,6 +15,7 @@ if ($isAuthenticated === true) {
     header('Location: dashboard.php');
     exit();
 }
+?>
 <!DOCTYPE html>
 <html lang="en">
 
