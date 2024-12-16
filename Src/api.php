@@ -14,6 +14,7 @@ session_start();
 $data = ['error' => 'Unauthorized'];
 if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
     echo json_encode($data);
+    exit();
 }
 
 if (!isset($_GET['page']) && 
