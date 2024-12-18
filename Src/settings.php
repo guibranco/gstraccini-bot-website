@@ -146,7 +146,7 @@ $title = "Settings";
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="auto_review_pr" class="form-label">
-                                    <i class="fas fa-user-check"></i> Auto Review Pull Request
+                                    <i class="fas fa-user-check"></i> Auto Approval Pull Request
                                 </label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="auto_review_pr" name="auto_review_pr"
@@ -154,7 +154,7 @@ $title = "Settings";
                                             echo 'checked';
                                         } ?>>
                                     <label class="form-check-label" for="auto_review_pr">
-                                        Automatically review the pull request if no issues are found
+                                        Automatically approve the pull request if no issues are found
                                     </label>
                                 </div>
                             </div>
@@ -166,7 +166,7 @@ $title = "Settings";
                                         <?php if ($userData['auto_merge_pr']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="auto_merge_pr">Automatically merge pull requests when all checks pass</label>
+                                    <label class="form-check-label" for="auto_merge_pr">Automatically merge pull requests when all checks pass from trusted senders</label>
                                 </div>
                             </div>
 
