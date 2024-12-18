@@ -21,7 +21,8 @@ $userData = [
     'notify_issues' => 1,
     'reminder_issues' => 1,
     'reminder_issues_days' => 10,
-    'auto_merge' => 1,
+    'auto_review_pr' => 1,
+    'auto_merge_pr' => 1,
     'create_issue' => 1,
     'notify_pull_requests' => 1
 ];
@@ -35,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
     $reminder_issues = isset($_POST['reminder_issues']) ? 1: 0;
     $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
-    $auto_merge = isset($_POST['auto_merge']) ? 1 : 0;
+    $auto_review_pr = isset($_POST['auto_review_pr']) ? 1 : 0;
+    $auto_merge_pr = isset($_POST['auto_merge_pr']) ? 1 : 0;
     $create_issue = isset($_POST['create_issue']) ? 1 : 0;
     $notify_pull_requests = isset($_POST['notify_pull_requests']) ? 1 : 0;
 
@@ -44,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'notify_issues' => $notify_issues,
         'reminder_issues' => $reminder_issues,
         'reminder_issues_days' => $reminder_issues_days,
-        'auto_merge' => $auto_merge,
+        'auto_review_pr' => $auto_review_pr,
+        'auto_merge_pr' => $auto_merge_pr,
         'create_issue' => $create_issue,
         'notify_pull_requests' => $notify_pull_requests
     ];
@@ -142,13 +145,28 @@ $title = "Settings";
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="auto_merge" class="form-label"><i class="fas fa-code-merge"></i> Enable Auto-Merge</label>
+                                <label for="auto_review_pr" class="form-label">
+                                    <i class="fas fa-user-check"></i> Auto Review Pull Request
+                                </label>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="auto_merge" name="auto_merge"
-                                        <?php if ($userData['auto_merge']) {
+                                    <input class="form-check-input" type="checkbox" id="auto_review_pr" name="auto_review_pr"
+                                        <?php if ($userData['auto_review_pr']) {
                                             echo 'checked';
                                         } ?>>
-                                    <label class="form-check-label" for="auto_merge">Automatically merge pull requests when all checks pass</label>
+                                    <label class="form-check-label" for="auto_review_pr">
+                                        Automatically review the pull request if no issues are found
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="auto_merge_pr" class="form-label"><i class="fas fa-code-merge"></i> Enable Auto-Merge</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto_merge_pr" name="auto_merge_pr"
+                                        <?php if ($userData['auto_merge_pr']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="auto_merge_pr">Automatically merge pull requests when all checks pass</label>
                                 </div>
                             </div>
 
