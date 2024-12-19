@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
     $reminder_issues = isset($_POST['reminder_issues']) ? 1: 0;
     $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
-    pr_template_description = isset($_POST['pr_template_description']) ? 1 : 0;
+    $pr_template_description = isset($_POST['pr_template_description']) ? 1 : 0;
     $auto_review_pr = isset($_POST['auto_review_pr']) ? 1 : 0;
     $auto_merge_pr = isset($_POST['auto_merge_pr']) ? 1 : 0;
     $create_issue = isset($_POST['create_issue']) ? 1 : 0;
