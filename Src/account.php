@@ -45,6 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
+$organizations = [];
+if (isset($_SESSION['organizations']) {
+    $organizations = $_SESSION['organizations'];
+}
+
 $title = "Account Details";
 ?>
 
