@@ -132,7 +132,7 @@ $selectedOrganization = $_GET['organization'] ?? '';
         }
 
         function loadData() {
-            fetch('api/repositories') // Adjust this URL to your API endpoint
+            fetch('api.php')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch repositories');
@@ -141,9 +141,10 @@ $selectedOrganization = $_GET['organization'] ?? '';
                 })
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
+                    setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
-                    console.error(error);
+                    console.error('Error:', error);
                     showErrorAlert('Failed to load repository data.');
                 });
         }
