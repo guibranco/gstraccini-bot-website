@@ -381,7 +381,7 @@ $title = "Account Details";
                                                     <?php if (!$entity['installation']): ?>
                                                         <a class="button install-button" href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
                                                     <?php else: ?>
-                                                        <a class="button repositories-button" href="repositories.php?organization=<?= urlencode($installation['account']['login']) ?>">
+                                                        <a class="button repositories-button" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
                                                             View Repositories
                                                         </a>
                                                     <?php endif; ?>
