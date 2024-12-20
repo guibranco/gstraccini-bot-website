@@ -68,7 +68,7 @@ foreach ($organizations as $organization) {
 }
 
 foreach ($installations as $installation) {
-    if (!isset($entities[$installation['account']['id'])) {
+    if (!isset($entities[$installation['account']['id']])) {
         $entities[$installation['account']['id']] = [
             'id' => $installation['id'],
             'name' => $installation['account']['login'],
