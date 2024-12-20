@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-if (!isset($_SESSION['organizations'])) {
+if (!isset($_SESSION['organizations']) || empty($organizations) || count($_SESSION['organizations']) === 0) {
     $token = $_SESSION['token'];
     $apiUrl = "https://api.github.com/user/orgs";
 
