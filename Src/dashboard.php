@@ -70,7 +70,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Total Pull Requests</h5>
-                                <p class="card-text display-4">120</p>
+                                <p class="card-text display-4" data-target="120">0</p>
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Pull Requests Merged</h5>
-                                <p class="card-text display-4">85</p>
+                                <p class="card-text display-4" data-target="85">0</p>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Commits Analyzed</h5>
-                                <p class="card-text display-4">320</p>
+                                <p class="card-text display-4" data-target="320">0</p>
                             </div>
                         </div>
                     </div>
@@ -99,7 +99,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Issues Closed</h5>
-                                <p class="card-text display-4">42</p>
+                                <p class="card-text display-4" data-target="42">0</p>
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Average Time to Merge (hrs)</h5>
-                                <p class="card-text display-4">12</p>
+                                <p class="card-text display-4" data-target="12">0</p>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Active Repositories</h5>
-                                <p class="card-text display-4">6</p>
+                                <p class="card-text display-4" data-target="6">0</p>
                             </div>
                         </div>
                     </div>
@@ -300,6 +300,30 @@ if (isset($user["first_name"])) {
         }
 
         window.addEventListener('DOMContentLoaded', loadData);
+        document.addEventListener('DOMContentLoaded', () => {
+            const counters = document.querySelectorAll('.card-text');
+        
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const duration = 2000;
+                const interval = 10;
+                const increment = target / (duration / interval);
+                
+                let current = 0;
+        
+                const updateCounter = () => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                    } else {
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, interval);
+                    }
+                };
+        
+                updateCounter();
+            });
+        });
     </script>
 </body>
 
