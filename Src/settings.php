@@ -21,6 +21,7 @@ $userData = [
     'notify_issues' => 1,
     'reminder_issues' => 1,
     'reminder_issues_days' => 10,
+    'pr_template_description' => 1,
     'auto_review_pr' => 1,
     'auto_merge_pr' => 1,
     'create_issue' => 1,
@@ -36,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
     $reminder_issues = isset($_POST['reminder_issues']) ? 1: 0;
     $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
+    $pr_template_description = isset($_POST['pr_template_description']) ? 1 : 0;
     $auto_review_pr = isset($_POST['auto_review_pr']) ? 1 : 0;
     $auto_merge_pr = isset($_POST['auto_merge_pr']) ? 1 : 0;
     $create_issue = isset($_POST['create_issue']) ? 1 : 0;
@@ -46,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'notify_issues' => $notify_issues,
         'reminder_issues' => $reminder_issues,
         'reminder_issues_days' => $reminder_issues_days,
+        'pr_template_description' => $pr_template_description,
         'auto_review_pr' => $auto_review_pr,
         'auto_merge_pr' => $auto_merge_pr,
         'create_issue' => $create_issue,
@@ -144,6 +147,24 @@ $title = "Settings";
                             <h3><i class="fas fa-code-branch"></i> Pull Requests Settings</h3>
                         </div>
                         <div class="card-body">
+                            <div class="mb-3">
+                                <label for="pr_template_description" class="form-label">
+                                    <i class="fas fa-file-alt"></i> Add PR description from template
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pr_template_description" name="pr_template_description"
+                                        <?php if ($userData['pr_template_description']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="pr_template_description">
+                                        Automatically add a description to pull requests based on a predefined template
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    This action will only be applied if the pull request description is empty.
+                                </small>
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="auto_review_pr" class="form-label">
                                     <i class="fas fa-user-check"></i> Auto Approval Pull Request
