@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-$installations = isset($_SESSION['installations']) && count($_SESSION['installations']['installations']) ? $_SESSION['installations']['installations'] : [];
-$organizations = isset($_SESSION['organizations']) ? $_SESSION['organizations'] : [];
+$installations = $_SESSION['installations']['installations'] ?? [];
+$organizations = $_SESSION['organizations'] ?? [];
 
 $installationMap = [];
 foreach ($installations as $installation) {
