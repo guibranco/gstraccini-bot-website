@@ -135,11 +135,11 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="ollama" class="form-label"><img height="24" width="24" src="Lamma.png" /> OLLAMA API Key</label>
+                        <label for="llama" class="form-label"><img height="24" width="24" src="Llama.png" /> LLAMA API Key</label>
                         <div class="input-group">
-                           <input type="password" class="form-control" id="ollama" placeholder="Enter OLLAMA API Key">
+                           <input type="password" class="form-control" id="llama" placeholder="Enter LLAMA API Key">
                            <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="ollama"></i>
+                              <i class="fas fa-eye toggle-visibility" data-target="llama"></i>
                            </span>
                         </div>
                      </div>
