@@ -368,7 +368,7 @@ $title = "Account Details";
                                                 </td>
                                                 <td>
                                                     <?php
-                                                        if ($entity['installation'] && $entity['installation']['suspended_at'])) {
+                                                        if ($entity['installation'] && $entity['installation']['suspended_at']) {
                                                             echo '<span class="status-suspended">Suspended</span>';
                                                         } else if ($entity['installation']) {
                                                             echo '<span class="status-installed">Installed</span>';
