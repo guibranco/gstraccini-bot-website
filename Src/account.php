@@ -196,19 +196,40 @@ $title = "Account Details";
                         <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo $installations["total_count"]; ?></span></h3>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($installations["installations"])): ?>
-                            <ul class="list-group">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Name</th>
+                                    <th>Installation Date</th>
+                                    <th>Repository Selection</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 <?php foreach ($installations["installations"] as $installation): ?>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <img src="<?php echo htmlspecialchars($installation['account']['avatar_url']); ?>" alt="Avatar"
-                                             class="rounded-circle me-3" width="40" height="40">
-                                        <span><?php echo htmlspecialchars($installation['account']['login']); ?></span>
-                                    </li>
+                                    <tr>
+                                        <td>
+                                            <img src="<?= htmlspecialchars($installation['account']['avatar_url']) ?>" alt="Avatar">
+                                        </td>
+                                        <td>
+                                            <a href="<?= htmlspecialchars($installation['account']['html_url']) ?>" target="_blank">
+                                                <?= htmlspecialchars($installation['account']['login']) ?>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <?= htmlspecialchars(date("Y-m-d H:i:s", strtotime($installation['created_at']))) ?>
+                                        </td>
+                                        <td>
+                                            <?= htmlspecialchars(ucfirst($installation['repository_selection'])) ?>
+                                        </td>
+                                        <td>
+                                            <?= $installation['suspended_at'] ? 'Suspended' : 'Not Suspended' ?>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-muted">No installations found.</p>
-                        <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
