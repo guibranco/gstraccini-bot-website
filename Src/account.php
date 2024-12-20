@@ -193,12 +193,12 @@ $title = "Account Details";
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Installations</h3>
+                        <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo $installations["total_count"]; ?></span></h3>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($installations)): ?>
+                        <?php if (!empty($installations["installations"])): ?>
                             <ul class="list-group">
-                                <?php foreach ($installations as $installation): ?>
+                                <?php foreach ($installations["installations"] as $installation): ?>
                                     <li class="list-group-item d-flex align-items-center">
                                         <img src="<?php echo htmlspecialchars($installation['account']['avatar_url']); ?>" alt="Avatar"
                                              class="rounded-circle me-3" width="40" height="40">
