@@ -44,7 +44,7 @@ $title = "Integration Details";
 <body>
    <?php require_once 'includes/header.php'; ?>
    <div class="container mt-5">
-      <h1 class="text-center">Integration details</h1>
+      <h1 class="text-center">Integrations</h1>
       <p class="text-center">Manage your integrations.</p>
       <?php if (isset($_GET['details_updated'])): ?>
          <div class="alert alert-success alert-dismissible fade show" role="alert">
