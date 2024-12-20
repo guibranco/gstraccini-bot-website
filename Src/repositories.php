@@ -33,6 +33,13 @@ if (isset($user["first_name"])) {
 }
 
 $selectedOrganization = $_GET['organization'] ?? '';
+$filteredRepositories = $data['repositories'];
+if (!empty($selectedOrganization)) {
+    $filteredRepositories = array_filter($filteredRepositories, function ($repo) use ($selectedOrganization) {
+        return $repo['organization'] === $selectedOrganization;
+    });
+}
+$organizations = array_unique(array_column($data['repositories'], 'organization'));
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +66,6 @@ $selectedOrganization = $_GET['organization'] ?? '';
                 <select id="organizationFilter" class="form-select">
                     <option value="">All Organizations</option>
                     <?php
-                    $organizations = array_unique(array_column($data["repositories"], 'organization'));
                     foreach ($organizations as $organization) {
                         $selected = $selectedOrganization === $organization ? 'selected' : '';
                         echo "<option value=\"" . htmlspecialchars($organization) . "\" $selected>" . htmlspecialchars($organization) . "</option>";
@@ -86,23 +92,22 @@ $selectedOrganization = $_GET['organization'] ?? '';
                         </tr>
                     </thead>
                     <tbody id="repositories">
-                        <?php if (count($data["repositories"]) === 0): ?>
+                        <?php if (count($filteredRepositories) === 0): ?>
                             <tr>
                                 <td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading data...
                                 </td>
                             </tr>
                         <?php endif; ?>
-                        <?php foreach ($data["repositories"] as $repo): ?>
-                            <tr class="repository-row"
-                                data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
+                        <?php foreach ($filteredRepositories as $repo): ?>
+                            <tr class="repository-row" data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
                                 <td><a href='<?php echo $repo['url']; ?>' target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
                                 <td><i class="fas fa-star status-pending"></i> <?php echo $repo['stars']; ?></td>
                                 <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
-                                <td><span class="badge bg-primary"><?php echo empty($repo['language'])?'-':$repo['language']; ?></span></td>
-                                <td><i class="fas fa-eye<?php echo ($repo['visibility']==='private')?'-slash':'';?>"></i> <?php echo $repo['visibility']; ?></td>                                
+                                <td><span class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span></td>
+                                <td><i class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash' : ''; ?>"></i> <?php echo $repo['visibility']; ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -141,6 +146,7 @@ $selectedOrganization = $_GET['organization'] ?? '';
                 })
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
+                    updateOrganizationFilter(data.repositories);
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
@@ -171,11 +177,25 @@ $selectedOrganization = $_GET['organization'] ?? '';
                 repositoriesTable.appendChild(row);
             });
 
-            // Update count
             document.getElementById('repositoriesCount').textContent = repositories.length;
-
-            // Reapply the organization filter
             filterRepositories();
+        }
+
+        function updateOrganizationFilter(repositories) {
+            const organizationFilter = document.getElementById('organizationFilter');
+            const existingValue = organizationFilter.value;
+        
+            const organizations = Array.from(new Set(repositories.map(repo => repo.organization)));        
+            organizationFilter.innerHTML = `<option value="">All Organizations</option>`;        
+            organizations.forEach(organization => {
+                const option = document.createElement('option');
+                option.value = organization;
+                option.textContent = organization;
+                if (organization === existingValue) {
+                    option.selected = true;
+                }
+                organizationFilter.appendChild(option);
+            });
         }
 
         function filterRepositories() {
@@ -183,7 +203,7 @@ $selectedOrganization = $_GET['organization'] ?? '';
             const queryString = new URLSearchParams(window.location.search);
             queryString.set('organization', organization);
             window.history.replaceState({}, '', '?' + queryString.toString());
-
+        
             document.querySelectorAll('.repository-row').forEach(row => {
                 const matches = !organization || row.dataset.organization === organization;
                 row.style.display = matches ? '' : 'none';
