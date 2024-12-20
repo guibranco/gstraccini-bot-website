@@ -133,22 +133,74 @@ $title = "Account Details";
             font-weight: bold;
             text-align: center;
         }        
-        .install-button, .add-installation-button {
+        .install-button {
             background-color: green;
         }
-        .install-button:hover, .add-installation-button:hover {
+        .install-button:hover {
             background-color: darkgreen;
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
         }
         .repositories-button {
             background-color: blue;
         }
         .repositories-button:hover {
             background-color:darkblue;
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
         }
+        .add-installation-note {
+            background-color: #f8f9fa; /* Light gray background for contrast */
+            border: 1px solid #dee2e6; /* Subtle border for separation */
+            border-radius: 5px; /* Rounded corners for a soft look */
+            padding: 15px; /* Spacing inside the container */
+            margin-top: 20px; /* Spacing from the content above */
+            font-family: Arial, sans-serif; /* Ensure clean, legible font */
+            color: #212529; /* Standard dark text color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for a subtle pop */
+        }
+        
+        .add-installation-note p {
+            margin: 0 0 10px; /* Add spacing below the paragraph */
+            font-size: 14px; /* Adjust font size for better readability */
+            line-height: 1.5; /* Improve line spacing */
+        }
+        
+        .add-installation-note strong {
+            font-weight: 600; /* Slightly stronger emphasis on bold text */
+            color: #495057; /* Darker shade for bold text */
+        }
+        
         .add-installation-container {
-            margin-top: 20px;
-            text-align: center;
+            text-align: center; /* Center-align the button */
+            margin-top: 10px; /* Add spacing above the button */
         }
+        
+        .add-installation-button {
+            display: inline-block;
+            background-color: #28a745; /* Green button color */
+            color: #fff; /* White text for contrast */
+            text-decoration: none; /* Remove underline */
+            font-size: 14px; /* Adjust font size */
+            font-weight: 600; /* Bold text for the button */
+            padding: 10px 20px; /* Add padding for a clickable button */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners for a smooth look */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+            transition: background-color 0.3s, transform 0.2s; /* Smooth hover effects */
+        }
+        
+        .add-installation-button:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
+        }
+        
+        .add-installation-button:active {
+            background-color: #1e7e34; /* Even darker green on click */
+            transform: translateY(0); /* Reset lift on click */
+        }
+
     </style>
 </head>
 
@@ -338,8 +390,14 @@ $title = "Account Details";
                                         <?php endforeach; ?>                               
                             </tbody>
                         </table>
-                        <div class="add-installation-container">
-                            <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button">Add New Installation</a>
+                        <div class="add-installation-note mt-3">
+                            <p>
+                                <strong>Didn't find the organization or entity you're looking for?</strong><br>
+                                No worries! If the desired organization or entity is missing from the list, you can manually add it to the installations by clicking the button below:
+                            </p>
+                            <div class="add-installation-container mt-2">
+                                <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button btn btn-success">Add New Installation</a>
+                            </div>
                         </div>
                     </div>
                 </div>
