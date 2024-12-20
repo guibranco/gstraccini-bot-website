@@ -31,6 +31,8 @@ if (isset($user["first_name"])) {
 } else if (isset($user["name"])) {
     $name = $user["name"];
 }
+
+$selectedOrganization = $_GET['organization'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -49,8 +51,23 @@ if (isset($user["first_name"])) {
     <?php require_once 'includes/header.php'; ?>
 
     <div class="container mt-5 d-none" id="alert-container"></div>
-  
+
     <div class="container mt-5">
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label for="organizationFilter" class="form-label">Filter by Organization</label>
+                <select id="organizationFilter" class="form-select">
+                    <option value="">All Organizations</option>
+                    <?php
+                    $organizations = array_unique(array_column($data["repositories"], 'organization'));
+                    foreach ($organizations as $organization) {
+                        $selected = $selectedOrganization === $organization ? 'selected' : '';
+                        echo "<option value=\"" . htmlspecialchars($organization) . "\" $selected>" . htmlspecialchars($organization) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
         <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Your Repositories <span class="badge text-bg-warning rounded-pill"
@@ -76,7 +93,8 @@ if (isset($user["first_name"])) {
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($data["repositories"] as $repo): ?>
-                            <tr>
+                            <tr class="repository-row"
+                                data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
                                 <td><a href='<?php echo $repo['url']; ?>' target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
                                 <td><i class="fas fa-star status-pending"></i> <?php echo $repo['stars']; ?></td>
@@ -113,41 +131,69 @@ if (isset($user["first_name"])) {
             }, 15000);
         }
 
-        function populateRepositoriesTable(repositories) {
-            $("#repositoriesCount").text(repositories.length);
-            const repositoriesTable = document.getElementById('repositories');
-            repositoriesTable.innerHTML = '';
-            repositories.forEach(repo => {
-                const slash = repo.visibility === 'private' ? '-slash' : '';
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${repo.organization}</td>
-                <td><a href='${repo.url}' target='_blank'>${repo.name}</a></a></td>
-                <td><i class="fas fa-star status-pending"></i> ${repo.stars}</td>
-                <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}
-                <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
-                <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
-                <td><span class="badge bg-primary">${repo.language ?? '-'}</span></td>
-                <td><i class="fas fa-eye${slash}"></i> ${repo.visibility}                
-            `;
-                repositoriesTable.appendChild(row);
-            });
-        }
-
         function loadData() {
-            fetch('api.php')
-                .then(response => response.json())
+            fetch('api/repositories') // Adjust this URL to your API endpoint
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch repositories');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
-                    setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    showErrorAlert('Failed to complete the request. Please try again later.');;
+                    console.error(error);
+                    showErrorAlert('Failed to load repository data.');
                 });
         }
 
-        window.addEventListener('DOMContentLoaded', loadData);
+        function populateRepositoriesTable(repositories) {
+            const repositoriesTable = document.getElementById('repositories');
+            repositoriesTable.innerHTML = '';
+
+            repositories.forEach(repo => {
+                const slash = repo.visibility === 'private' ? '-slash' : '';
+                const row = document.createElement('tr');
+                row.classList.add('repository-row');
+                row.setAttribute('data-organization', repo.organization);
+                row.innerHTML = `
+                <td>${repo.organization}</td>
+                <td><a href='${repo.url}' target='_blank'>${repo.name}</a></td>
+                <td><i class="fas fa-star status-pending"></i> ${repo.stars}</td>
+                <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}</td>
+                <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
+                <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
+                <td><span class="badge bg-primary">${repo.language ?? '-'}</span></td>
+                <td><i class="fas fa-eye${slash}"></i> ${repo.visibility}</td>                
+                `;
+                repositoriesTable.appendChild(row);
+            });
+
+            // Update count
+            document.getElementById('repositoriesCount').textContent = repositories.length;
+
+            // Reapply the organization filter
+            filterRepositories();
+        }
+
+        function filterRepositories() {
+            const organization = document.getElementById('organizationFilter').value;
+            const queryString = new URLSearchParams(window.location.search);
+            queryString.set('organization', organization);
+            window.history.replaceState({}, '', '?' + queryString.toString());
+
+            document.querySelectorAll('.repository-row').forEach(row => {
+                const matches = !organization || row.dataset.organization === organization;
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        document.getElementById('organizationFilter').addEventListener('change', filterRepositories);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData(); // Load repository data when the page is ready
+        });
     </script>
 </body>
 
