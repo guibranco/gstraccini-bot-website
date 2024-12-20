@@ -52,9 +52,12 @@ if (!isset($_SESSION['organizations'])) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $apiUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $token",
-        "User-Agent: GStraccini-Bot/1.0 (+https://github.com/guibranco/gstraccini-bot-website)"
+        "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+        "Accept: application/vnd.github+json",
+        "X-GitHub-Api-Version: 2022-11-28"
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -66,6 +69,7 @@ if (!isset($_SESSION['organizations'])) {
     } else {
         $organizations = [];
         $_SESSION['organizations'] = [];
+        error_log("Error calling GH API from account.php: {$httpCode}");
     }
 } else {
     $organizations = $_SESSION['organizations'];
