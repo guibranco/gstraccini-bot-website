@@ -45,9 +45,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-$installations = [];
-if (isset($_SESSION['installations'])) {
-    $installations = $_SESSION['installations'];
+$installations = isset($_SESSION['installations']) ? $_SESSION['installations'] : [];
+$organizations = isset($_SESSION['organizations']) ? $_SESSION['organizations'] : [];
+
+$installationMap = [];
+foreach ($installations as $installation) {
+    $installationMap[$installation['account']['id']] = $installation;
+}
+
+$entities = [];
+foreach ($organizations as $organization) {
+    $organizationId = $organization['id'];
+    $hasInstallation = isset($installationMap[$organizationId]);
+
+    $entities[] = [
+        'type' => 'organization',
+        'id' => $organizationId,
+        'name' => $organization['login'],
+        'image' => $organization['avatar_url'],
+        'installation' => $hasInstallation ? $installationMap[$organizationId] : null,
+    ];
+}
+
+foreach ($installations as $installation) {
+    if (!isset($installationMap[$installation['account']['id']])) {
+        $entities[] = [
+            'type' => 'installation',
+            'id' => $installation['id'],
+            'name' => $installation['account']['login'],
+            'image' => $installation['account']['avatar_url'],
+            'installation' => $installation,
+        ];
+    }
 }
 
 $title = "Account Details";
@@ -64,20 +93,20 @@ $title = "Account Details";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="user.css">
     <style>
-        .installations table {
+        .entities table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .installations th, .installations td {
+        .entities th, .entities td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-        .installations th {
+        .entities th {
             background-color: #f4f4f4;
         }
-        .installations img {
+        .entities img {
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -94,7 +123,7 @@ $title = "Account Details";
             color: orange;
             font-weight: bold;
         }
-        .install-button, .add-installation-button {
+        .button {
             display: inline-block;
             padding: 10px 20px;
             background-color: green;
@@ -103,14 +132,75 @@ $title = "Account Details";
             border-radius: 4px;
             font-weight: bold;
             text-align: center;
+        }        
+        .install-button {
+            background-color: green;
         }
-        .install-button:hover, .add-installation-button:hover {
+        .install-button:hover {
             background-color: darkgreen;
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
         }
+        .repositories-button {
+            background-color: blue;
+        }
+        .repositories-button:hover {
+            background-color:darkblue;
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
+        }
+        .add-installation-note {
+            background-color: #f8f9fa; /* Light gray background for contrast */
+            border: 1px solid #dee2e6; /* Subtle border for separation */
+            border-radius: 5px; /* Rounded corners for a soft look */
+            padding: 15px; /* Spacing inside the container */
+            margin-top: 20px; /* Spacing from the content above */
+            font-family: Arial, sans-serif; /* Ensure clean, legible font */
+            color: #212529; /* Standard dark text color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for a subtle pop */
+        }
+        
+        .add-installation-note p {
+            margin: 0 0 10px; /* Add spacing below the paragraph */
+            font-size: 14px; /* Adjust font size for better readability */
+            line-height: 1.5; /* Improve line spacing */
+        }
+        
+        .add-installation-note strong {
+            font-weight: 600; /* Slightly stronger emphasis on bold text */
+            color: #495057; /* Darker shade for bold text */
+        }
+        
         .add-installation-container {
-            margin-top: 20px;
-            text-align: center;
+            text-align: center; /* Center-align the button */
+            margin-top: 10px; /* Add spacing above the button */
         }
+        
+        .add-installation-button {
+            display: inline-block;
+            background-color: #28a745; /* Green button color */
+            color: #fff; /* White text for contrast */
+            text-decoration: none; /* Remove underline */
+            font-size: 14px; /* Adjust font size */
+            font-weight: 600; /* Bold text for the button */
+            padding: 10px 20px; /* Add padding for a clickable button */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners for a smooth look */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+            transition: background-color 0.3s, transform 0.2s; /* Smooth hover effects */
+        }
+        
+        .add-installation-button:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+            text-decoration: none; /* Ensure underline doesn’t appear */
+        }
+        
+        .add-installation-button:active {
+            background-color: #1e7e34; /* Even darker green on click */
+            transform: translateY(0); /* Reset lift on click */
+        }
+
     </style>
 </head>
 
@@ -242,53 +332,72 @@ $title = "Account Details";
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo $installations["total_count"]; ?></span></h3>
+                        <h3>Entities <span class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
                     </div>
-                    <div class="card-body installations">
+                    <div class="card-body entities">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Avatar</th>
-                                    <th>Name</th>
+                                    <th>Entity</th>
+                                    <th>Login</th>
+                                    <th>Type</th>
                                     <th>Installation Date</th>
-                                    <th>Repository Selection</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($installations["installations"] as $installation): ?>
-                                    <tr>
-                                        <td>
-                                            <img src="<?= htmlspecialchars($installation['account']['avatar_url']) ?>" alt="Avatar">
-                                        </td>
-                                        <td>
-                                            <a href="<?= htmlspecialchars($installation['account']['html_url']) ?>" target="_blank">
-                                                <?= htmlspecialchars($installation['account']['login']) ?>
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <?= htmlspecialchars(date("Y-m-d H:i:s", strtotime($installation['created_at']))) ?>
-                                        </td>
-                                        <td>
-                                            <a href="repositories.php?organization=<?= urlencode($installation['account']['login']) ?>">
-                                                View Repositories
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <?php
-                                                if ($installation['suspended_at']) {
-                                                    echo '<span class="status-suspended">Suspended</span>';
-                                                } else {
-                                                    echo '<span class="status-installed">Installed</span>';
-                                                }
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
+                                <?php foreach ($entities as $entity): ?>
+                                            <tr>
+                                                <td>
+                                                    <img src="<?php echo htmlspecialchars($entity['image']); ?>" alt="Entity Avatar">
+                                                </td>
+                                                <td>
+                                                    <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
+                                                </td>
+                                                <td><?php echo ucfirst($entity['type']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                        if ($entity['installation']) { 
+                                                           echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
+                                                        } else {
+                                                            echo "-";
+                                                        }
+                                                    ?>
+                                                        
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                        if ($entity['installation'] && $entity['installation']['suspended_at']) {
+                                                            echo '<span class="status-suspended">Suspended</span>';
+                                                        } else if ($entity['installation']) {
+                                                            echo '<span class="status-installed">Installed</span>';
+                                                        } else {
+                                                            echo '<span class="status-uninstalled">Not Installed</span>';
+                                                        }
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php if (!$entity['installation']): ?>
+                                                        <a class="button install-button" href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
+                                                    <?php else: ?>
+                                                        <a class="button repositories-button" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
+                                                            View Repositories
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>                               
                             </tbody>
                         </table>
-                        <div class="add-installation-container">
-                            <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button">Add New Installation</a>
+                        <div class="add-installation-note mt-3">
+                            <p>
+                                <strong>Didn't find the organization or entity you're looking for?</strong><br>
+                                No worries! If the desired organization or entity is missing from the list, you can manually add it to the installations by clicking the button below:
+                            </p>
+                            <div class="add-installation-container mt-2">
+                                <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button btn btn-success">Add New Installation</a>
+                            </div>
                         </div>
                     </div>
                 </div>
