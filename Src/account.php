@@ -63,6 +63,26 @@ $title = "Account Details";
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="user.css">
+    <style>
+        .installations table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .installations th, .installations td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .installations th {
+            background-color: #f4f4f4;
+        }
+        .installations img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+        }
+    </style>
 </head>
 
 <body>
@@ -195,7 +215,7 @@ $title = "Account Details";
                     <div class="card-header">
                         <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo $installations["total_count"]; ?></span></h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body installations">
                         <table>
                             <thead>
                                 <tr>
