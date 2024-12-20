@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-$installations = isset($_SESSION['installations']) ? $_SESSION['installations'] : [];
+$installations = isset($_SESSION['installations']) && count($_SESSION['installations']['installations']) ? $_SESSION['installations']['installations'] : [];
 $organizations = isset($_SESSION['organizations']) ? $_SESSION['organizations'] : [];
 
 $installationMap = [];
@@ -58,7 +58,7 @@ foreach ($organizations as $organization) {
     $organizationId = $organization['id'];
     $hasInstallation = isset($installationMap[$organizationId]);
 
-    $entities[] = [
+    $entities[$organizationId] = [
         'type' => 'organization',
         'id' => $organizationId,
         'name' => $organization['login'],
@@ -68,7 +68,7 @@ foreach ($organizations as $organization) {
 }
 
 foreach ($installations as $installation) {
-    if (!isset($installationMap[$installation['account']['id']])) {
+    if (!isset($entities[$organizationId])) {
         $entities[] = [
             'type' => 'installation',
             'id' => $installation['id'],
@@ -138,67 +138,67 @@ $title = "Account Details";
         }
         .install-button:hover {
             background-color: darkgreen;
-            transform: translateY(-2px); /* Slight lift on hover */
-            text-decoration: none; /* Ensure underline doesn’t appear */
+            transform: translateY(-2px);
+            text-decoration: none;
         }
         .repositories-button {
             background-color: blue;
         }
         .repositories-button:hover {
             background-color:darkblue;
-            transform: translateY(-2px); /* Slight lift on hover */
-            text-decoration: none; /* Ensure underline doesn’t appear */
+            transform: translateY(-2px);
+            text-decoration: none;
         }
         .add-installation-note {
-            background-color: #f8f9fa; /* Light gray background for contrast */
-            border: 1px solid #dee2e6; /* Subtle border for separation */
-            border-radius: 5px; /* Rounded corners for a soft look */
-            padding: 15px; /* Spacing inside the container */
-            margin-top: 20px; /* Spacing from the content above */
-            font-family: Arial, sans-serif; /* Ensure clean, legible font */
-            color: #212529; /* Standard dark text color */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for a subtle pop */
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            color: #212529;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .add-installation-note p {
-            margin: 0 0 10px; /* Add spacing below the paragraph */
-            font-size: 14px; /* Adjust font size for better readability */
-            line-height: 1.5; /* Improve line spacing */
+            margin: 0 0 10px;
+            font-size: 14px;
+            line-height: 1.5;
         }
         
         .add-installation-note strong {
-            font-weight: 600; /* Slightly stronger emphasis on bold text */
-            color: #495057; /* Darker shade for bold text */
+            font-weight: 600;
+            color: #495057;
         }
         
         .add-installation-container {
-            text-align: center; /* Center-align the button */
-            margin-top: 10px; /* Add spacing above the button */
+            text-align: center;
+            margin-top: 10px;
         }
         
         .add-installation-button {
             display: inline-block;
-            background-color: #28a745; /* Green button color */
-            color: #fff; /* White text for contrast */
-            text-decoration: none; /* Remove underline */
-            font-size: 14px; /* Adjust font size */
-            font-weight: 600; /* Bold text for the button */
-            padding: 10px 20px; /* Add padding for a clickable button */
-            border: none; /* Remove border */
-            border-radius: 5px; /* Rounded corners for a smooth look */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
-            transition: background-color 0.3s, transform 0.2s; /* Smooth hover effects */
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
         }
         
         .add-installation-button:hover {
-            background-color: #218838; /* Darker green on hover */
-            transform: translateY(-2px); /* Slight lift on hover */
-            text-decoration: none; /* Ensure underline doesn’t appear */
+            background-color: #218838;
+            transform: translateY(-2px);
+            text-decoration: none;
         }
         
         .add-installation-button:active {
-            background-color: #1e7e34; /* Even darker green on click */
-            transform: translateY(0); /* Reset lift on click */
+            background-color: #1e7e34;
+            transform: translateY(0); 
         }
 
     </style>
@@ -379,7 +379,7 @@ $title = "Account Details";
                                                 </td>
                                                 <td>
                                                     <?php if (!$entity['installation']): ?>
-                                                        <a class="button install-button" href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
+                                                        <a class="button install-button" target="_blank"  href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
                                                     <?php else: ?>
                                                         <a class="button repositories-button" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
                                                             View Repositories
@@ -396,7 +396,7 @@ $title = "Account Details";
                                 No worries! If the desired organization or entity is missing from the list, you can manually add it to the installations by clicking the button below:
                             </p>
                             <div class="add-installation-container mt-2">
-                                <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button btn btn-success">Add New Installation</a>
+                                <a class="add-installation-button btn btn-success" target="_blank" href="https://github.com/apps/gstraccini/installations/select_target">Add New Installation</a>
                             </div>
                         </div>
                     </div>
