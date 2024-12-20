@@ -82,6 +82,35 @@ $title = "Account Details";
             width: 40px;
             height: 40px;
         }
+        .status-installed {
+            color: green;
+            font-weight: bold;
+        }
+        .status-uninstalled {
+            color: red;
+            font-weight: bold;
+        }
+        .status-suspended {
+            color: orange;
+            font-weight: bold;
+        }
+        .install-button, .add-installation-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .install-button:hover, .add-installation-button:hover {
+            background-color: darkgreen;
+        }
+        .add-installation-container {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -241,15 +270,26 @@ $title = "Account Details";
                                             <?= htmlspecialchars(date("Y-m-d H:i:s", strtotime($installation['created_at']))) ?>
                                         </td>
                                         <td>
-                                            <?= htmlspecialchars(ucfirst($installation['repository_selection'])) ?>
+                                            <a href="repositories.php?organization=<?= urlencode($installation['account']['login']) ?>">
+                                                View Repositories
+                                            </a>
                                         </td>
                                         <td>
-                                            <?= $installation['suspended_at'] ? 'Suspended' : 'Not Suspended' ?>
+                                            <?php
+                                                if ($installation['suspended_at']) {
+                                                    echo '<span class="status-suspended">Suspended</span>';
+                                                } else {
+                                                    echo '<span class="status-installed">Installed</span>';
+                                                }
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <div class="add-installation-container">
+                            <a href="https://github.com/apps/gstraccini/installations/select_target" class="add-installation-button">Add New Installation</a>
+                        </div>
                     </div>
                 </div>
             </div>
