@@ -69,7 +69,7 @@ foreach ($organizations as $organization) {
 
 foreach ($installations as $installation) {
     if (!isset($entities[$installation['account']['id'])) {
-        $entities[] = [
+        $entities[$installation['account']['id']] = [
             'id' => $installation['id'],
             'name' => $installation['account']['login'],
             'image' => $installation['account']['avatar_url'],
@@ -78,6 +78,8 @@ foreach ($installations as $installation) {
         ];
     }
 }
+
+ksort($entities);
 
 $title = "Account Details";
 ?>
