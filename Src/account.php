@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $organizations = [];
-if (isset($_SESSION['organizations']) {
+if (isset($_SESSION['organizations'])) {
     $organizations = $_SESSION['organizations'];
 }
 
