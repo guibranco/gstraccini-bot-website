@@ -45,6 +45,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
+if (!isset($_SESSION['organizations'])) {
+    $token = $_SESSION['token'];
+    $apiUrl = "https://api.github.com/user/orgs";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $token",
+        "User-Agent: GStraccini-Bot/1.0 (+https://github.com/guibranco/gstraccini-bot-website)"
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        $organizations = json_decode($response, true);
+        $_SESSION['organizations'] = $organizations;
+    } else {
+        $organizations = [];
+        $_SESSION['organizations'] = [];
+    }
+} else {
+    $organizations = $_SESSION['organizations'];
+}
+
 $title = "Account Details";
 ?>
 
@@ -181,6 +207,31 @@ $title = "Account Details";
                         <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Organizations</h3>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($organizations)): ?>
+                            <ul class="list-group">
+                                <?php foreach ($organizations as $org): ?>
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <img src="<?php echo htmlspecialchars($org['avatar_url']); ?>" alt="Avatar"
+                                             class="rounded-circle me-3" width="40" height="40">
+                                        <span><?php echo htmlspecialchars($org['login']); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="text-muted">No organizations found or granted access.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
