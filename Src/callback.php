@@ -81,7 +81,7 @@ if (isset($body['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$
 $_SESSION['token'] = $token;
 $_SESSION['user'] = $body;
 
-$apiUrl = 'https://api.github.com/user/orgs';
+$apiUrl = 'https://api.github.com/user/installations';
 
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -102,7 +102,7 @@ $body = json_decode(substr($response, $headerSize), true);
 
 curl_close($ch);
 
-$_SESSION['organizations'] = $body;
+$_SESSION['installations'] = $body;
 
 header('Location: dashboard.php');
 exit();

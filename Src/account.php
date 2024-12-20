@@ -45,9 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-$organizations = [];
-if (isset($_SESSION['organizations'])) {
-    $organizations = $_SESSION['organizations'];
+$installations = [];
+if (isset($_SESSION['installations'])) {
+    $installations = $_SESSION['installations'];
 }
 
 $title = "Account Details";
@@ -193,21 +193,21 @@ $title = "Account Details";
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Organizations</h3>
+                        <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo $installations["total_count"]; ?></span></h3>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($organizations)): ?>
+                        <?php if (!empty($installations["installations"])): ?>
                             <ul class="list-group">
-                                <?php foreach ($organizations as $org): ?>
+                                <?php foreach ($installations["installations"] as $installation): ?>
                                     <li class="list-group-item d-flex align-items-center">
-                                        <img src="<?php echo htmlspecialchars($org['avatar_url']); ?>" alt="Avatar"
+                                        <img src="<?php echo htmlspecialchars($installation['account']['avatar_url']); ?>" alt="Avatar"
                                              class="rounded-circle me-3" width="40" height="40">
-                                        <span><?php echo htmlspecialchars($org['login']); ?></span>
+                                        <span><?php echo htmlspecialchars($installation['account']['login']); ?></span>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php else: ?>
-                            <p class="text-muted">No organizations found or granted access.</p>
+                            <p class="text-muted">No installations found.</p>
                         <?php endif; ?>
                     </div>
                 </div>
