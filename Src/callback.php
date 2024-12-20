@@ -104,5 +104,28 @@ curl_close($ch);
 
 $_SESSION['installations'] = $body;
 
+$apiUrl = 'https://api.github.com/users/'.$_SESSION['user']['login'].'/orgs';
+
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+curl_setopt($ch, CURLOPT_HEADER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Authorization: Bearer $token",
+    "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+    "Accept: application/vnd.github+json",
+    "X-GitHub-Api-Version: 2022-11-28"
+]);
+
+$response = curl_exec($ch);
+
+$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+$headers = substr($response, 0, $headerSize);
+$body = json_decode(substr($response, $headerSize), true);
+
+curl_close($ch);
+
+$_SESSION['organizations'] = $body;
+
 header('Location: dashboard.php');
 exit();
