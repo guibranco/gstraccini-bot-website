@@ -66,6 +66,7 @@ if (!isset($_SESSION['organizations']) || empty($_SESSION['organizations']) || c
     if ($httpCode === 200) {
         $organizations = json_decode($response, true);
         $_SESSION['organizations'] = $organizations;
+        error_log("Error calling GH API from account.php: {$httpCode}");
     } else {
         $organizations = [];
         $_SESSION['organizations'] = [];
