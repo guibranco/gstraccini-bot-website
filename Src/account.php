@@ -59,21 +59,21 @@ foreach ($organizations as $organization) {
     $hasInstallation = isset($installationMap[$organizationId]);
 
     $entities[$organizationId] = [
-        'type' => 'organization',
         'id' => $organizationId,
         'name' => $organization['login'],
         'image' => $organization['avatar_url'],
+        'html_url' => $organization['html_url'],
         'installation' => $hasInstallation ? $installationMap[$organizationId] : null,
     ];
 }
 
 foreach ($installations as $installation) {
-    if (!isset($entities[$installation['id']])) {
+    if (!isset($entities[$installation['account']['id'])) {
         $entities[] = [
-            'type' => 'installation',
             'id' => $installation['id'],
             'name' => $installation['account']['login'],
             'image' => $installation['account']['avatar_url'],
+            'html_url' => $installation['account']['html_url'],
             'installation' => $installation,
         ];
     }
@@ -122,32 +122,6 @@ $title = "Account Details";
         .status-suspended {
             color: orange;
             font-weight: bold;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: green;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            text-align: center;
-        }        
-        .install-button {
-            background-color: green;
-        }
-        .install-button:hover {
-            background-color: darkgreen;
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-        .repositories-button {
-            background-color: blue;
-        }
-        .repositories-button:hover {
-            background-color:darkblue;
-            transform: translateY(-2px);
-            text-decoration: none;
         }
         .add-installation-note {
             background-color: #f8f9fa;
@@ -338,9 +312,8 @@ $title = "Account Details";
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Entity</th>
+                                    <th>&nbsp;</th>
                                     <th>Login</th>
-                                    <th>Type</th>
                                     <th>Installation Date</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -350,18 +323,21 @@ $title = "Account Details";
                                 <?php foreach ($entities as $entity): ?>
                                             <tr>
                                                 <td>
-                                                    <img src="<?php echo htmlspecialchars($entity['image']); ?>" alt="Entity Avatar">
+                                                    <a href="<?= $entity['html_url'] ?>" target="_blank">
+                                                        <img src="<?php echo htmlspecialchars($entity['image']); ?>" alt="Entity Avatar">
+                                                    </a>
                                                 </td>
                                                 <td>
-                                                    <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
+                                                   <a href="<?= $entity['html_url'] ?>" target="_blank">
+                                                        <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
+                                                    </a>                                                    
                                                 </td>
-                                                <td><?php echo ucfirst($entity['type']); ?></td>
                                                 <td>
                                                     <?php 
                                                         if ($entity['installation']) { 
                                                            echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
                                                         } else {
-                                                            echo "-";
+                                                            echo "<span style='text-align:center;font-weight:bold;'>-</span>";
                                                         }
                                                     ?>
                                                         
@@ -379,9 +355,9 @@ $title = "Account Details";
                                                 </td>
                                                 <td>
                                                     <?php if (!$entity['installation']): ?>
-                                                        <a class="button install-button" target="_blank"  href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
+                                                        <a class="btn btn-success btn-sm" target="_blank"  href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
                                                     <?php else: ?>
-                                                        <a class="button repositories-button" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
+                                                        <a class="btn btn-primary btn-sm" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
                                                             View Repositories
                                                         </a>
                                                     <?php endif; ?>
