@@ -325,12 +325,12 @@ $title = "Account Details";
                                 <?php foreach ($entities as $entity): ?>
                                             <tr>
                                                 <td>
-                                                    <a href="<?= $entity['html_url'] ?>" target="_blank">
+                                                    <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
                                                         <img src="<?php echo htmlspecialchars($entity['image']); ?>" alt="Entity Avatar">
                                                     </a>
                                                 </td>
                                                 <td>
-                                                   <a href="<?= $entity['html_url'] ?>" target="_blank">
+                                                   <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
                                                         <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
                                                     </a>                                                    
                                                 </td>
