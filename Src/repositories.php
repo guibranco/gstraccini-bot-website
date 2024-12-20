@@ -203,11 +203,17 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
             const queryString = new URLSearchParams(window.location.search);
             queryString.set('organization', organization);
             window.history.replaceState({}, '', '?' + queryString.toString());
-        
+
+            let counter = 0;
             document.querySelectorAll('.repository-row').forEach(row => {
                 const matches = !organization || row.dataset.organization === organization;
                 row.style.display = matches ? '' : 'none';
+                if(matches) {
+                    counter++;
+                }
             });
+
+            document.getElementById('repositoriesCount').textContent = counter;
         }
 
         document.getElementById('organizationFilter').addEventListener('change', filterRepositories);
