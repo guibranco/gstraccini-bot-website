@@ -135,6 +135,15 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
+                        <label for="llama" class="form-label"><img height="24" width="24" src="Llama.png" /> LLAMA API Key</label>
+                        <div class="input-group">
+                           <input type="password" class="form-control" id="llama" placeholder="Enter LLAMA API Key">
+                           <span class="input-group-text">
+                              <i class="fas fa-eye toggle-visibility" data-target="llama"></i>
+                           </span>
+                        </div>
+                     </div>
+                     <div class="mb-3 position-relative">
                         <label for="codeclimate" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Cpanel" /> CPanel API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="cpanel"
