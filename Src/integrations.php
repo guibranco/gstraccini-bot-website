@@ -29,7 +29,7 @@ $title = "Integration Details";
    <title>GStraccini-bot | <?php echo $title; ?></title>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="static/user.css">
+   <link rel="stylesheet" href="/static/user.css">
 </head>
 
 <body>
@@ -101,7 +101,7 @@ $title = "Integration Details";
                      </div>
                      <div class="mb-3 position-relative">
                         <label for="deepsource" class="form-label"><img height="24" width="24"
-                              src="images/Deepsource.png" alt="DeepSource" />
+                              src="/images/Deepsource.png" alt="DeepSource" />
                            DeepSource API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="deepsource"
@@ -135,7 +135,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="llama" class="form-label"><img height="24" width="24" src="images/Llama.png"
+                        <label for="llama" class="form-label"><img height="24" width="24" src="/images/Llama.png"
                               alt="Llama" />
                            LLAMA API
                            Key</label>

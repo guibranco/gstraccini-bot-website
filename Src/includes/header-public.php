@@ -1,6 +1,6 @@
 <header>
   <a href="https://bot.straccini.com">
-    <img src="images/logo.png" alt="GStraccini-bot Logo" class="logo">
+    <img src="/images/logo.png" alt="GStraccini-bot Logo" class="logo">
   </a>
   <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
 </header>

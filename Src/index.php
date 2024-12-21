@@ -9,7 +9,7 @@ require_once "includes/session.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Introducing Your GStraccini-bot - Automate GitHub tasks with ease.">
   <title>GStraccini-bot - Automate Your Workflow</title>
-  <link rel="stylesheet" href="static/main.css" />
+  <link rel="stylesheet" href="/static/main.css" />
 </head>
 
 <body>
@@ -28,7 +28,7 @@ require_once "includes/session.php";
     <?php else: ?>
       <form action="login.php" method="get">
         <button type="submit" class="github-button">
-          <img src="images/GitHub.png" width="20" height="20" alt="GitHub logo" />
+          <img src="/images/GitHub.png" width="20" height="20" alt="GitHub logo" />
           Login with GitHub
         </button>
       </form>

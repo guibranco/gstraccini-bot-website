@@ -9,7 +9,7 @@ require_once "includes/session.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Privacy Notice for GStraccini-bot - Understand how your data is handled.">
   <title>GStraccini-bot Privacy Notice</title>
-  <link rel="stylesheet" href="static/main.css" />  
+  <link rel="stylesheet" href="/static/main.css" />  
 </head>
 
 <body>
