@@ -38,85 +38,66 @@ if ($token === null || empty($token) === true) {
     exit();
 }
 
-$apiUrl = 'https://api.github.com/user';
+function getGitHub($url, $token)
+{
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $token",
+        "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+        "Accept: application/vnd.github+json",
+        "X-GitHub-Api-Version: 2022-11-28"
+    ]);
 
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-curl_setopt($ch, CURLOPT_HEADER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer $token",
-    "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
-    "Accept: application/vnd.github+json",
-    "X-GitHub-Api-Version: 2022-11-28"
-]);
 
-$response = curl_exec($ch);
+    $response = curl_exec($ch);
 
-$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$headers = substr($response, 0, $headerSize);
-$body = json_decode(substr($response, $headerSize), true);
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $headers = substr($response, 0, $headerSize);
+    $body = json_decode(substr($response, $headerSize), true);
 
-curl_close($ch);
+    curl_close($ch);
 
-if (isset($body["message"])) {
-    header("Location: signin.php?error=" . urlencode($body["message"]));
+    return ["headers" => $headers, "body" => $body];
+}
+
+
+$apiUrlUser = 'https://api.github.com/user';
+$userResponse = getGitHub($apiUrlUser, $token);
+
+if (isset($userResponse["body"]["message"])) {
+    header("Location: signin.php?error=" . urlencode($userResponse["body"]["message"]));
     exit();
 }
 
-if (isset($body['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $body['name'], $matches)) {
-    $body['first_name'] = $matches[1];
-    $body['last_name'] = $matches[2];
+if (isset($userResponse["body"]['name']) === true && preg_match('/^(\w+)(?:\s+[\w\s]+)?\s+(\w+)$/', $userResponse["body"]['name'], $matches)) {
+    $userResponse["body"]['first_name'] = $matches[1];
+    $userResponse["body"]['last_name'] = $matches[2];
 }
 
 $_SESSION['token'] = $token;
-$_SESSION['user'] = $body;
+$_SESSION['user'] = $userResponse["body"];
 
-$apiUrl = 'https://api.github.com/user/installations';
+$apiUrlInstallations = 'https://api.github.com/user/installations';
+$installationsResponse = getGitHub($apiUrlInstallations, $token);
 
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-curl_setopt($ch, CURLOPT_HEADER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer $token",
-    "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
-    "Accept: application/vnd.github+json",
-    "X-GitHub-Api-Version: 2022-11-28"
-]);
+if(isset($installationsResponse["body"]["message"])) {
+    header("Location: signin.php?error=" . urlencode($installationsResponse["body"]["message"]));
+    exit();
+}
+$_SESSION['installations'] = $installationsResponse["body"];
 
-$response = curl_exec($ch);
+$apiUrlOrganizations = 'https://api.github.com/users/' . $_SESSION['user']['login'] . '/orgs';
+$organizationsResponse = getGitHub($apiUrlOrganizations, $token);
 
-$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$headers = substr($response, 0, $headerSize);
-$body = json_decode(substr($response, $headerSize), true);
+if(isset($organizationsResponse["body"]["message"])) {
+    header("Location: signin.php?error=" . urlencode($organizationsResponse["body"]["message"]));
+    exit();
+}
 
-curl_close($ch);
-
-$_SESSION['installations'] = $body;
-
-$apiUrl = 'https://api.github.com/users/' . $_SESSION['user']['login'] . '/orgs';
-
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-curl_setopt($ch, CURLOPT_HEADER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer $token",
-    "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
-    "Accept: application/vnd.github+json",
-    "X-GitHub-Api-Version: 2022-11-28"
-]);
-
-$response = curl_exec($ch);
-
-$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-$headers = substr($response, 0, $headerSize);
-$body = json_decode(substr($response, $headerSize), true);
-
-curl_close($ch);
-
-$_SESSION['organizations'] = $body;
+$_SESSION['organizations'] = $organizationsResponse["body"];
 
 $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
 $_SESSION['redirectUrl'] = null;
