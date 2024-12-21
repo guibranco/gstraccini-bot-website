@@ -125,6 +125,16 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
+                        <label for="snyk" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Snyk" alt="Codeclsnykimate" /> Snyk Auth Token</label>
+                        <div class="input-group">
+                           <input type="password" class="form-control" id="snyk" placeholder="Enter Snyk Auth Token">
+                           <span class="input-group-text">
+                              <i class="fas fa-eye toggle-visibility" data-target="snyk"></i>
+                           </span>
+                        </div>
+                     </div>
+                     <div class="mb-3 position-relative">
                         <label for="openai" class="form-label"><img height="24" width="24"
                               src="https://cdn.simpleicons.org/Openai" alt="OpenAI" /> OpenAI API Key</label>
                         <div class="input-group">
