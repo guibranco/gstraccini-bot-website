@@ -1,17 +1,8 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-   header('Location: login.php');
+if ($isAuthenticated === false) {
+   header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
    exit();
 }
 
@@ -38,7 +29,7 @@ $title = "Integration Details";
    <title>GStraccini-bot | <?php echo $title; ?></title>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="user.css">
+   <link rel="stylesheet" href="/static/user.css">
 </head>
 
 <body>
@@ -61,7 +52,9 @@ $title = "Integration Details";
                   </div>
                   <div class="card-body">
                      <div class="mb-3 position-relative">
-                        <label for="sonarcloud" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Sonarcloud" /> SonarCloud API Key</label>
+                        <label for="sonarcloud" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Sonarcloud" alt="SonarCloud" /> SonarCloud API
+                           Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="sonarcloud"
                               placeholder="Enter SonarCloud API Key">
@@ -71,7 +64,8 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="appveyor" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Appveyor" /> AppVeyor
+                        <label for="appveyor" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Appveyor" alt="AppVeyor" /> AppVeyor
                            API Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="appveyor"
@@ -82,7 +76,8 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codacy" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Codacy" /> Codacy
+                        <label for="codacy" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Codacy" alt="Codacy" /> Codacy
                            Project Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codacy"
@@ -93,7 +88,8 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codecov" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Codecov" /> Codecov
+                        <label for="codecov" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Codecov" alt="Codecov" /> Codecov
                            Upload Token</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codecov"
@@ -104,7 +100,9 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="deepsource" class="form-label"><img height="24" width="24" src="Deepsource.png" /> DeepSource API Key</label>
+                        <label for="deepsource" class="form-label"><img height="24" width="24"
+                              src="/images/Deepsource.png" alt="DeepSource" />
+                           DeepSource API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="deepsource"
                               placeholder="Enter DeepSource API Key">
@@ -114,7 +112,9 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Codeclimate" /> CodeClimate Test Reporter
+                        <label for="codeclimate" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Codeclimate" alt="Codeclimate" /> CodeClimate Test
+                           Reporter
                            ID</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="codeclimate"
@@ -125,17 +125,20 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Openai" /> OpenAI API Key</label>
+                        <label for="openai" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Openai" alt="OpenAI" /> OpenAI API Key</label>
                         <div class="input-group">
-                           <input type="password" class="form-control" id="openai"
-                              placeholder="Enter OpenAI API Key">
+                           <input type="password" class="form-control" id="openai" placeholder="Enter OpenAI API Key">
                            <span class="input-group-text">
                               <i class="fas fa-eye toggle-visibility" data-target="openai"></i>
                            </span>
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="llama" class="form-label"><img height="24" width="24" src="Llama.png" /> LLAMA API Key</label>
+                        <label for="llama" class="form-label"><img height="24" width="24" src="/images/Llama.png"
+                              alt="Llama" />
+                           LLAMA API
+                           Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="llama" placeholder="Enter LLAMA API Key">
                            <span class="input-group-text">
@@ -144,18 +147,18 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24" src="https://cdn.simpleicons.org/Cpanel" /> CPanel API Key</label>
+                        <label for="cpanel" class="form-label"><img height="24" width="24"
+                              src="https://cdn.simpleicons.org/Cpanel" alt="CPanel" /> CPanel API Key</label>
                         <div class="input-group">
-                           <input type="password" class="form-control" id="cpanel"
-                              placeholder="Enter CPanel API Key">
+                           <input type="password" class="form-control" id="cpanel" placeholder="Enter CPanel API Key">
                            <span class="input-group-text">
                               <i class="fas fa-eye toggle-visibility" data-target="cpanel"></i>
                            </span>
                         </div>
-                     </div>                  
-                  </div>                  
+                     </div>
+                  </div>
                </div>
-               
+
                <div class="text-center mt-4">
                   <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
                   <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
@@ -164,8 +167,8 @@ $title = "Integration Details";
          </div>
       </div>
    </div>
-  
-   <?php require_once "includes/footer.php"; ?>  
+
+   <?php require_once "includes/footer.php"; ?>
    <script>
       $(document).ready(function () {
          $('.input-group-text').on('click', function () {

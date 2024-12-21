@@ -1,17 +1,8 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-    header('Location: login.php');
+if ($isAuthenticated === false) {
+    header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
     exit();
 }
 
@@ -42,14 +33,14 @@ if (isset($user["first_name"])) {
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="user.css">
+    <link rel="stylesheet" href="/static/user.css">
 </head>
 
 <body>
     <?php require_once 'includes/header.php'; ?>
 
     <div class="container mt-5 d-none" id="alert-container"></div>
-  
+
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-12">
@@ -63,12 +54,15 @@ if (isset($user["first_name"])) {
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a
-                                    href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <strong><a href='<?php echo htmlspecialchars($issue['url'], ENT_QUOTES, 'UTF-8'); ?>'
+                                    rel="noopener noreferrer"
+                                    target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
-                            </span> - 
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name'], ENT_QUOTES, 'UTF-8'); ?>'
+                                    rel="noopener noreferrer"
+                                    target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
+                            </span> -
                             <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
@@ -143,7 +137,7 @@ if (isset($user["first_name"])) {
                 list.appendChild(itemLi);
             });
         }
-      
+
         function getStateBadge(state) {
             switch (state) {
                 case 'success':
@@ -163,7 +157,7 @@ if (isset($user["first_name"])) {
             fetch('api.php')
                 .then(response => response.json())
                 .then(data => {
-                    populateIssues(data.openPullRequests, "openPullRequests");               
+                    populateIssues(data.openPullRequests, "openPullRequests");
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
