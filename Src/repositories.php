@@ -77,7 +77,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
         <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Your Repositories <span class="badge text-bg-warning rounded-pill"
-                        id="repositoriesCount"><?php echo count($data["repositories"]); ?></span></h3>
+                        id="repositoriesCount"><?php echo count($filteredRepositories); ?></span></h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
