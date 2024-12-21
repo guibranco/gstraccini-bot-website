@@ -28,18 +28,6 @@ jobs:
           php_extensions: sockets
           dev: no
           progress: yes
-          working_dir: "./Src/"
-
-      - name: Create MySQL secrets file
-        run: |
-          cd Src
-          mkdir -p secrets
-          cd secrets
-          echo "<?php" >> mySql.secrets.php
-          echo "\$mySqlHost     = \"database\";" >> mySql.secrets.php
-          echo "\$mySqlUser     = \"test\";" >> mySql.secrets.php
-          echo "\$mySqlPassword = \"test\";" >> mySql.secrets.php
-          echo "\$mySqlDatabase = \"test\";" >> mySql.secrets.php
 
       - name: Docker compose up
         run: |
