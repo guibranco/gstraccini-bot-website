@@ -36,6 +36,20 @@ Follow these steps to start contributing:
 - **Testing** 🧪:
 
   - All new features and fixes **must include PHPUnit tests**.
+  - Aim for minimum 80% code coverage for new code
+  - Include both unit tests and integration tests where applicable
+  - Test data can be set up using the provided fixtures in `tests/fixtures/`
+  - Example test structure:
+
+    ```php
+    public function testFeature(): void
+    {
+        // Arrange: Set up test data
+        // Act: Execute the feature
+        // Assert: Verify the results
+    }
+    ```
+
   - Run the test suite to ensure everything works:
 
     ```bash
