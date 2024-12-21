@@ -25,61 +25,51 @@ $integrations = [
    [
       'id' => 'sonarcloud',
       'label' => 'SonarCloud API Key',
-      'placeholder' => 'Enter SonarCloud API Key',
       'icon' => 'https://cdn.simpleicons.org/Sonarcloud',
    ],
    [
       'id' => 'appveyor',
       'label' => 'AppVeyor API Token',
-      'placeholder' => 'Enter AppVeyor API Token',
       'icon' => 'https://cdn.simpleicons.org/Appveyor',
    ],
    [
       'id' => 'codacy',
       'label' => 'Codacy Project Token',
-      'placeholder' => 'Enter Codacy Project Token',
       'icon' => 'https://cdn.simpleicons.org/Codacy',
    ],
    [
       'id' => 'codecov',
       'label' => 'Codecov Upload Token',
-      'placeholder' => 'Enter Codecov Upload Token',
       'icon' => 'https://cdn.simpleicons.org/Codecov',
    ],
    [
       'id' => 'deepsource',
       'label' => 'DeepSource API Key',
-      'placeholder' => 'Enter DeepSource API Key',
       'icon' => '/images/Deepsource.png',
    ],
    [
       'id' => 'codeclimate',
       'label' => 'CodeClimate Test Reporter ID',
-      'placeholder' => 'Enter CodeClimate Test Reporter ID',
       'icon' => 'https://cdn.simpleicons.org/Codeclimate',
    ],
    [
       'id' => 'snyk',
       'label' => 'Snyk Auth Token',
-      'placeholder' => 'Enter Snyk Auth Token',
       'icon' => 'https://cdn.simpleicons.org/Snyk',
    ],
    [
       'id' => 'openai',
       'label' => 'OpenAI API Key',
-      'placeholder' => 'Enter OpenAI API Key',
       'icon' => 'https://cdn.simpleicons.org/Openai',
    ],
    [
       'id' => 'llama',
       'label' => 'LLAMA API Key',
-      'placeholder' => 'Enter LLAMA API Key',
       'icon' => '/images/Llama.png',
    ],
    [
       'id' => 'cpanel',
       'label' => 'CPanel API Key',
-      'placeholder' => 'Enter CPanel API Key',
       'icon' => 'https://cdn.simpleicons.org/Cpanel',
    ],
 ];
@@ -118,19 +108,17 @@ $integrations = [
                      <?php foreach ($integrations as $integration): ?>
                         <div class="mb-3 position-relative">
                            <label for="<?php echo $integration['id']; ?>" class="form-label">
-                              <img height="24" width="24" src="<?php echo $integration['icon']; ?>" alt="<?php echo $integration['id']; ?>" />
+                              <img height="24" width="24" src="<?php echo $integration['icon']; ?>"
+                                 alt="<?php echo $integration['id']; ?>" />
                               <?php echo $integration['label']; ?>
                            </label>
                            <div class="input-group">
-                              <input 
-                                 type="password" 
-                                 class="form-control" 
-                                 id="<?php echo $integration['id']; ?>" 
-                                 placeholder="<?php echo $integration['placeholder']; ?>" 
-                                 name="<?php echo $integration['id']; ?>"
-                              >
+                              <input type="password" class="form-control" id="<?php echo $integration['id']; ?>"
+                                 placeholder="ENter <?php echo $integration['label']; ?>"
+                                 name="<?php echo $integration['id']; ?>">
                               <span class="input-group-text">
-                                 <i class="fas fa-eye toggle-visibility" data-target="<?php echo $integration['id']; ?>"></i>
+                                 <i class="fas fa-eye toggle-visibility"
+                                    data-target="<?php echo $integration['id']; ?>"></i>
                               </span>
                            </div>
                         </div>
