@@ -273,7 +273,7 @@ $title = "Account Details";
                                                     href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id'] ?>">Install</a>
                                             <?php else: ?>
                                                 <a class="btn btn-primary btn-sm"
-                                                    href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
+                                                href="repositories.php?organization=<?= htmlspecialchars(urlencode($entity['installation']['account']['login'])) ?>">  
                                                     View Repositories
                                                 </a>
                                             <?php endif; ?>

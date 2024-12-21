@@ -125,7 +125,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24"
+                        <label for="openai" class="form-label"><img height="24" width="24"
                               src="https://cdn.simpleicons.org/Openai" alt="OpenAI" /> OpenAI API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="openai" placeholder="Enter OpenAI API Key">
@@ -146,7 +146,7 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24"
+                        <label for="cpanel" class="form-label"><img height="24" width="24"
                               src="https://cdn.simpleicons.org/Cpanel" alt="CPanel" /> CPanel API Key</label>
                         <div class="input-group">
                            <input type="password" class="form-control" id="cpanel" placeholder="Enter CPanel API Key">
