@@ -2,7 +2,7 @@
 require_once "includes/session.php";
 
 if ($isAuthenticated === false) {
-    header('Location: signin.php?redirectUrl='.urlencode($_SERVER['REQUEST_URI']));
+    header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
     exit();
 }
 

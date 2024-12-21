@@ -2,7 +2,7 @@
 require_once "includes/session.php";
 
 if ($isAuthenticated === false) {
-   header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI']));
+   header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
    exit();
 }
 
@@ -135,7 +135,8 @@ $title = "Integration Details";
                         </div>
                      </div>
                      <div class="mb-3 position-relative">
-                        <label for="llama" class="form-label"><img height="24" width="24" src="images/Llama.png" alt="Llama" />
+                        <label for="llama" class="form-label"><img height="24" width="24" src="images/Llama.png"
+                              alt="Llama" />
                            LLAMA API
                            Key</label>
                         <div class="input-group">
