@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Install dependencies
+        uses: "php-actions/composer@v6"
+        with:
+          php_extensions: sockets
+          dev: no
+          progress: yes
+
+      - name: Docker compose up
+        run: |
+          docker compose up -d
+          timeout=60
+          while ! curl -s http://localhost:8008/health.php > /dev/null; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for service to be ready"
+              exit 1
+            fi
+            timeout=$((timeout-1))
+            sleep 1
+          done

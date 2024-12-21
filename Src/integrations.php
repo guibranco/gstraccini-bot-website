@@ -19,6 +19,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $title = "Integration Details";
+
+// Define integrations array
+$integrations = [
+   [
+      'id' => 'sonarcloud',
+      'label' => 'SonarCloud API Key',
+      'placeholder' => 'Enter SonarCloud API Key',
+      'icon' => 'https://cdn.simpleicons.org/Sonarcloud',
+   ],
+   [
+      'id' => 'appveyor',
+      'label' => 'AppVeyor API Token',
+      'placeholder' => 'Enter AppVeyor API Token',
+      'icon' => 'https://cdn.simpleicons.org/Appveyor',
+   ],
+   [
+      'id' => 'codacy',
+      'label' => 'Codacy Project Token',
+      'placeholder' => 'Enter Codacy Project Token',
+      'icon' => 'https://cdn.simpleicons.org/Codacy',
+   ],
+   [
+      'id' => 'codecov',
+      'label' => 'Codecov Upload Token',
+      'placeholder' => 'Enter Codecov Upload Token',
+      'icon' => 'https://cdn.simpleicons.org/Codecov',
+   ],
+   [
+      'id' => 'deepsource',
+      'label' => 'DeepSource API Key',
+      'placeholder' => 'Enter DeepSource API Key',
+      'icon' => '/images/Deepsource.png',
+   ],
+   [
+      'id' => 'codeclimate',
+      'label' => 'CodeClimate Test Reporter ID',
+      'placeholder' => 'Enter CodeClimate Test Reporter ID',
+      'icon' => 'https://cdn.simpleicons.org/Codeclimate',
+   ],
+   [
+      'id' => 'snyk',
+      'label' => 'Snyk Auth Token',
+      'placeholder' => 'Enter Snyk Auth Token',
+      'icon' => 'https://cdn.simpleicons.org/Snyk',
+   ],
+   [
+      'id' => 'openai',
+      'label' => 'OpenAI API Key',
+      'placeholder' => 'Enter OpenAI API Key',
+      'icon' => 'https://cdn.simpleicons.org/Openai',
+   ],
+   [
+      'id' => 'llama',
+      'label' => 'LLAMA API Key',
+      'placeholder' => 'Enter LLAMA API Key',
+      'icon' => '/images/Llama.png',
+   ],
+   [
+      'id' => 'cpanel',
+      'label' => 'CPanel API Key',
+      'placeholder' => 'Enter CPanel API Key',
+      'icon' => 'https://cdn.simpleicons.org/Cpanel',
+   ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,111 +115,26 @@ $title = "Integration Details";
                      <h2>Integration Details</h2>
                   </div>
                   <div class="card-body">
-                     <div class="mb-3 position-relative">
-                        <label for="sonarcloud" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Sonarcloud" alt="SonarCloud" /> SonarCloud API
-                           Key</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="sonarcloud"
-                              placeholder="Enter SonarCloud API Key">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="sonarcloud"></i>
-                           </span>
+                     <?php foreach ($integrations as $integration): ?>
+                        <div class="mb-3 position-relative">
+                           <label for="<?php echo $integration['id']; ?>" class="form-label">
+                              <img height="24" width="24" src="<?php echo $integration['icon']; ?>" alt="<?php echo $integration['id']; ?>" />
+                              <?php echo $integration['label']; ?>
+                           </label>
+                           <div class="input-group">
+                              <input 
+                                 type="password" 
+                                 class="form-control" 
+                                 id="<?php echo $integration['id']; ?>" 
+                                 placeholder="<?php echo $integration['placeholder']; ?>" 
+                                 name="<?php echo $integration['id']; ?>"
+                              >
+                              <span class="input-group-text">
+                                 <i class="fas fa-eye toggle-visibility" data-target="<?php echo $integration['id']; ?>"></i>
+                              </span>
+                           </div>
                         </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="appveyor" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Appveyor" alt="AppVeyor" /> AppVeyor
-                           API Token</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="appveyor"
-                              placeholder="Enter AppVeyor API Token">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="appveyor"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="codacy" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Codacy" alt="Codacy" /> Codacy
-                           Project Token</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="codacy"
-                              placeholder="Enter Codacy Project Token">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="codacy"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="codecov" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Codecov" alt="Codecov" /> Codecov
-                           Upload Token</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="codecov"
-                              placeholder="Enter Codecov Upload Token">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="codecov"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="deepsource" class="form-label"><img height="24" width="24"
-                              src="/images/Deepsource.png" alt="DeepSource" />
-                           DeepSource API Key</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="deepsource"
-                              placeholder="Enter DeepSource API Key">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="deepsource"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="codeclimate" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Codeclimate" alt="Codeclimate" /> CodeClimate Test
-                           Reporter
-                           ID</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="codeclimate"
-                              placeholder="Enter CodeClimate Test Reporter ID">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="codeclimate"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="openai" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Openai" alt="OpenAI" /> OpenAI API Key</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="openai" placeholder="Enter OpenAI API Key">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="openai"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="llama" class="form-label"><img height="24" width="24" src="/images/Llama.png"
-                              alt="Llama" />
-                           LLAMA API
-                           Key</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="llama" placeholder="Enter LLAMA API Key">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="llama"></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="mb-3 position-relative">
-                        <label for="cpanel" class="form-label"><img height="24" width="24"
-                              src="https://cdn.simpleicons.org/Cpanel" alt="CPanel" /> CPanel API Key</label>
-                        <div class="input-group">
-                           <input type="password" class="form-control" id="cpanel" placeholder="Enter CPanel API Key">
-                           <span class="input-group-text">
-                              <i class="fas fa-eye toggle-visibility" data-target="cpanel"></i>
-                           </span>
-                        </div>
-                     </div>
+                     <?php endforeach; ?>
                   </div>
                </div>
 
@@ -170,33 +149,23 @@ $title = "Integration Details";
 
    <?php require_once "includes/footer.php"; ?>
    <script>
-      $(document).ready(function () {
-         $('.input-group-text').on('click', function () {
-            const icon = $(this).find('[data-fa-i2svg]');
-            const targetInputId = icon.data('target');
-            const inputField = $('#' + targetInputId);
+      document.addEventListener('DOMContentLoaded', function () {
+         document.querySelectorAll('.input-group-text').forEach(btn => {
+            btn.addEventListener('click', function () {
+               const icon = this.querySelector('.fas');
+               const targetInputId = this.getAttribute('data-target');
+               const inputField = document.getElementById(targetInputId);
 
-            if (inputField.attr('type') === 'password') {
-               inputField.attr('type', 'text');
-               icon.toggleClass('fa-eye').toggleClass('fa-eye-slash');
-            } else {
-               inputField.attr('type', 'password');
-               icon.toggleClass('fa-eye-slash').toggleClass('fa-eye');
-            }
-         });
-
-         $('#integrationsForm').on('submit', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const form = $(this);
-
-            if (form.checkValidity() === false) {
-               form.classList.add('was-validated');
-            } else {
-               form.classList.remove('was-validated');
-               form.submit();
-            }
+               if (inputField.type === 'password') {
+                  inputField.type = 'text';
+                  icon.classList.remove('fa-eye');
+                  icon.classList.add('fa-eye-slash');
+               } else {
+                  inputField.type = 'password';
+                  icon.classList.remove('fa-eye-slash');
+                  icon.classList.add('fa-eye');
+               }
+            });
          });
       });
    </script>
