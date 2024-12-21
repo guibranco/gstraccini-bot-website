@@ -93,7 +93,12 @@ if (isset($user["first_name"])) {
             appendLoadingItem();
 
             fetch(`${apiUrl}?page=${page}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     removeLoadingItem();
                     if (data.openIssues.length === 0) {
@@ -120,7 +125,12 @@ if (isset($user["first_name"])) {
                 })
                 .catch(error => {
                     console.error('Error loading items:', error);
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'alert alert-danger';
+                    errorItem.textContent = 'Failed to load items. Please try again.';
+                    scrollableList.appendChild(errorItem);
                     loading = false;
+                    removeLoadingItem();
                 });
         }
 
