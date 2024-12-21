@@ -54,11 +54,13 @@ if (isset($user["first_name"])) {
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequests"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a href='<?php echo $issue['url']; ?>'
+                            <strong><a href='<?php echo htmlspecialchars($issue['url'], ENT_QUOTES, 'UTF-8'); ?>'
+                                    rel="noopener noreferrer"
                                     target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name'], ENT_QUOTES, 'UTF-8'); ?>'
+                                    rel="noopener noreferrer"
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> -
                             <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
