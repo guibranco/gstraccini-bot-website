@@ -2,7 +2,7 @@
 require_once "includes/session.php";
 
 if ($isAuthenticated === false) {
-    header('Location: signin.php?redirectUrl='.urlencode($_SERVER['REQUEST_URI']));
+    header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI']));
     exit();
 }
 
@@ -269,11 +269,11 @@ $title = "Account Details";
                                         </td>
                                         <td>
                                             <?php if (!$entity['installation']): ?>
-                                                <a class="btn btn-success btn-sm" target="_blank"
+                                                <a class="btn btn-success btn-sm" target="_blank" rel="noopener noreferrer"
                                                     href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id'] ?>">Install</a>
                                             <?php else: ?>
                                                 <a class="btn btn-primary btn-sm"
-                                                href="repositories.php?organization=<?= htmlspecialchars(urlencode($entity['installation']['account']['login'])) ?>">  
+                                                    href="repositories.php?organization=<?= htmlspecialchars(urlencode($entity['installation']['account']['login'])) ?>">
                                                     View Repositories
                                                 </a>
                                             <?php endif; ?>
@@ -290,6 +290,7 @@ $title = "Account Details";
                             </p>
                             <div class="add-installation-container mt-2">
                                 <a class="add-installation-button btn btn-success" target="_blank"
+                                    rel="noopener noreferrer"
                                     href="https://github.com/apps/gstraccini/installations/select_target">Add New
                                     Installation</a>
                             </div>
