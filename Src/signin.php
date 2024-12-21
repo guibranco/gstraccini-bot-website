@@ -1,9 +1,15 @@
 <?php
 require_once "includes/session.php";
 
-if (isset($_GET['redirectUrl'])) {
-    $_SESSION['redirectUrl'] = $_GET['redirectUrl'];
+$redirectUrl = $_GET['redirectUrl'] ?? 'dashboard.php';
+$redirectUrl = (substr($redirectUrl, 0, 1) === '/') ? $redirectUrl : '/' . $redirectUrl;
+$baseUrl = 'https://bot.straccini.com';
+$parsedUrl = parse_url($redirectUrl);
+if (isset($parsedUrl['host']) && $parsedUrl['host'] !== parse_url($baseUrl, PHP_URL_HOST)) {
+    error_log("Invalid redirect URL: " . $redirectUrl);
+    $redirectUrl = 'dashboard.php';
 }
+$_SESSION['redirectUrl'] = $redirectUrl;
 
 if ($isAuthenticated === true) {
     $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
