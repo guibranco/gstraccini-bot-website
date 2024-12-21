@@ -53,7 +53,7 @@ foreach ($organizations as $organization) {
         'id' => $organizationId,
         'name' => $organization['login'],
         'image' => $organization['avatar_url'],
-        'html_url' => $organization['html_url'],
+        'html_url' => 'https://github.com/'.$organization['login'],
         'installation' => $hasInstallation ? $installationMap[$organizationId] : null,
     ];
 }
