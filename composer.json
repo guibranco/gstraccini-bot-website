@@ -1,0 +1,29 @@
+{
+    "name": "guibranco/gstraccini-bot-website",
+    "description": "Guilherme Stracini's Bot website/portal",
+    "type": "project",
+    "require": {
+        "guibranco/pancake": "^0.14.28"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Guibranco\\GstracciniBotWebsite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GuiBranco\\GstracciniBotWebsite\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Guilherme Branco Stracini",
+            "email": "guilherme@guilhermebranco.com.br"
+        }
+    ],
+    "minimum-stability": "stable"
+}
