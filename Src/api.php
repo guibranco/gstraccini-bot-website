@@ -1,25 +1,16 @@
 <?php
-$expires = 60;
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-$data = ['error' => 'Unauthorized'];
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-    echo json_encode($data);
+if ($isAuthenticated === false) {
+    echo json_encode(['error' => 'Unauthorized']);
     exit();
 }
 
-if (!isset($_GET['page']) && 
+$expires = 60;
+if (
+    !isset($_GET['page']) &&
     !isset($_GET['dashboard']) &&
-    isset($_SESSION['last_api_call']) && 
+    isset($_SESSION['last_api_call']) &&
     $_SESSION['last_api_call'] > (time() - 180) &&
     isset($_SESSION['data'])
 ) {

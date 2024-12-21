@@ -1,16 +1,7 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['token'])) {
+if ($isAuthenticated === false) {
     echo json_encode(['error' => 'User not authenticated.']);
     exit();
 }

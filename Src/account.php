@@ -1,23 +1,14 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-    header('Location: login.php');
+if ($isAuthenticated === false) {
+    header('Location: signin.php?redirectUrl='.urlencode($_SERVER['REQUEST_URI']));
     exit();
 }
 
 $user = $_SESSION['user'];
 if (isset($user['first_name']) === false) {
-    $user['first_name'] = '';    
+    $user['first_name'] = '';
 }
 if (isset($user['last_name']) === false) {
     $user['last_name'] = '';
@@ -93,91 +84,7 @@ $title = "Account Details";
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="user.css">
-    <style>
-        .entities table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .entities th, .entities td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .entities th {
-            background-color: #f4f4f4;
-        }
-        .entities img {
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-        }
-        .status-installed {
-            color: green;
-            font-weight: bold;
-        }
-        .status-uninstalled {
-            color: red;
-            font-weight: bold;
-        }
-        .status-suspended {
-            color: orange;
-            font-weight: bold;
-        }
-        .add-installation-note {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            margin-top: 20px;
-            font-family: Arial, sans-serif;
-            color: #212529;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .add-installation-note p {
-            margin: 0 0 10px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .add-installation-note strong {
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .add-installation-container {
-            text-align: center;
-            margin-top: 10px;
-        }
-        
-        .add-installation-button {
-            display: inline-block;
-            background-color: #28a745;
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        
-        .add-installation-button:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-        
-        .add-installation-button:active {
-            background-color: #1e7e34;
-            transform: translateY(0); 
-        }
-
-    </style>
+    <link rel="stylesheet" href="static/user.css">
 </head>
 
 <body>
@@ -277,7 +184,8 @@ $title = "Account Details";
                                         minlength="6">
                                     <div class="invalid-feedback">Password must be at least 6 characters long.</div>
                                 </div>
-                                <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
+                                <small class="form-text text-muted">Leave blank if you don't want to change your
+                                    password.</small>
                             </div>
 
                             <div class="mb-3">
@@ -290,14 +198,16 @@ $title = "Account Details";
                                         name="passwordConfirm">
                                     <div class="invalid-feedback">Passwords must match.</div>
                                 </div>
-                                <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
+                                <small class="form-text text-muted">Leave blank if you don't want to change your
+                                    password.</small>
                             </div>
 
                         </div>
                     </div>
 
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Account Details</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Account
+                            Details</button>
                         <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
@@ -308,7 +218,8 @@ $title = "Account Details";
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Entities <span class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
+                        <h3>Entities <span
+                                class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
                     </div>
                     <div class="card-body entities">
                         <table>
@@ -323,58 +234,64 @@ $title = "Account Details";
                             </thead>
                             <tbody>
                                 <?php foreach ($entities as $entity): ?>
-                                            <tr>
-                                                <td>
-                                                    <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
-                                                        <img src="<?php echo htmlspecialchars($entity['image']); ?>" alt="Entity Avatar">
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                   <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
-                                                        <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
-                                                    </a>                                                    
-                                                </td>
-                                                <td>
-                                                    <?php 
-                                                        if ($entity['installation']) { 
-                                                           echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
-                                                        } else {
-                                                            echo "<span style='text-align:center;font-weight:bold;'>-</span>";
-                                                        }
-                                                    ?>
-                                                        
-                                                </td>
-                                                <td>
-                                                    <?php
-                                                        if ($entity['installation'] && $entity['installation']['suspended_at']) {
-                                                            echo '<span class="status-suspended">Suspended</span>';
-                                                        } else if ($entity['installation']) {
-                                                            echo '<span class="status-installed">Installed</span>';
-                                                        } else {
-                                                            echo '<span class="status-uninstalled">Not Installed</span>';
-                                                        }
-                                                    ?>
-                                                </td>
-                                                <td>
-                                                    <?php if (!$entity['installation']): ?>
-                                                        <a class="btn btn-success btn-sm" target="_blank"  href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id']?>">Install</a>
-                                                    <?php else: ?>
-                                                        <a class="btn btn-primary btn-sm" href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
-                                                            View Repositories
-                                                        </a>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>                               
+                                    <tr>
+                                        <td>
+                                            <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
+                                                <img src="<?php echo htmlspecialchars($entity['image']); ?>"
+                                                    alt="Entity Avatar">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="<?php echo htmlspecialchars($entity['html_url']); ?>" target="_blank">
+                                                <strong><?php echo htmlspecialchars($entity['name']); ?></strong>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            if ($entity['installation']) {
+                                                echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
+                                            } else {
+                                                echo "<span style='text-align:center;font-weight:bold;'>-</span>";
+                                            }
+                                            ?>
+
+                                        </td>
+                                        <td>
+                                            <?php
+                                            if ($entity['installation'] && $entity['installation']['suspended_at']) {
+                                                echo '<span class="status-suspended">Suspended</span>';
+                                            } else if ($entity['installation']) {
+                                                echo '<span class="status-installed">Installed</span>';
+                                            } else {
+                                                echo '<span class="status-uninstalled">Not Installed</span>';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!$entity['installation']): ?>
+                                                <a class="btn btn-success btn-sm" target="_blank"
+                                                    href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id'] ?>">Install</a>
+                                            <?php else: ?>
+                                                <a class="btn btn-primary btn-sm"
+                                                    href="repositories.php?organization=<?= urlencode($entity['installation']['account']['login']) ?>">
+                                                    View Repositories
+                                                </a>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                         <div class="add-installation-note mt-3">
                             <p>
                                 <strong>Didn't find the organization or entity you're looking for?</strong><br>
-                                No worries! If the desired organization or entity is missing from the list, you can manually add it to the installations by clicking the button below:
+                                No worries! If the desired organization or entity is missing from the list, you can
+                                manually add it to the installations by clicking the button below:
                             </p>
                             <div class="add-installation-container mt-2">
-                                <a class="add-installation-button btn btn-success" target="_blank" href="https://github.com/apps/gstraccini/installations/select_target">Add New Installation</a>
+                                <a class="add-installation-button btn btn-success" target="_blank"
+                                    href="https://github.com/apps/gstraccini/installations/select_target">Add New
+                                    Installation</a>
                             </div>
                         </div>
                     </div>
@@ -383,7 +300,7 @@ $title = "Account Details";
         </div>
     </div>
 
-    <?php require_once "includes/footer.php"; ?>  
+    <?php require_once "includes/footer.php"; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('settingsForm');

@@ -1,14 +1,5 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
 if (isset($_GET['state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
     header('Location: index.php?error=Invalid+state+parameter');
@@ -46,7 +37,7 @@ if ($token === null || empty($token) === true) {
     header('Location: index.php?error=Unable+to+retrieve+access+token');
     exit();
 }
- 
+
 $apiUrl = 'https://api.github.com/user';
 
 $ch = curl_init($apiUrl);
@@ -104,7 +95,7 @@ curl_close($ch);
 
 $_SESSION['installations'] = $body;
 
-$apiUrl = 'https://api.github.com/users/'.$_SESSION['user']['login'].'/orgs';
+$apiUrl = 'https://api.github.com/users/' . $_SESSION['user']['login'] . '/orgs';
 
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -127,5 +118,7 @@ curl_close($ch);
 
 $_SESSION['organizations'] = $body;
 
-header('Location: dashboard.php');
+$redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
+$_SESSION['redirectUrl'] = null;
+header("Location: {$redirectUrl}");
 exit();

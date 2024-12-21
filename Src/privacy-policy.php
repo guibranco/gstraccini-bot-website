@@ -1,15 +1,5 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
-$isAuthenticated = isset($_SESSION['user']);
+require_once "includes/session.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +9,7 @@ $isAuthenticated = isset($_SESSION['user']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Privacy Notice for GStraccini-bot - Understand how your data is handled.">
   <title>GStraccini-bot Privacy Notice</title>
-  <link rel="stylesheet" href="main.css" />  
+  <link rel="stylesheet" href="static/main.css" />  
 </head>
 
 <body>

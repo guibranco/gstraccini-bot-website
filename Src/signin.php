@@ -1,20 +1,17 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
-$isAuthenticated = isset($_SESSION['user']);
+require_once "includes/session.php";
+
+if (isset($_GET['redirectUrl'])) {
+    $_SESSION['redirectUrl'] = $_GET['redirectUrl'];
+}
+
 if ($isAuthenticated === true) {
-    header('Location: dashboard.php');
+    $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
+    $_SESSION['redirectUrl'] = null;
+    header("Location: {$redirectUrl}");
     exit();
 }
-?>    
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,7 +21,7 @@ if ($isAuthenticated === true) {
     <title>Login Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="static/main.css" />
     <style>
         .input-group-6digit input {
             width: 40px;
@@ -46,7 +43,7 @@ if ($isAuthenticated === true) {
         #resendCodeBtn:disabled {
             background-color: lightgray;
             cursor: not-allowed;
-        }       
+        }
     </style>
 </head>
 
@@ -62,7 +59,7 @@ if ($isAuthenticated === true) {
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
-            
+
             <div class="col-md-6">
                 <h2 class="text-center mb-4">Login</h2>
 
@@ -319,4 +316,5 @@ if ($isAuthenticated === true) {
         }
     </script>
 </body>
+
 </html>

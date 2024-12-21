@@ -1,17 +1,8 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-    header('Location: login.php');
+if ($isAuthenticated === false) {
+    header('Location: signin.php?redirectUrl='.urlencode($_SERVER['REQUEST_URI']));
     exit();
 }
 
@@ -42,7 +33,7 @@ if (isset($user["first_name"])) {
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="user.css">
+    <link rel="stylesheet" href="static/user.css">
 </head>
 
 <body>
@@ -52,7 +43,8 @@ if (isset($user["first_name"])) {
         <div class="user-info">
             <img src="<?php echo $user['avatar_url']; ?>" alt="User Avatar" width="80" height="80">
             <div>
-                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>" target="_blank"><?php echo htmlspecialchars($name); ?></a></h2>
+                <h2>Welcome, <a href="<?php echo htmlspecialchars($user['html_url']); ?>"
+                        target="_blank"><?php echo htmlspecialchars($name); ?></a></h2>
                 <p class="welcome-message">We're glad to have you back.</p>
             </div>
         </div>
@@ -163,12 +155,13 @@ if (isset($user["first_name"])) {
                     <?php endif; ?>
                     <?php foreach ($data["openPullRequestsDashboard"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a
-                                    href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <strong><a href='<?php echo $issue['url']; ?>'
+                                    target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
                             <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
-                            </span> - 
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'
+                                    target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
+                            </span> -
                             <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
@@ -207,12 +200,13 @@ if (isset($user["first_name"])) {
                     <?php endif; ?>
                     <?php foreach ($data["openIssuesDashboard"] as $issue): ?>
                         <li class="list-group-item">
-                            <strong><a
-                                    href='<?php echo $issue['url']; ?>' target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
-                            <br />                            
+                            <strong><a href='<?php echo $issue['url']; ?>'
+                                    target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
+                            <br />
                             <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>' target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
-                            </span> - 
+                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name']); ?>'
+                                    target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
+                            </span> -
                             <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
                         </li>
                     <?php endforeach; ?>
@@ -269,7 +263,7 @@ if (isset($user["first_name"])) {
                 list.appendChild(itemLi);
             });
         }
-      
+
         function getStateBadge(state) {
             switch (state) {
                 case 'success':
@@ -290,7 +284,7 @@ if (isset($user["first_name"])) {
                 .then(response => response.json())
                 .then(data => {
                     populateIssues(data.openPullRequestsDashboard, "openPullRequests");
-                    populateIssues(data.openIssuesDashboard, "openIssues");                    
+                    populateIssues(data.openIssuesDashboard, "openIssues");
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
@@ -302,15 +296,15 @@ if (isset($user["first_name"])) {
         window.addEventListener('DOMContentLoaded', loadData);
         document.addEventListener('DOMContentLoaded', () => {
             const counters = document.querySelectorAll('.card-text');
-        
+
             counters.forEach(counter => {
                 const target = +counter.getAttribute('data-target');
                 const duration = 2000;
                 const interval = 10;
                 const increment = target / (duration / interval);
-                
+
                 let current = 0;
-        
+
                 const updateCounter = () => {
                     current += increment;
                     if (current >= target) {
@@ -320,7 +314,7 @@ if (isset($user["first_name"])) {
                         setTimeout(updateCounter, interval);
                     }
                 };
-        
+
                 updateCounter();
             });
         });

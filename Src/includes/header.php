@@ -1,6 +1,6 @@
 <header class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
-        <a href="https://bot.straccini.com/dashboard.php"><img src="logo-white.png" alt="Bot Logo" class="me-2"></a>
+        <a href="https://bot.straccini.com/dashboard.php"><img src="images/logo-white.png" alt="Bot Logo" class="me-2"></a>
         
         <nav class="navbar-nav flex-row me-auto">
             <a href="dashboard.php" class="nav-link text-white me-3">

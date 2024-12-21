@@ -1,17 +1,8 @@
 <?php
-$cookie_lifetime = 604800;
-session_set_cookie_params([
-    'lifetime' => $cookie_lifetime,
-    'path' => '/',
-    'domain' => 'bot.straccini.com',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
-session_start();
+require_once "includes/session.php";
 
-if (!isset($_SESSION['user']) || !isset($_SESSION['token'])) {
-    header('Location: login.php');
+if ($isAuthenticated === false) {
+    header('Location: signin.php?redirectUrl='.urlencode($_SERVER['REQUEST_URI']));
     exit();
 }
 
@@ -51,7 +42,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
     <title>GStraccini-bot | <?php echo $title; ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="user.css">
+    <link rel="stylesheet" href="static/user.css">
 </head>
 
 <body>
@@ -99,15 +90,22 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                             </tr>
                         <?php endif; ?>
                         <?php foreach ($filteredRepositories as $repo): ?>
-                            <tr class="repository-row" data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
+                            <tr class="repository-row"
+                                data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
-                                <td><a href='<?php echo $repo['url']; ?>' target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
+                                <td><a href='<?php echo $repo['url']; ?>'
+                                        target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
                                 <td><i class="fas fa-star status-pending"></i> <?php echo $repo['stars']; ?></td>
-                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?></td>
+                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?>
+                                </td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
-                                <td><span class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span></td>
-                                <td><i class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash' : ''; ?>"></i> <?php echo $repo['visibility']; ?></td>
+                                <td><span
+                                        class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span>
+                                </td>
+                                <td><i
+                                        class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash' : ''; ?>"></i>
+                                    <?php echo $repo['visibility']; ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -184,9 +182,9 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
         function updateOrganizationFilter(repositories) {
             const organizationFilter = document.getElementById('organizationFilter');
             const existingValue = organizationFilter.value;
-        
-            const organizations = Array.from(new Set(repositories.map(repo => repo.organization)));        
-            organizationFilter.innerHTML = `<option value="">All Organizations</option>`;        
+
+            const organizations = Array.from(new Set(repositories.map(repo => repo.organization)));
+            organizationFilter.innerHTML = `<option value="">All Organizations</option>`;
             organizations.forEach(organization => {
                 const option = document.createElement('option');
                 option.value = organization;
@@ -208,7 +206,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
             document.querySelectorAll('.repository-row').forEach(row => {
                 const matches = !organization || row.dataset.organization === organization;
                 row.style.display = matches ? '' : 'none';
-                if(matches) {
+                if (matches) {
                     counter++;
                 }
             });
