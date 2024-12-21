@@ -64,7 +64,7 @@ Follow these steps to start contributing:
 
 ## Code of Conduct 🌟
 
-Please follow our [Code of Conduct](CODE_OF_CONDUCT.md) to maintain a welcoming and inclusive environment for everyone.
+Please follow our [Code of Conduct](https://github.com/guibranco/.github/blob/main/CODE_OF_CONDUCT.md) to maintain a welcoming and inclusive environment for everyone.
 
 ## Tips and Resources 💡
 
