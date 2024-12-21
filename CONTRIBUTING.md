@@ -15,7 +15,7 @@ Follow these steps to start contributing:
 
 3. **Set Up Your Environment** 🛠️:
 
-   - This project requires **PHP 8.3**.
+   - This project requires **PHP 8.3 or higher**.
    - Use **Docker Compose** for a fully functional local environment:
 
      ```bash
