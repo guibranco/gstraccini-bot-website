@@ -102,7 +102,7 @@ $integrations = [
             <form action="integrations.php" method="POST" id="integrationsForm" novalidate>
                <div class="card mt-4">
                   <div class="card-header">
-                     <h2>Integration Details</h2>
+                     <h2>Integrations Details</h2>
                   </div>
                   <div class="card-body">
                      <?php foreach ($integrations as $integration): ?>
@@ -114,7 +114,7 @@ $integrations = [
                            </label>
                            <div class="input-group">
                               <input type="password" class="form-control" id="<?php echo $integration['id']; ?>"
-                                 placeholder="ENter <?php echo $integration['label']; ?>"
+                                 placeholder="Enter <?php echo $integration['label']; ?>"
                                  name="<?php echo $integration['id']; ?>">
                               <span class="input-group-text">
                                  <i class="fas fa-eye toggle-visibility"
