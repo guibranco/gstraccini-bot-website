@@ -126,36 +126,6 @@ require_once "includes/session.php";
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>API</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
-        <tr>
-          <td>Webhook Processing</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
-        <tr>
-          <td>Dashboard</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
-        <tr>
-          <td>Documentation</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
-        <tr>
-          <td>GitHub Integration (Service)</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
-        <tr>
-          <td>GitHub Workflows</td>
-          <td class="status-up">Operational</td>
-          <td>2024-12-21 01:30 AM UTC</td>
-        </tr>
       </tbody>
     </table>
     <p><strong>Note:</strong> If you are experiencing issues not listed above, please contact us at <a
@@ -163,6 +133,49 @@ require_once "includes/session.php";
   </section>
 
   <?php include_once "includes/footer-public.php"; ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('service-status-api.php')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch status data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const tableBody = document.querySelector('.status-table tbody');
+          tableBody.innerHTML = '';
+
+          data.forEach(service => {
+            const row = document.createElement('tr');
+
+            const nameTd = document.createElement('td');
+            nameTd.textContent = service.name;
+            row.appendChild(nameTd);
+
+            const statusTd = document.createElement('td');
+            if (service.status === 'Operational') {
+              statusTd.classList.add('status-up');
+            } else if (service.status === 'Maintenance') {
+              statusTd.classList.add('status-maintenance');
+            } else {
+              statusTd.classList.add('status-down');
+            }
+            statusTd.textContent = service.status;
+            row.appendChild(statusTd);
+
+            const updatedTd = document.createElement('td');
+            updatedTd.textContent = service.lastUpdated;
+            row.appendChild(updatedTd);
+
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    });
+  </script>
 </body>
 
 </html>
