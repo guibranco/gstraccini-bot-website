@@ -163,19 +163,19 @@ if (isset($user["first_name"])) {
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span> -
                             <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
-                            <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
+                            <?php if (isset($issue["state"]) === true && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
                                     <i class="fas fa-check-circle"></i> Success
                                 </span>
-                            <?php } else if (isset($issue["state"]) && $issue["state"] === "failure") { ?>
+                            <?php } elseif (isset($issue["state"]) === true && $issue["state"] === "failure") { ?>
                                     <span class="badge bg-danger">
                                         <i class="fas fa-times-circle"></i> Failure
                                     </span>
-                            <?php } else if (isset($issue["state"]) && $issue["state"] === "pending") { ?>
+                            <?php } elseif (isset($issue["state"]) === true && $issue["state"] === "pending") { ?>
                                         <span class="badge bg-warning text-dark">
                                             <i class="fas fa-hourglass-half"></i> Pending
                                         </span>
-                            <?php } else if (isset($issue["state"]) && $issue["state"] === "error") { ?>
+                            <?php } elseif (isset($issue["state"]) === true && $issue["state"] === "error") { ?>
                                             <span class="badge bg-danger">
                                                 <i class="fas fa-exclamation-triangle"></i> Error
                                             </span>
