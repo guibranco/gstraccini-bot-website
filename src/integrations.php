@@ -108,11 +108,11 @@ function maskApiKey($apiKey)
                                 Select a provider
                             </button>
                             <ul class="dropdown-menu w-100" aria-labelledby="providerDropdown">
-                                <?php foreach ($providers as $provider => $logo): ?>
-                                    <a class="dropdown-item d-flex align-items-center" data-value="<?php echo $provider; ?>"
+                                <?php foreach ($providers as $providerName => $logo): ?>
+                                    <a class="dropdown-item d-flex align-items-center" data-value="<?php echo $providerName; ?>"
                                         data-logo="<?php echo $logo; ?>">
-                                        <img src="<?php echo $logo; ?>" alt="<?php echo $provider; ?> logo"
-                                            class="provider-logo me-2" /> <?php echo $provider; ?>
+                                        <img src="<?php echo $logo; ?>" alt="<?php echo $providerName; ?> logo"
+                                            class="provider-logo me-2" /> <?php echo $providerName; ?>
                                     </a>
                                 <?php endforeach; ?>
                                 <input type="hidden" name="provider" id="providerSelect">
