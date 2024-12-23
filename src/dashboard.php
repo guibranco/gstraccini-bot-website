@@ -19,7 +19,7 @@ $title = "Dashboard";
 $name = $user["login"];
 if (isset($user["first_name"])) {
     $name = $user["first_name"];
-} else if (isset($user["name"])) {
+} elseif (isset($user["name"])) {
     $name = $user["name"];
 }
 ?>
