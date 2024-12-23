@@ -7,12 +7,7 @@ if ($isAuthenticated === false) {
 }
 
 $user = $_SESSION['user'];
-
-$data = array("repositories" => []);
-
-if (isset($_SESSION["data"])) {
-    $data = $_SESSION["data"];
-}
+$data = $_SESSION["data"] ?? array("repositories" => []);
 
 $title = "Repositories";
 
@@ -95,8 +90,8 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                                 <td><?php echo htmlspecialchars($repo['organization']) ?></td>
                                 <td><a href='<?php echo $repo['url']; ?>'
                                         target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
-                                <td><i class="fas fa-star status-pending"></i> <?php echo $repo['stars']; ?></td>
-                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'; ?>
+                                <td><i class="fas fa-star status-suspended"></i> <?php echo $repo['stars']; ?></td>
+                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-installed"></i> Yes' : '<i class="fas fa-circle-xmark status-uninstalled"></i> No'; ?>
                                 </td>
                                 <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
                                 <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
@@ -165,12 +160,12 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 row.innerHTML = `
                 <td>${repo.organization}</td>
                 <td><a href='${repo.url}' target='_blank'>${repo.name}</a></td>
-                <td><i class="fas fa-star status-pending"></i> ${repo.stars}</td>
-                <td>${repo.fork ? '<i class="fas fa-circle-check status-success"></i> Yes' : '<i class="fas fa-circle-xmark status-failed"></i> No'}</td>
+                <td><i class="fas fa-star status-suspended"></i> ${repo.stars}</td>
+                <td>${repo.fork ? '<i class="fas fa-circle-check status-installed"></i> Yes' : '<i class="fas fa-circle-xmark status-uninstalled"></i> No'}</td>
                 <td><i class="fas fa-code-branch"></i> ${repo.forks}</td>
                 <td><i class="fas fa-circle-exclamation"></i> ${repo.issues}</td>
                 <td><span class="badge bg-primary">${repo.language ?? '-'}</span></td>
-                <td><i class="fas fa-eye${slash}"></i> ${repo.visibility}</td>                
+                <td><i class="fas fa-eye${slash}"></i> ${repo.visibility}</td>
                 `;
                 repositoriesTable.appendChild(row);
             });
