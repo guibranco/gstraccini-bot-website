@@ -2,7 +2,8 @@
   <a href="https://bot.straccini.com">
     <img src="/images/logo.png" alt="GStraccini-bot Logo" class="logo">
   </a>
-  <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat"> Automate your GitHub workflow effortlessly.</p>
+  <p>🤖 <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt="GitHub Octocat" class="octocat">
+    Automate your GitHub workflow effortlessly.</p>
 </header>
 
 <nav class="menu">
@@ -18,15 +19,18 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-  const menu = document.querySelector('.menu');
-  const headerHeight = document.querySelector('header').offsetHeight;
+    const menu = document.querySelector('.menu');
+    const headerHeight = document.querySelector('header').offsetHeight;
+    let ticking = false;
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > headerHeight) {
-      menu.classList.add('hidden');
-    } else {
-      menu.classList.remove('hidden');
-    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          menu.classList.toggle('hidden', window.scrollY > headerHeight);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
   });
-});
 </script>

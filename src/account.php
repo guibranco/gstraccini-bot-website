@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $firstName = htmlspecialchars($_POST['firstName']);
     $lastName = htmlspecialchars($_POST['lastName']);
-    $password = $_POST['password'];
-    $passwordConfirm = $_POST['passwordConfirm'];
+    $password = $_POST['password'] ?? '';
+    $passwordConfirm = $_POST['passwordConfirm'] ?? '';
 
     if ($password !== '' && $password !== $passwordConfirm) {
         header("Location: settings.php?password_mismatch=true");
