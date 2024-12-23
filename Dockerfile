@@ -8,4 +8,4 @@ RUN a2enmod rewrite \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
-COPY ./Src /var/www/html/
+COPY ./src /var/www/html/

@@ -2,161 +2,250 @@
 require_once "includes/session.php";
 
 if ($isAuthenticated === false) {
-   header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
-   exit();
+    header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
+    exit();
 }
 
 $user = $_SESSION['user'];
-$details = [];
-
-if (isset($_SESSION['details'])) {
-   $details = $_SESSION['details'];
-}
+$integrations = $_SESSION['integrations'] ?? [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-   header("Location: integrations.php?details_updated=true");
-   exit();
+    $provider = $_POST['provider'] ?? "";
+    $apiKey = $_POST['apiKey'] ?? "";
+    if (!empty($provider) && !empty($apiKey)) {
+        $isValid = strlen($apiKey) > 10;
+        if ($isValid) {
+            if (!isset($integrations[$provider])) {
+                $integrations[$provider] = [
+                    'apiKey' => $apiKey,
+                    'status' => 'Validated',
+                    'lastUsage' => 'N/A',
+                    'lastError' => 'N/A',
+                ];
+                $_SESSION['integrations'] = $integrations;
+                $message = "Integration for $provider added successfully!";
+            } else {
+                $error = "Integration for $provider already exists.";
+            }
+        } else {
+            $error = "Invalid API key for $provider.";
+        }
+    } else {
+        $error = "Please select a provider and enter a valid API Key.";
+    }
+}
+
+if (isset($_GET['remove'])) {
+    $providerToRemove = $_GET['remove'];
+    unset($integrations[$providerToRemove]);
+    $_SESSION['integrations'] = $integrations;
+    $message = "Integration for $providerToRemove removed successfully!";
 }
 
 $title = "Integration Details";
-
-// Define integrations array
-$integrations = [
-   [
-      'id' => 'sonarcloud',
-      'label' => 'SonarCloud API Key',
-      'icon' => 'https://cdn.simpleicons.org/Sonarcloud',
-   ],
-   [
-      'id' => 'appveyor',
-      'label' => 'AppVeyor API Token',
-      'icon' => 'https://cdn.simpleicons.org/Appveyor',
-   ],
-   [
-      'id' => 'codacy',
-      'label' => 'Codacy Project Token',
-      'icon' => 'https://cdn.simpleicons.org/Codacy',
-   ],
-   [
-      'id' => 'codecov',
-      'label' => 'Codecov Upload Token',
-      'icon' => 'https://cdn.simpleicons.org/Codecov',
-   ],
-   [
-      'id' => 'deepsource',
-      'label' => 'DeepSource API Key',
-      'icon' => '/images/Deepsource.png',
-   ],
-   [
-      'id' => 'codeclimate',
-      'label' => 'CodeClimate Test Reporter ID',
-      'icon' => 'https://cdn.simpleicons.org/Codeclimate',
-   ],
-   [
-      'id' => 'snyk',
-      'label' => 'Snyk Auth Token',
-      'icon' => 'https://cdn.simpleicons.org/Snyk',
-   ],
-   [
-      'id' => 'openai',
-      'label' => 'OpenAI API Key',
-      'icon' => 'https://cdn.simpleicons.org/Openai',
-   ],
-   [
-      'id' => 'llama',
-      'label' => 'LLAMA API Key',
-      'icon' => '/images/Llama.png',
-   ],
-   [
-      'id' => 'cpanel',
-      'label' => 'CPanel API Key',
-      'icon' => 'https://cdn.simpleicons.org/Cpanel',
-   ],
+$providers = [
+    "SonarCloud" => "https://cdn.simpleicons.org/Sonarcloud",
+    "AppVeyor" => "https://cdn.simpleicons.org/Appveyor",
+    "Codacy" => "https://cdn.simpleicons.org/Codacy",
+    "Codecov" => "https://cdn.simpleicons.org/Codecov",
+    "DeepSource" => "/images/Deepsource.png",
+    "CodeClimate" => "https://cdn.simpleicons.org/Codeclimate",
+    "Snyk" => "https://cdn.simpleicons.org/Snyk",
+    "OpenAI" => "https://cdn.simpleicons.org/Openai",
+    "Llama" => "/images/Llama.png",
+    "CPanel" => "https://cdn.simpleicons.org/Cpanel",
 ];
+
+function maskApiKey($apiKey)
+{
+    $visibleLength = 4;
+    $maskedLength = strlen($apiKey) - ($visibleLength * 2);
+    return substr($apiKey, 0, $visibleLength) . str_repeat('*', $maskedLength) . substr($apiKey, -$visibleLength);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>GStraccini-bot | <?php echo $title; ?></title>
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="/static/user.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GStraccini-bot | <?php echo $title; ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/user.css">
 </head>
 
 <body>
-   <?php require_once 'includes/header.php'; ?>
-   <div class="container mt-5">
-      <h1 class="text-center">Integrations</h1>
-      <p class="text-center">Manage your account integrations below.</p>
-      <?php if (isset($_GET['details_updated'])): ?>
-         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            Your integration details have been updated successfully.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-         </div>
-      <?php endif; ?>
-      <div class="row">
-         <div class="col-md-8 offset-md-2">
-            <form action="integrations.php" method="POST" id="integrationsForm" novalidate>
-               <div class="card mt-4">
-                  <div class="card-header">
-                     <h2>Integrations Details</h2>
-                  </div>
-                  <div class="card-body">
-                     <?php foreach ($integrations as $integration): ?>
-                        <div class="mb-3 position-relative">
-                           <label for="<?php echo $integration['id']; ?>" class="form-label">
-                              <img height="24" width="24" src="<?php echo $integration['icon']; ?>"
-                                 alt="<?php echo $integration['id']; ?>" />
-                              <?php echo $integration['label']; ?>
-                           </label>
-                           <div class="input-group">
-                              <input type="password" class="form-control" id="<?php echo $integration['id']; ?>"
-                                 placeholder="Enter <?php echo $integration['label']; ?>"
-                                 name="<?php echo $integration['id']; ?>">
-                              <span class="input-group-text">
-                                 <i class="fas fa-eye toggle-visibility"
-                                    data-target="<?php echo $integration['id']; ?>"></i>
-                              </span>
-                           </div>
+    <?php require_once 'includes/header.php'; ?>
+    <div class="container mt-5">
+        <h1 class="text-center">Integrations</h1>
+        <p class="text-center">Manage your account integrations below.</p>
+
+        <?php if (isset($message)): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo $message; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo $error; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <!-- Add Integration Form -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2>Add Integration</h2>
+            </div>
+            <div class="card-body">
+                <form action="integrations2.php" method="POST" id="addIntegrationForm" novalidate>
+                    <div class="mb-3 position-relative">
+                        <label for="providerDropdown" class="form-label">Select Provider</label>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="providerDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Select a provider
+                            </button>
+                            <ul class="dropdown-menu w-100" aria-labelledby="providerDropdown">
+                                <?php foreach ($providers as $provider => $logo): ?>
+                                    <a class="dropdown-item d-flex align-items-center" data-value="<?php echo $provider; ?>"
+                                        data-logo="<?php echo $logo; ?>">
+                                        <img src="<?php echo $logo; ?>" alt="<?php echo $provider; ?> logo"
+                                            class="provider-logo me-2" /> <?php echo $provider; ?>
+                                    </a>
+                                <?php endforeach; ?>
+                                <input type="hidden" name="provider" id="providerSelect">
+                            </ul>
                         </div>
-                     <?php endforeach; ?>
-                  </div>
-               </div>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <label for="apiKey" class="form-label">API Key</label>
+                        <div class="input-group">
+                            <input type="password" name="apiKey" id="apiKey" class="form-control"
+                                placeholder="Enter API Key" aria-label="API Key">
+                            <span class="input-group-text" id="toggleVisibility">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span id="badgeStatus" class="badge" style="display:none;"></span>
+                            <button class="btn btn-primary" id="saveBtn">Save API Key</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-               <div class="text-center mt-4">
-                  <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
-                  <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
-               </div>
-            </form>
-         </div>
-      </div>
-   </div>
+        <?php if (!empty($integrations)): ?>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>Integrations</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Provider</th>
+                                <th>API Key</th>
+                                <th>Status</th>
+                                <th>Last Usage</th>
+                                <th>Last Error</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($integrations as $provider => $details): ?>
+                                <tr>
+                                    <td>
+                                        <img src="<?php echo $providers[$provider]; ?>" alt="<?php echo $provider; ?>"
+                                            class="provider-logo">
+                                        <?php echo htmlspecialchars($provider); ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars(maskApiKey($details['apiKey'])); ?></td>
+                                    <td><?php echo htmlspecialchars($details['status']); ?></td>
+                                    <td><?php echo htmlspecialchars($details['lastUsage']); ?></td>
+                                    <td><?php echo htmlspecialchars($details['lastError']); ?></td>
+                                    <td>
+                                        <a href="integrations2.php?remove=<?php echo urlencode($provider); ?>"
+                                            class="btn btn-danger btn-sm">Remove</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
 
-   <?php require_once "includes/footer.php"; ?>
-   <script>
-      document.addEventListener('DOMContentLoaded', function () {
-         document.querySelectorAll('.input-group-text').forEach(btn => {
-            btn.addEventListener('click', function () {
-               const icon = this.querySelector('.fas');
-               const targetInputId = this.getAttribute('data-target');
-               const inputField = document.getElementById(targetInputId);
+    <?php require_once "includes/footer.php"; ?>
+    <script>
+        $(document).ready(function () {
+            $("#toggleVisibility").click(toggleVisibility);
+            $("#saveBtn").click(saveIntegration);
 
-               if (inputField.type === 'password') {
-                  inputField.type = 'text';
-                  icon.classList.remove('fa-eye');
-                  icon.classList.add('fa-eye-slash');
-               } else {
-                  inputField.type = 'password';
-                  icon.classList.remove('fa-eye-slash');
-                  icon.classList.add('fa-eye');
-               }
+            $(document).on('click', '.dropdown-item', function () {
+                const selectedProvider = $(this).data('value');
+                const providerLogo = $(this).data('logo');
+                const providerName = $(this).data('value');
+
+                $('#providerDropdown')
+                    .html(
+                        `<span class="provider-label">
+                    <img src="${providerLogo}" alt="${providerName} Logo" class="provider-logo me-2" />
+                    ${providerName}
+                </span>`
+                    );
+                $('#providerSelect').val(selectedProvider);
             });
-         });
-      });
-   </script>
+        });
+
+        let isVisible = false;
+
+        function toggleVisibility() {
+            const input = $('#apiKey');
+            const icon = $('#toggleVisibility svg');
+
+            if (isVisible) {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            } else {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            }
+            isVisible = !isVisible;
+        }
+
+        function saveIntegration() {
+            const provider = $('#providerSelect').val();
+            const apiKey = $('#apiKey').val();
+
+            if (!provider || apiKey.length < 8) {
+                alert('Please select a provider and enter a valid API Key (minimum 8 characters).');
+                return;
+            }
+
+            $("#addIntegrationForm").submit();
+        }
+
+        function updateBadge(isValid, badge) {
+            if (isValid) {
+                badge.html('<i class="far fa-check-circle"></i> Healthy').addClass('badge-healthy').removeClass('badge-checking badge-unhealthy');
+            } else {
+                badge.html('<i class="fas fa-times-circle"></i> Unhealthy').addClass('badge-unhealthy').removeClass('badge-checking badge-healthy');
+            }
+        }
+
+        function resetInput() {
+            $('#apiKey').val('').prop('disabled', false);
+            $('#providerSelect').val('');
+            $('#badgeStatus').hide().removeClass('badge-healthy badge-unhealthy badge-checking');
+            $('#saveBtn').prop('disabled', false);
+        }
+
+    </script>
 </body>
 
 </html>

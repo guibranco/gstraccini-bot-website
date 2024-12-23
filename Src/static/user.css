@@ -41,6 +41,41 @@ body {
   color: #f0f0f0;
 }
 
+
+.input-container {
+  margin: 2rem auto;
+  width: 50%;
+  position: relative;
+}
+
+.dropdown-toggle {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+
+.dropdown-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Provider dropdown list */
+.dropdown-menu {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.dropdown-item {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
 .dropdown-item.logout {
   background-color: #dc3545;
   color: white;
@@ -50,19 +85,33 @@ body {
   background-color: #c82333;
 }
 
+.dropdown-item:hover {
+  background-color: #e9ecef;
+}
+
+.provider-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  margin-right: 8px;
+}
+
+.provider-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.provider-label img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
 .input-group-text {
   width: 40px;
   justify-content: center;
-}
-
-.status-success {
-  color: #28a745;
-}
-.status-failed {
-  color: #dc3545;
-}
-.status-pending {
-  color: #ffc107;
 }
 
 footer {
@@ -103,24 +152,6 @@ footer nav ul li a:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-  footer nav ul {
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-  }
-
-  footer nav ul li {
-    width: 100%;
-    text-align: center;
-  }
-
-  footer p {
-    font-size: 0.9em;
-  }
-}
-
-
 .entities table {
   width: 100%;
   border-collapse: collapse;
@@ -145,17 +176,22 @@ footer nav ul li a:hover {
 }
 
 .status-installed {
-  color: green;
+  color: #28a745;
   font-weight: bold;
 }
 
 .status-uninstalled {
-  color: red;
+  color: #dc3545;
   font-weight: bold;
 }
 
 .status-suspended {
-  color: orange;
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.status-checking {
+  color: #7f858b;
   font-weight: bold;
 }
 
@@ -209,4 +245,21 @@ footer nav ul li a:hover {
 .add-installation-button:active {
   background-color: #1e7e34;
   transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  footer nav ul {
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  footer nav ul li {
+    width: 100%;
+    text-align: center;
+  }
+
+  footer p {
+    font-size: 0.9em;
+  }
 }
