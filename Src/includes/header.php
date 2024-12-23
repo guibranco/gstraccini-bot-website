@@ -49,13 +49,11 @@
                             Dashboard</a></li>
                     <li><a class="dropdown-item" href="account.php"><i class="fas fa-user me-2"></i> Account</a></li>
                     <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog me-2"></i> Settings</a></li>
-                    <li><a class="dropdown-item" href="integrations.php"><i class="fas fa-plug me-2"></i>
-                            Integrations</a></li>
+                    <li><a class="dropdown-item" href="integrations.php"><i class="fas fa-plug me-2"></i> Integrations</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item logout" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>
-                            Logout</a></li>
+                    <li><a class="dropdown-item logout" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
             </div>
         </div>

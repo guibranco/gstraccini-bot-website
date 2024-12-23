@@ -100,7 +100,7 @@ function maskApiKey($apiKey)
                 <h2>Add Integration</h2>
             </div>
             <div class="card-body">
-                <form action="integrations2.php" method="POST" id="addIntegrationForm" novalidate>
+                <form action="integrations.php" method="POST" id="addIntegrationForm" novalidate>
                     <div class="mb-3 position-relative">
                         <label for="providerDropdown" class="form-label">Select Provider</label>
                         <div class="dropdown">
@@ -168,7 +168,7 @@ function maskApiKey($apiKey)
                                     <td><?php echo htmlspecialchars($details['lastUsage']); ?></td>
                                     <td><?php echo htmlspecialchars($details['lastError']); ?></td>
                                     <td>
-                                        <a href="integrations2.php?remove=<?php echo urlencode($provider); ?>"
+                                        <a href="integrations.php?remove=<?php echo urlencode($provider); ?>"
                                             class="btn btn-danger btn-sm">Remove</a>
                                     </td>
                                 </tr>
