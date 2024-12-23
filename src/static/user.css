@@ -68,9 +68,8 @@ body {
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-/* Provider dropdown list */
 .dropdown-menu {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
   border: 1px solid #ced4da;
   border-radius: 5px;
