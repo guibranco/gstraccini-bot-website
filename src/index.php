@@ -13,7 +13,7 @@ require_once "includes/session.php";
 </head>
 
 <body>
-  <?php include_once "includes/header-public.php"; ?>
+  <?php require_once "includes/header-public.php"; ?>
 
   <section class="hero fade-in">
     <h2>Boost Your GitHub Efficiency</h2>
@@ -131,7 +131,7 @@ require_once "includes/session.php";
     </div>
   </section>
 
-  <?php include_once "includes/footer-public.php"; ?>
+  <?php require_once "includes/footer-public.php"; ?>
 </body>
 
 </html>
