@@ -1,15 +1,15 @@
 <footer>
-  <p>© 2024 GStraccini-bot. All rights reserved.</p>
-  <nav>
-    <ul>
-      <li><a href="privacy-policy.php">Privacy Policy</a></li>
-      <li><a href="terms-of-service.php">Terms of Service</a></li>
-      <li><a href="service-status.php">Service Status</a></li>
-      <li><a href="https://docs.bot.straccini.com" target="_blank">Documentation</a></li>
-      <li><a href="https://github.com/marketplace/gstraccini-bot" target="_blank">GitHub Marketplace</a></li>
-      <li><a href="https://github.com/guibranco/gstraccini-bot-service" target="_blank">GitHub Repository</a></li>
-    </ul>
-  </nav>
+    <p>© 2024 GStraccini-bot. All rights reserved.</p>
+    <nav>
+        <ul>
+            <li><a href="privacy-policy.php">Privacy Policy</a></li>
+            <li><a href="terms-of-service.php">Terms of Service</a></li>
+            <li><a href="service-status.php">Service Status</a></li>
+            <li><a href="https://docs.bot.straccini.com" target="_blank">Documentation</a></li>
+            <li><a href="https://github.com/marketplace/gstraccini-bot" target="_blank">GitHub Marketplace</a></li>
+            <li><a href="https://github.com/guibranco/gstraccini-bot-service" target="_blank">GitHub Repository</a></li>
+        </ul>
+    </nav>
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -56,7 +56,10 @@
                 const listItem = document.createElement('li');
                 listItem.classList.add('dropdown-item');
 
-                listItem.innerHTML = `<a href="${url}" target="_blank">${title} - ${repo}</a>`;
+                const safeUrl = encodeURI(url);
+                const safeTitle = escapeHtml(title);
+                const safeRepo = escapeHtml(repo);
+                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" aria-label="Notification: ${safeTitle}">${safeTitle} - ${safeRepo}</a>`;
                 notificationsMenu.appendChild(listItem);
             });
             notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
