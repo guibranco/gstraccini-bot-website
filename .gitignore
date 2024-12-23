@@ -1,2 +1,2 @@
-﻿Src/secrets/**.php
+﻿src/secrets/**.php
 **/vendor/**
