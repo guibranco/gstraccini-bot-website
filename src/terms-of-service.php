@@ -38,7 +38,7 @@ require_once "includes/session.php";
     <h2>3. Your Responsibilities</h2>
     <ul>
       <li><strong>Compliance:</strong> You agree to comply with GitHub’s <a
-          href="https://docs.github.com/en/github/site-policy/github-terms-of-service" target="_blank">Terms of
+          href="https://docs.github.com/en/github/site-policy/github-terms-of-service" target="_blank" rel="noopener noreferrer">Terms of
           Service</a> and all applicable laws.</li>
       <li><strong>Permissions:</strong> By installing the app, you grant the app access to the repository data necessary
         to perform its actions.</li>
