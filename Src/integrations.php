@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $provider = $_POST['provider'] ?? "";
     $apiKey = $_POST['apiKey'] ?? "";
     if (!empty($provider) && !empty($apiKey)) {
-        $isValid = strlen($apiKey) > 10;
+        $isValid = strlen($apiKey) >= 10;
         if ($isValid) {
             if (!isset($integrations[$provider])) {
                 $integrations[$provider] = [
@@ -94,7 +94,6 @@ function maskApiKey($apiKey)
             </div>
         <?php endif; ?>
 
-        <!-- Add Integration Form -->
         <div class="card mt-4">
             <div class="card-header">
                 <h2>Add Integration</h2>
@@ -222,29 +221,13 @@ function maskApiKey($apiKey)
             const provider = $('#providerSelect').val();
             const apiKey = $('#apiKey').val();
 
-            if (!provider || apiKey.length < 8) {
+            if (!provider || apiKey.length < 10) {
                 alert('Please select a provider and enter a valid API Key (minimum 8 characters).');
                 return;
             }
 
             $("#addIntegrationForm").submit();
         }
-
-        function updateBadge(isValid, badge) {
-            if (isValid) {
-                badge.html('<i class="far fa-check-circle"></i> Healthy').addClass('badge-healthy').removeClass('badge-checking badge-unhealthy');
-            } else {
-                badge.html('<i class="fas fa-times-circle"></i> Unhealthy').addClass('badge-unhealthy').removeClass('badge-checking badge-healthy');
-            }
-        }
-
-        function resetInput() {
-            $('#apiKey').val('').prop('disabled', false);
-            $('#providerSelect').val('');
-            $('#badgeStatus').hide().removeClass('badge-healthy badge-unhealthy badge-checking');
-            $('#saveBtn').prop('disabled', false);
-        }
-
     </script>
 </body>
 
