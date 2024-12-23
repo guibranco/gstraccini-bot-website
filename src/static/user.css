@@ -41,7 +41,6 @@ body {
   color: #f0f0f0;
 }
 
-
 .input-container {
   margin: 2rem auto;
   width: 50%;
@@ -253,6 +252,20 @@ footer nav ul li a:hover {
 }
 
 @media (max-width: 768px) {
+  .user-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .user-info img {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .input-container {
+    width: 100%;
+  }
+  
   footer nav ul {
     flex-direction: column;
     align-items: center;
