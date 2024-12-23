@@ -156,6 +156,9 @@ footer nav ul li a:hover {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .entities th,
@@ -173,6 +176,8 @@ footer nav ul li a:hover {
   border-radius: 50%;
   width: 40px;
   height: 40px;
+  object-fit: cover;
+  aspect-ratio: 1;
 }
 
 .status-installed {
