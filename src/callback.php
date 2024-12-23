@@ -22,13 +22,13 @@ $postFields = [
     'redirect_uri' => $gitHubRedirectUri
 ];
 
-$ch = curl_init($tokenUrl);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)']);
-$response = curl_exec($ch);
-curl_close($ch);
+$curl = curl_init($tokenUrl);
+curl_setopt($curl, CURLOPT_POST, 1);
+curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postFields));
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)']);
+$response = curl_exec($curl);
+curl_close($curl);
 
 $content = json_decode($response, true);
 $token = $content['access_token'];
@@ -40,11 +40,11 @@ if ($token === null || empty($token) === true) {
 
 function getGitHub($url, $token)
 {
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-    curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+    curl_setopt($curl, CURLOPT_HEADER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $token",
         "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
         "Accept: application/vnd.github+json",
@@ -52,13 +52,13 @@ function getGitHub($url, $token)
     ]);
 
 
-    $response = curl_exec($ch);
+    $response = curl_exec($curl);
 
-    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $headers = substr($response, 0, $headerSize);
     $body = json_decode(substr($response, $headerSize), true);
 
-    curl_close($ch);
+    curl_close($curl);
 
     return ["headers" => $headers, "body" => $body];
 }
