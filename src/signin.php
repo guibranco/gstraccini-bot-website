@@ -54,7 +54,7 @@ if ($isAuthenticated === true) {
 </head>
 
 <body>
-    <?php include_once "includes/header-public.php"; ?>
+    <?php require_once "includes/header-public.php"; ?>
 
     <div class="container my-5">
         <div class="row justify-content-center">
@@ -170,7 +170,7 @@ if ($isAuthenticated === true) {
         </div>
     </div>
 
-    <?php include_once "includes/footer-public.php"; ?>
+    <?php require_once "includes/footer-public.php"; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

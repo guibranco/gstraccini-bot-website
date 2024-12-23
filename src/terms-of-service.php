@@ -13,7 +13,7 @@ require_once "includes/session.php";
 </head>
 
 <body>
-  <?php include_once "includes/header-public.php"; ?>
+  <?php require_once "includes/header-public.php"; ?>
 
   <section class="content">
     <h1>Terms of Service</h1>
@@ -76,7 +76,7 @@ require_once "includes/session.php";
     <p>Thank you for using GStraccini-bot!</p>
   </section>
 
-  <?php include_once "includes/footer-public.php"; ?>
+  <?php require_once "includes/footer-public.php"; ?>
 </body>
 
 </html>

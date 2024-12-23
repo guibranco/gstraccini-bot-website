@@ -13,7 +13,7 @@ require_once "includes/session.php";
 </head>
 
 <body>
-  <?php include_once "includes/header-public.php"; ?>
+  <?php require_once "includes/header-public.php"; ?>
 
   <section class="content">
     <h1>Privacy Notice</h1>
@@ -46,7 +46,7 @@ require_once "includes/session.php";
     <p>For inquiries, contact us at <a href="mailto:bot@straccini.com">bot@straccini.com</a>.</p>
   </section>
 
-  <?php include_once "includes/footer-public.php"; ?>
+  <?php require_once "includes/footer-public.php"; ?>
 </body>
 
 </html>
