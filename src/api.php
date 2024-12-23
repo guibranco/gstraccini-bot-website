@@ -32,30 +32,30 @@ session_write_close();
 
 function loadData($url, $token)
 {
-    $ch = curl_init($url);
+    $curl = curl_init($url);
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-    curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+    curl_setopt($curl, CURLOPT_HEADER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
         "Authorization: Bearer $token",
         "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
         "Accept: application/vnd.github+json",
         "X-GitHub-Api-Version: 2022-11-28"
     ]);
 
-    $response = curl_exec($ch);
+    $response = curl_exec($curl);
 
-    if (curl_errno($ch)) {
-        curl_close($ch);
+    if (curl_errno($curl)) {
+        curl_close($curl);
         return null;
     }
 
-    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $header = substr($response, 0, $headerSize);
     $body = json_decode(substr($response, $headerSize), true);
 
-    curl_close($ch);
+    curl_close($curl);
 
     return ["headers" => $header, "body" => $body];
 }
@@ -77,9 +77,9 @@ function fetchAllGitHubPages($url, $token)
     return $results;
 }
 
-function getNextPageUrl($link_header)
+function getNextPageUrl($linkHeader)
 {
-    if (preg_match('/<([^>]+)>; rel="next"/', $link_header, $matches)) {
+    if (preg_match('/<([^>]+)>; rel="next"/', $linkHeader, $matches)) {
         return $matches[1];
     }
     return null;
