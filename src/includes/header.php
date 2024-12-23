@@ -41,7 +41,7 @@
             <div class="dropdown me-3">
                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
                     id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="<?php echo $user['avatar_url']; ?>" alt="<?php echo $user['login']; ?> avatar"
+                    <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>" alt="<?php echo htmlspecialchars($user['login']); ?> avatar"
                         class="rounded-circle" width="40" height="40">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
