@@ -7,12 +7,7 @@ if ($isAuthenticated === false) {
 }
 
 $user = $_SESSION['user'];
-
-$data = array("openIssues" => []);
-
-if (isset($_SESSION["data"])) {
-    $data = $_SESSION["data"];
-}
+$data = $_SESSION["data"] ?? array("openIssues" => []);
 
 $title = "Issues";
 

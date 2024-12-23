@@ -8,11 +8,7 @@ if ($isAuthenticated === false) {
 
 $user = $_SESSION['user'];
 
-$data = array("openPullRequests" => []);
-
-if (isset($_SESSION["data"])) {
-    $data = $_SESSION["data"];
-}
+$data = $_SESSION["data"] ?? array("openPullRequests" => []);
 
 $title = "Pull Requests";
 
