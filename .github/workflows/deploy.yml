@@ -34,10 +34,10 @@ jobs:
 
       - name: Create github.secrets.php
         run: |
-          echo "<?php" > Src/github.secrets.php
-          echo "\$gitHubClientId      = \"${{ secrets.GH_CLIENT_ID }}\";" >> Src/github.secrets.php
-          echo "\$gitHubClientSecret  = \"${{ secrets.GH_CLIENT_SECRET }}\";" >> Src/github.secrets.php
-          echo "\$gitHubRedirectUri   = \"${{ secrets.GH_REDIRECT_URI }}\";" >> Src/github.secrets.php
+          echo "<?php" > src/github.secrets.php
+          echo "\$gitHubClientId      = \"${{ secrets.GH_CLIENT_ID }}\";" >> src/github.secrets.php
+          echo "\$gitHubClientSecret  = \"${{ secrets.GH_CLIENT_SECRET }}\";" >> src/github.secrets.php
+          echo "\$gitHubRedirectUri   = \"${{ secrets.GH_REDIRECT_URI }}\";" >> src/github.secrets.php
 
       - name: Upload site
         uses: sebastianpopp/ftp-action@releases/v2
@@ -45,7 +45,7 @@ jobs:
           host: ${{ secrets.FTP_SERVER }}
           user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: "Src"
+          localDir: "src"
           remoteDir: "/"
 
   create_release:

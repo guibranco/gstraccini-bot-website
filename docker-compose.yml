@@ -7,7 +7,7 @@ services:
     ports:
       - "8008:80"
     volumes:
-      - ./Src:/var/www/html/
+      - ./src:/var/www/html/
       - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     networks:
       - default
