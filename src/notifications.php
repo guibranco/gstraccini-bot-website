@@ -86,6 +86,21 @@ $title = "Notifications";
             }
 
             updateNotificationList(notifications);
+
+            // const params = new URLSearchParams({ filter, page: 1, limit: 10 });
+            // fetch(`/api/notifications?${params}`)
+            //     .then(response => {
+            //         if (!response.ok) throw new Error('Failed to fetch notifications');
+            //         return response.json();
+            //     })
+            //     .then(data => {
+            //         updateNotificationList(data.notifications);
+            //         updatePagination(data.pagination);
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         showErrorMessage('Failed to load notifications');
+            //     });
         }
 
         function updateNotificationList(notifications) {
