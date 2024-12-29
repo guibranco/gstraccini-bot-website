@@ -269,11 +269,13 @@ $title = "Account Details";
                                         <td>
                                             <?php if (!$entity['installation']): ?>
                                                 <a class="btn btn-success btn-sm" target="_blank" rel="noopener noreferrer"
-                                                    href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id'] ?>">Install</a>
+                                                    href="https://github.com/apps/gstraccini/installations/new/permissions?target_id=<?= $entity['id'] ?>">
+                                                    <i class="fas fa-plus"></i> Install
+                                                </a>
                                             <?php else: ?>
                                                 <a class="btn btn-primary btn-sm"
                                                     href="repositories.php?organization=<?= htmlspecialchars(urlencode($entity['installation']['account']['login'])) ?>">
-                                                    View Repositories
+                                                    <i class="fas fa-list"></i> View Repositories
                                                 </a>
                                             <?php endif; ?>
                                         </td>
@@ -291,7 +293,7 @@ $title = "Account Details";
                                 <a class="add-installation-button btn btn-success" target="_blank"
                                     rel="noopener noreferrer"
                                     href="https://github.com/apps/gstraccini/installations/select_target">Add New
-                                    Installation</a>
+                                    <i class="fas fa-plus"></i> Installation</a>
                             </div>
                         </div>
                     </div>
