@@ -261,7 +261,7 @@ $title = "Account Details";
                                             if ($entity['installation']) {
                                                 echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
                                             } else {
-                                                echo "<span style='text-align:center;font-weight:bold;'>-</span>";
+                                                echo "<span style='font-weight:bold;text-align:center;display:block;color:red;'><i class='fas fa-times'></i></span>";
                                             }
                                             ?>
 
