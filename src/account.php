@@ -218,17 +218,16 @@ $title = "Account Details";
             <div class="col-md-8 offset-md-2">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Entities <span
-                                class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
+                        <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
                     </div>
                     <div class="card-body entities">
                         <table>
                             <thead>
                                 <tr>
                                     <th>&nbsp;</th>
-                                    <th>Login</th>
-                                    <th>Installation Date</th>
+                                    <th>Login</th>                                    
                                     <th>Status</th>
+                                    <th>Installation Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -248,16 +247,6 @@ $title = "Account Details";
                                         </td>
                                         <td>
                                             <?php
-                                            if ($entity['installation']) {
-                                                echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
-                                            } else {
-                                                echo "<span style='text-align:center;font-weight:bold;'>-</span>";
-                                            }
-                                            ?>
-
-                                        </td>
-                                        <td>
-                                            <?php
                                             if ($entity['installation'] && $entity['installation']['suspended_at']) {
                                                 echo '<span class="status-suspended">Suspended</span>';
                                             } else if ($entity['installation']) {
@@ -267,6 +256,16 @@ $title = "Account Details";
                                             }
                                             ?>
                                         </td>
+                                        <td>
+                                            <?php
+                                            if ($entity['installation']) {
+                                                echo htmlspecialchars(date("Y-m-d H:i:s", strtotime($entity['installation']['created_at'])));
+                                            } else {
+                                                echo "<span style='text-align:center;font-weight:bold;'>-</span>";
+                                            }
+                                            ?>
+
+                                        </td>                                        
                                         <td>
                                             <?php if (!$entity['installation']): ?>
                                                 <a class="btn btn-success btn-sm" target="_blank" rel="noopener noreferrer"
@@ -284,8 +283,8 @@ $title = "Account Details";
                         </table>
                         <div class="add-installation-note mt-3">
                             <p>
-                                <strong>Didn't find the organization or entity you're looking for?</strong><br>
-                                No worries! If the desired organization or entity is missing from the list, you can
+                                <strong>Didn't find the organization you're looking for?</strong><br>
+                                No worries! If the desired organization is missing from the list, you can
                                 manually add it to the installations by clicking the button below:
                             </p>
                             <div class="add-installation-container mt-2">
