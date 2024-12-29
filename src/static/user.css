@@ -157,7 +157,7 @@ footer nav ul li a:hover {
   text-decoration: underline;
 }
 
-.entities table {
+.installations table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
@@ -166,18 +166,18 @@ footer nav ul li a:hover {
   -webkit-overflow-scrolling: touch;
 }
 
-.entities th,
-.entities td {
+.installations th,
+.installations td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-.entities th {
+.installations th {
   background-color: #f4f4f4;
 }
 
-.entities img {
+.installations img {
   border-radius: 50%;
   width: 40px;
   height: 40px;
