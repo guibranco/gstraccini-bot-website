@@ -292,8 +292,7 @@ $title = "Account Details";
                             <div class="add-installation-container mt-2">
                                 <a class="add-installation-button btn btn-success" target="_blank"
                                     rel="noopener noreferrer"
-                                    href="https://github.com/apps/gstraccini/installations/select_target">Add New
-                                    <i class="fas fa-plus"></i> Installation</a>
+                                    href="https://github.com/apps/gstraccini/installations/select_target"><i class="fas fa-plus"></i> Add New Installation</a>
                             </div>
                         </div>
                     </div>
