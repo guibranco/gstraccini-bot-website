@@ -112,7 +112,7 @@ $title = "Settings";
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="require_acceptance_criteria_checklist" class="form-label">
-                                    <i class="fas fa-user-check"></i> Require Acceptance Criteria checklist
+                                    <i class="fas fa-list-check"></i> Require Acceptance Criteria checklist
                                 </label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="require_acceptance_criteria_checklist"
