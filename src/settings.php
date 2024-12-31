@@ -112,7 +112,7 @@ $title = "Settings";
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="require_acceptance_criteria_checklist" class="form-label">
-                                    <i class="fas fa-user-check"></i> Require Acceptance Criteria checklist
+                                    <i class="fas fa-list-check"></i> Require Acceptance Criteria checklist
                                 </label>
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="require_acceptance_criteria_checklist"
@@ -215,15 +215,15 @@ $title = "Settings";
                                     <i class="fas fa-tasks"></i>
                                     Create issues for pending tasks in code comments
                                     <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
                                         <i class="fas fa-wrench"></i> Fixme
                                     </span>
                                     <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
                                         <i class="fas fa-tasks"></i> Todo
                                     </span>
                                     <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block;">
+                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
                                         <i class="fas fa-bug"></i> Bug
                                     </span>
                                 </label>
