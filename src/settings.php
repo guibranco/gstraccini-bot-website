@@ -10,7 +10,8 @@ $user = $_SESSION['user'];
 $userData = [
     'create_labels' => 1,
     'notify_issues' => 1,
-    'reminder_issues' => 1,
+    'require_acceptance_criteria_checklist' => 1,
+    'reminder_issues' => 1,    
     'reminder_issues_days' => 10,
     'pr_template_description' => 1,
     'auto_review_pr' => 1,
@@ -26,6 +27,7 @@ if (isset($_SESSION['user_data'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $create_labels = isset($_POST['create_labels']) ? 1 : 0;
     $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
+    $require_acceptance_criteria_checklist = isset($_POST['require_acceptance_criteria_checklist']) ? 1 : 0;
     $reminder_issues = isset($_POST['reminder_issues']) ? 1 : 0;
     $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
     $pr_template_description = isset($_POST['pr_template_description']) ? 1 : 0;
@@ -37,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['user_data'] = [
         'create_labels' => $create_labels,
         'notify_issues' => $notify_issues,
+        'require_acceptance_criteria_checklist' => $require_acceptance_criteria_checklist,
         'reminder_issues' => $reminder_issues,
         'reminder_issues_days' => $reminder_issues_days,
         'pr_template_description' => $pr_template_description,
@@ -107,6 +110,20 @@ $title = "Settings";
                             <h3><i class="fas fa-exclamation-circle"></i> Issues Settings</h3>
                         </div>
                         <div class="card-body">
+                            <div class="mb-3">
+                                <label for="require_acceptance_criteria_checklist" class="form-label">
+                                    <i class="fas fa-user-check"></i> Require Acceptance Criteria checklist
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="require_acceptance_criteria_checklist"
+                                        name="require_acceptance_criteria_checklist" <?php if ($userData['require_acceptance_criteria_checklist']) {
+                                            echo 'checked';
+                                        } ?>>
+                                    <label class="form-check-label" for="require_acceptance_criteria_checklist">
+                                        Requires issue description to have an acceptance criteria checklist section.
+                                    </label>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label for="reminder_issues" class="form-label"><i class="fas fa-calendar-alt"></i>
                                     Issues Reminder</label>
