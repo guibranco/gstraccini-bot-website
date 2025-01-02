@@ -220,7 +220,7 @@ $title = "Account Details";
                     <div class="card-header">
                         <h3>Installations <span class="badge text-bg-warning rounded-pill"><?php echo count($entities); ?></span></h3>
                     </div>
-                    <div class="card-body entities">
+                    <div class="card-body installations">
                         <table>
                             <thead>
                                 <tr>
