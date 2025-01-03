@@ -1,7 +1,7 @@
 <?php
 require_once "includes/session.php";
 
-if (isset($_GET['state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
+if (isset($_GET['state']) === false || isset($_SESSION['oauth_state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
     header('Location: index.php?error=Invalid+state+parameter');
     exit();
 }
