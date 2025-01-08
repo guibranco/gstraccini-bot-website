@@ -108,7 +108,7 @@ function updateTokenData($tokenData, $userData, $installationData): void
 {
     global $webhookUrl, $webhookSecret;
     $payload = ["token" => $tokenData, "user" => $userData, "installations" => $installationData];
-    $headers = ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)', 'Authorization: bearer '. $webhookSecret];
+    $headers = ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)', 'Authorization: token '. $webhookSecret];
     $curl = curl_init($webhookUrl);
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
