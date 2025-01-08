@@ -101,5 +101,19 @@ $_SESSION['organizations'] = $organizationsResponse["body"];
 
 $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
 $_SESSION['redirectUrl'] = null;
+
+function updateTokenData($tokenData, $userData, $installationData): void 
+{
+    $payload = ["token" => $tokenData, "user" => $userData, "installations" => $installationData];
+    $headers = ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)', 'Authorization: bearer '];
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_exec($curl);
+    curl_close($curl);
+}
+updateTokenData($content, $userResponse["body"], $installationsResponse["body"]);
 header("Location: {$redirectUrl}");
 exit();
