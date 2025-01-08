@@ -63,7 +63,6 @@ function getGitHub($url, $token)
     return ["headers" => $headers, "body" => $body];
 }
 
-
 $apiUrlUser = 'https://api.github.com/user';
 $userResponse = getGitHub($apiUrlUser, $token);
 
@@ -108,7 +107,7 @@ function updateTokenData($tokenData, $userData, $installationData): void
 {
     global $webhookUrl, $webhookSecret;
     $payload = ["token" => $tokenData, "user" => $userData, "installations" => $installationData];
-    $headers = ['Accept: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)', 'Authorization: token '. $webhookSecret];
+    $headers = ['Content-Type: application/json', 'User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)', 'Authorization: token '. $webhookSecret];
     $curl = curl_init($webhookUrl);
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
