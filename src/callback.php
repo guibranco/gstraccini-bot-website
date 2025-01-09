@@ -2,12 +2,12 @@
 require_once "includes/session.php";
 
 if (isset($_GET['state']) === false || isset($_SESSION['oauth_state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
-    header('Location: index.php?error=Invalid+state+parameter');
+    header('Location: signin.php?error=Invalid+state+parameter');
     exit();
 }
 
 if (isset($_GET['code']) === false) {
-    header('Location: index.php?error=Authorization+code+not+found');
+    header('Location: signin.php?error=Authorization+code+not+found');
     exit();
 }
 
@@ -34,7 +34,7 @@ $content = json_decode($response, true);
 $token = $content['access_token'];
 
 if ($token === null || empty($token) === true) {
-    header('Location: index.php?error=Unable+to+retrieve+access+token');
+    header('Location: signin.php?error=Unable+to+retrieve+access+token');
     exit();
 }
 
