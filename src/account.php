@@ -77,7 +77,7 @@ if (!isset($entities[$user["id"]])) {
         'image' => $user['avatar_url'],
         'html_url' => $user['html_url'],
         'installation' => null,
-    ]
+    ];
 }
 
 ksort($entities);
