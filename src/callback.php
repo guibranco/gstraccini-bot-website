@@ -117,5 +117,6 @@ function updateTokenData($tokenData, $userData, $installationData): void
     curl_close($curl);
 }
 updateTokenData($content, $userResponse["body"], $installationsResponse["body"]);
+session_regenerate_id();
 header("Location: {$redirectUrl}");
 exit();
