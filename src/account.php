@@ -70,6 +70,16 @@ foreach ($installations as $installation) {
     }
 }
 
+if (!isset($entities[$user["id"]])) {
+    $entities[$user["id"]] = [
+        'id' => $user['id'],
+        'name' => $user['login'],
+        'image' => $user['avatar_url'],
+        'html_url' => $user['html_url'],
+        'installation' => null,
+    ]
+}
+
 ksort($entities);
 
 $title = "Account Details";
