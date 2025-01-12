@@ -1,4 +1,5 @@
 <?php
+$date = new DateTime('now', new DateTimeZone('UTC'));
 $services = [
     [
         'name' => 'API',
@@ -13,7 +14,7 @@ $services = [
     [
         'name' => 'Dashboard',
         'status' => 'Operational',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
+        'lastUpdated' => $date->format('Y-m-d h:i A T')
     ],
     [
         'name' => 'Documentation',
