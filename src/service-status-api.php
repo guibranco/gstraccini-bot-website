@@ -4,12 +4,7 @@ $services = [
     [
         'name' => 'API',
         'status' => 'Operational',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
-    ],
-    [
-        'name' => 'Webhook Processing',
-        'status' => 'Operational',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
+        'lastUpdated' => '2025-01-16 22:39 PM UTC'
     ],
     [
         'name' => 'Dashboard',
@@ -19,17 +14,22 @@ $services = [
     [
         'name' => 'Documentation',
         'status' => 'Maintenance',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
+        'lastUpdated' => '2025-01-16 22:39 PM UTC'
     ],
     [
         'name' => 'GitHub Integration (Service)',
         'status' => 'Operational',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
+        'lastUpdated' => '2025-01-16 22:39 PM UTC'
     ],
     [
         'name' => 'GitHub Workflows',
         'status' => 'Operational',
-        'lastUpdated' => '2024-12-23 02:24 AM UTC'
+        'lastUpdated' => '2025-01-16 22:39 PM UTC'
+    ],
+    [
+        'name' => 'Webhook Processing',
+        'status' => 'Operational',
+        'lastUpdated' => '2025-01-16 22:39 PM UTC'
     ]
 ];
 
