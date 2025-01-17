@@ -8,6 +8,8 @@ if ($isAuthenticated === false) {
 
 $user = $_SESSION['user'];
 $integrations = $_SESSION['integrations'] ?? [];
+ksort($integrations);
+$usedIntegrations = array_keys($integrations);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $provider = $_POST['provider'] ?? "";
@@ -56,8 +58,10 @@ $providers = [
     "CPanel" => "https://cdn.simpleicons.org/Cpanel",
     "CloudAMQP" => "/images/CloudAMQP.png",
 ];
-
 ksort($providers);
+$providers = array_filter($providers, function ($provider) use ($usedIntegrations) {
+    return !in_array($provider, $usedIntegrations);
+});
 
 function maskApiKey($apiKey)
 {
@@ -102,6 +106,11 @@ function maskApiKey($apiKey)
                 <h2>Add Integration</h2>
             </div>
             <div class="card-body">
+                <?php if (count($providers) === 0): ?>
+                    <div class="alert alert-warning fade show" role="alert">
+                        All providers are already configured
+                    </div>
+                <?php else: ?>
                 <form action="integrations.php" method="POST" id="addIntegrationForm" novalidate>
                     <div class="mb-3 position-relative">
                         <label for="providerDropdown" class="form-label">Select Provider</label>
@@ -137,6 +146,7 @@ function maskApiKey($apiKey)
                         </div>
                     </div>
                 </form>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -226,7 +236,7 @@ function maskApiKey($apiKey)
 
             if (!provider || apiKey.length < 10) {
                 alert('Please select a provider and enter a valid API Key (minimum 8 characters).');
-                return;
+                return false;
             }
 
             $("#addIntegrationForm").submit();
