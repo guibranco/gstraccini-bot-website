@@ -106,6 +106,11 @@ function maskApiKey($apiKey)
                 <h2>Add Integration</h2>
             </div>
             <div class="card-body">
+                <?php if(count($providers) === 0) { ?>
+                    <div class="alert alert-warning fade show" role="alert">
+                    All providers are already configured
+                </div>
+                <?php } else { ?>
                 <form action="integrations.php" method="POST" id="addIntegrationForm" novalidate>
                     <div class="mb-3 position-relative">
                         <label for="providerDropdown" class="form-label">Select Provider</label>
@@ -141,6 +146,7 @@ function maskApiKey($apiKey)
                         </div>
                     </div>
                 </form>
+                <?php } ?>
             </div>
         </div>
 
