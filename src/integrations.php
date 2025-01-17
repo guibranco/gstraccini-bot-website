@@ -54,7 +54,10 @@ $providers = [
     "OpenAI" => "https://cdn.simpleicons.org/Openai",
     "Llama" => "/images/Llama.png",
     "CPanel" => "https://cdn.simpleicons.org/Cpanel",
+    "CloudAMQP" => "/images/CloudAMQP.png",
 ];
+
+ksort($providers);
 
 function maskApiKey($apiKey)
 {
