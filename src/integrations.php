@@ -8,8 +8,6 @@ if ($isAuthenticated === false) {
 
 $user = $_SESSION['user'];
 $integrations = $_SESSION['integrations'] ?? [];
-ksort($integrations);
-$usedIntegrations = array_keys($integrations);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $provider = $_POST['provider'] ?? "";
@@ -44,6 +42,9 @@ if (isset($_GET['remove'])) {
     $message = "Integration for $providerToRemove removed successfully!";
 }
 
+ksort($integrations);
+$usedIntegrations = array_keys($integrations);
+
 $title = "Integration Details";
 $providers = [
     "SonarCloud" => "https://cdn.simpleicons.org/Sonarcloud",
@@ -61,7 +62,7 @@ $providers = [
 ksort($providers);
 $providers = array_filter($providers, function ($provider) use ($usedIntegrations) {
     return !in_array($provider, $usedIntegrations);
-});
+}, ARRAY_FILTER_USE_KEY);
 
 function maskApiKey($apiKey)
 {
