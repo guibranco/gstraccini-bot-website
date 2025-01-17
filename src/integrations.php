@@ -236,7 +236,7 @@ function maskApiKey($apiKey)
 
             if (!provider || apiKey.length < 10) {
                 alert('Please select a provider and enter a valid API Key (minimum 8 characters).');
-                return;
+                return false;
             }
 
             $("#addIntegrationForm").submit();
