@@ -23,12 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'lastError' => 'N/A',
                 ];
                 $_SESSION['integrations'] = $integrations;
-                $message = "Integration for $provider added successfully!";
+                $message = "Integration for <strong>$provider</strong> added successfully!";
             } else {
-                $error = "Integration for $provider already exists.";
+                $error = "Integration for <strong>$provider</strong> already exists.";
             }
         } else {
-            $error = "Invalid API key for $provider.";
+            $error = "Invalid API key for <strong>$provider</strong>.";
         }
     } else {
         $error = "Please select a provider and enter a valid API Key.";
@@ -39,7 +39,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     unset($integrations[$providerToRemove]);
     $_SESSION['integrations'] = $integrations;
-    $message = "Integration for $providerToRemove removed successfully!";
+    $message = "Integration for <strong>$providerToRemove</strong> removed successfully!";
 }
 
 ksort($integrations);
