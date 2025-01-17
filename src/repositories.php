@@ -99,7 +99,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                                         class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span>
                                 </td>
                                 <td><i
-                                        class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash' : ''; ?>"></i>
+                                        class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash status-uninstalled' : ' status-installed'; ?>"></i>
                                     <?php echo $repo['visibility']; ?></td>
                             </tr>
                         <?php endforeach; ?>
