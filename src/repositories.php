@@ -153,7 +153,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
             repositoriesTable.innerHTML = '';
 
             repositories.forEach(repo => {
-                const slash = repo.visibility === 'private' ? '-slash' : '';
+                const slash = repo.visibility === 'private' ? '-slash status-uninstalled' : ' status-installed';
                 const row = document.createElement('tr');
                 row.classList.add('repository-row');
                 row.setAttribute('data-organization', repo.organization);
