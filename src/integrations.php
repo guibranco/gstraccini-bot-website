@@ -151,7 +151,7 @@ function maskApiKey($apiKey)
             </div>
         </div>
 
-        <?php if (!empty($integrations) && count($integrations) > 0): ?>
+        <?php if (count($integrations) > 0): ?>
             <div class="card mt-4">
                 <div class="card-header">
                     <h2>Integrations</h2>
