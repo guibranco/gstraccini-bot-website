@@ -9,6 +9,7 @@ if ($isAuthenticated === false) {
 $user = $_SESSION['user'];
 $integrations = $_SESSION['integrations'] ?? [];
 ksort($integrations);
+$usedIntegrations = array_keys($integrations);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $provider = $_POST['provider'] ?? "";
@@ -57,8 +58,10 @@ $providers = [
     "CPanel" => "https://cdn.simpleicons.org/Cpanel",
     "CloudAMQP" => "/images/CloudAMQP.png",
 ];
-
 ksort($providers);
+$providers = array_filter($providers, function ($provider) use ($usedIntegrations) {
+    return !in_array($provider, $usedIntegrations);
+});
 
 function maskApiKey($apiKey)
 {
