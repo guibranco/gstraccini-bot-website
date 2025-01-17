@@ -8,6 +8,7 @@ if ($isAuthenticated === false) {
 
 $user = $_SESSION['user'];
 $integrations = $_SESSION['integrations'] ?? [];
+ksort($integrations);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $provider = $_POST['provider'] ?? "";
