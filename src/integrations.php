@@ -23,12 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'lastError' => 'N/A',
                 ];
                 $_SESSION['integrations'] = $integrations;
-                $message = "Integration for $provider added successfully!";
+                $message = "Integration for <strong>$provider</strong> added successfully!";
             } else {
-                $error = "Integration for $provider already exists.";
+                $error = "Integration for <strong>$provider</strong> already exists.";
             }
         } else {
-            $error = "Invalid API key for $provider.";
+            $error = "Invalid API key for <strong>$provider</strong>.";
         }
     } else {
         $error = "Please select a provider and enter a valid API Key.";
@@ -39,7 +39,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     unset($integrations[$providerToRemove]);
     $_SESSION['integrations'] = $integrations;
-    $message = "Integration for $providerToRemove removed successfully!";
+    $message = "Integration for <strong>$providerToRemove</strong> removed successfully!";
 }
 
 ksort($integrations);
@@ -60,7 +60,7 @@ $providers = [
     "CloudAMQP" => "/images/CloudAMQP.png",
 ];
 ksort($providers);
-$providers = array_filter($providers, function ($provider) use ($usedIntegrations) {
+$availableProviders = array_filter($providers, function ($provider) use ($usedIntegrations) {
     return !in_array($provider, $usedIntegrations);
 }, ARRAY_FILTER_USE_KEY);
 
@@ -107,7 +107,7 @@ function maskApiKey($apiKey)
                 <h2>Add Integration</h2>
             </div>
             <div class="card-body">
-                <?php if (count($providers) === 0): ?>
+                <?php if (count($availableProviders) === 0): ?>
                     <div class="alert alert-warning fade show" role="alert">
                         All providers are already configured
                     </div>
@@ -121,7 +121,7 @@ function maskApiKey($apiKey)
                                 Select a provider
                             </button>
                             <ul class="dropdown-menu w-100" aria-labelledby="providerDropdown">
-                                <?php foreach ($providers as $providerName => $logo): ?>
+                                <?php foreach ($availableProviders as $providerName => $logo): ?>
                                     <a class="dropdown-item d-flex align-items-center" data-value="<?php echo $providerName; ?>"
                                         data-logo="<?php echo $logo; ?>">
                                         <img src="<?php echo $logo; ?>" alt="<?php echo $providerName; ?> logo"
@@ -151,7 +151,7 @@ function maskApiKey($apiKey)
             </div>
         </div>
 
-        <?php if (!empty($integrations)): ?>
+        <?php if (count($integrations) > 0): ?>
             <div class="card mt-4">
                 <div class="card-header">
                     <h2>Integrations</h2>
