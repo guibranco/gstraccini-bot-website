@@ -7,7 +7,7 @@ session_set_cookie_params([
     'domain' => 'bot.straccini.com',
     'secure' => true,
     'httponly' => true,
-    'samesite' => 'Strict'
+    'samesite' => 'LAX'
 ]);
 session_start();
 
