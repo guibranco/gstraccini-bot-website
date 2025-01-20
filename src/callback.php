@@ -2,17 +2,22 @@
 require_once "includes/session.php";
 
 
+/**
+ * Validates the OAuth state parameter to prevent CSRF attacks.
+ * 
+ * @return bool True if the state is valid, false otherwise
+ */
 function checkForValidState(): bool
 {
-    if (isset($_GET["state"] === false) {
+    if (isset($_GET["state"]) === false) {
         return false;
     }
 
-    if (isset($_GET["installation"]) === true) {
+    if (isset($_GET["installation"])) {
         return true;
     }
 
-    return isset($_SESSION["oauth_state"]) === true && $_GET["state"] === $_SESSION["oauth_state"];
+    return isset($_SESSION["oauth_state"]) && $_GET["state"] === $_SESSION["oauth_state"];
 }
 
 if (checkForValidState() === false) {
