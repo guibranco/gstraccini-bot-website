@@ -13,10 +13,6 @@ function checkForValidState(): bool
         return false;
     }
 
-    if (isset($_GET["installation"])) {
-        return true;
-    }
-
     return isset($_SESSION["oauth_state"]) && $_GET["state"] === $_SESSION["oauth_state"];
 }
 
