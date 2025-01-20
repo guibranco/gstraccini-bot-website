@@ -1,7 +1,21 @@
 <?php
 require_once "includes/session.php";
 
-if (isset($_GET['state']) === false || isset($_SESSION['oauth_state']) === false || $_GET['state'] !== $_SESSION['oauth_state']) {
+
+function checkForValidState(): bool
+{
+    if (isset($_GET["state"] === false) {
+        return false;
+    }
+
+    if (isset($_GET["installation"]) === true) {
+        return true;
+    }
+
+    return isset($_SESSION["oauth_state"]) === true && $_GET["state"] === $_SESSION["oauth_state"];
+}
+
+if (checkForValidState() === false) {
     header('Location: signin.php?error=Invalid+state+parameter');
     exit();
 }
