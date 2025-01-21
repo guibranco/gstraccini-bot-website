@@ -55,48 +55,50 @@ foreach ($data["openPullRequests"] as $pr) {
                 <?php if (empty($groupedPullRequests)): ?>
                     <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
                 <?php else: ?>
-                    <?php foreach ($groupedPullRequests as $account => $pullRequests): ?>
-                        <h4><?php echo htmlspecialchars($account, ENT_QUOTES, 'UTF-8'); ?></h4>
-                        <ul class="list-group mb-4">
-                            <?php foreach ($pullRequests as $pr): ?>
-                                <li class="list-group-item">
-                                    <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
-                                            rel="noopener noreferrer"
-                                            target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
-                                    <br />
-                                    <span class="text-muted">
-                                        <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
-                                            rel="noopener noreferrer"
-                                            target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
-                                    </span> -
-                                    <span class="text-muted">(🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?>)</span>
-                                    <?php if (isset($pr["state"])): ?>
-                                        <?php if ($pr["state"] === "success"): ?>
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check-circle"></i> Success
-                                            </span>
-                                        <?php elseif ($pr["state"] === "failure"): ?>
-                                            <span class="badge bg-danger">
-                                                <i class="fas fa-times-circle"></i> Failure
-                                            </span>
-                                        <?php elseif ($pr["state"] === "pending"): ?>
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="fas fa-hourglass-half"></i> Pending
-                                            </span>
-                                        <?php elseif ($pr["state"] === "error"): ?>
-                                            <span class="badge bg-danger">
-                                                <i class="fas fa-exclamation-triangle"></i> Error
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-question-circle"></i> Empty
-                                            </span>
+                    <div id="groupedPullRequests">
+                        <?php foreach ($groupedPullRequests as $account => $pullRequests): ?>
+                            <h4><?php echo htmlspecialchars($account, ENT_QUOTES, 'UTF-8'); ?></h4>
+                            <ul class="list-group mb-4">
+                                <?php foreach ($pullRequests as $pr): ?>
+                                    <li class="list-group-item">
+                                        <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
+                                                rel="noopener noreferrer"
+                                                target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
+                                        <br />
+                                        <span class="text-muted">
+                                            <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
+                                                rel="noopener noreferrer"
+                                                target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                        </span> -
+                                        <span class="text-muted">(🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?>)</span>
+                                        <?php if (isset($pr["state"])): ?>
+                                            <?php if ($pr["state"] === "success"): ?>
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle"></i> Success
+                                                </span>
+                                            <?php elseif ($pr["state"] === "failure"): ?>
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle"></i> Failure
+                                                </span>
+                                            <?php elseif ($pr["state"] === "pending"): ?>
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-hourglass-half"></i> Pending
+                                                </span>
+                                            <?php elseif ($pr["state"] === "error"): ?>
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-exclamation-triangle"></i> Error
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-question-circle"></i> Empty
+                                                </span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
-                                    <?php endif; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endforeach; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
