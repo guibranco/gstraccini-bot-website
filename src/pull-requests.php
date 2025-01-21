@@ -199,8 +199,8 @@ foreach ($data["openPullRequests"] as $pr) {
                     pullRequestList.appendChild(itemLi);
                 });
 
-                $ownerDiv.appendChild(pullRequestList);
-                groupedContainer.appendChild($ownerDiv);
+                ownerDiv.appendChild(pullRequestList);
+                groupedContainer.appendChild(ownerDiv);
             }
         }
 
