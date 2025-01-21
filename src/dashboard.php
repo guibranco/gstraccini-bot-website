@@ -163,7 +163,7 @@ if (isset($user["first_name"])) {
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span>
                             <br />
-                            <span class="text-muted">🕐 <?php echo $issue['created_at']; ?></span>
+                            <span class="text-muted">🕐 <?php echo $issue['created_at']; ?></span> 
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
                                     <i class="fas fa-check-circle"></i> Success
@@ -259,7 +259,7 @@ if (isset($user["first_name"])) {
                 let content = '';
                 content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
                 content += `<span class="text-muted"><a href='https://github.com/${item.full_name}' target='_blank'>${item.repository}</a></span><br />`;
-                content += `<span class="text-muted">🕐 ${item.created_at}</span>`
+                content += `<span class="text-muted">🕐 ${item.created_at}</span> `
                 content += state;
                 itemLi.innerHTML = content;
                 list.appendChild(itemLi);
