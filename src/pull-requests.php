@@ -127,7 +127,7 @@ foreach ($data["openPullRequests"] as $pr) {
         function populateIssuesGroupedByAccount(items) {
             const groupedData = {};
             items.forEach(item => {
-                const account = item.account || 'Unknown';
+                const account = item?.account || 'Unknown';
                 if (!groupedData[account]) {
                     groupedData[account] = [];
                 }
@@ -135,6 +135,10 @@ foreach ($data["openPullRequests"] as $pr) {
             });
 
             const groupedContainer = document.getElementById("groupedPullRequests");
+            if (!groupedContainer) {
+                console.error('Container element not found');
+                return;
+            }
             groupedContainer.innerHTML = '';
 
             if (items.length === 0) {
@@ -150,7 +154,7 @@ foreach ($data["openPullRequests"] as $pr) {
                 accountDiv.className = 'mb-4';
 
                 const accountHeader = document.createElement('h5');
-                accountHeader.textContent = `${account} (${pullRequests.length})`;
+                accountHeader.textContent = `${escapeHtml(account)} (${pullRequests.length})`;
                 accountHeader.className = 'text-primary mb-2';
                 accountDiv.appendChild(accountHeader);
 
@@ -160,17 +164,53 @@ foreach ($data["openPullRequests"] as $pr) {
                     const state = getStateBadge(pr.state);
                     const itemLi = document.createElement('li');
                     itemLi.className = 'list-group-item';
-                    let content = '';
-                    content += `<strong><a href='${pr.url}' target='_blank'>${pr.title}</a></strong><br />`;
-                    content += `<span class="text-muted"><a href='https://github.com/${pr.full_name}' target='_blank'>${pr.repository}</a></span> - `;
-                    content += `<span class="text-muted">(🕐 ${pr.created_at})</span> ${state}`;
-                    itemLi.innerHTML = content;
+                    
+                    const titleLink = document.createElement('a');
+                    titleLink.href = escapeHtml(pr.url);
+                    titleLink.target = '_blank';
+                    titleLink.textContent = pr.title;
+                    
+                    const strong = document.createElement('strong');
+                    strong.appendChild(titleLink);                    
+                    itemLi.appendChild(strong);
+                    
+                    itemLi.appendChild(document.createElement('br'));
+                    
+                    const repoSpan = document.createElement('span');
+                    repoSpan.className = 'text-muted';
+                    
+                    const repoLink = document.createElement('a');
+                    repoLink.href = `https://github.com/${escapeHtml(pr.full_name)}`;
+                    repoLink.target = '_blank';
+                    repoLink.textContent = pr.repository;
+                    repoSpan.appendChild(repoLink);
+                    itemLi.appendChild(repoSpan);
+                    
+                    itemLi.appendChild(document.createTextNode(' - '));
+                    
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'text-muted';
+                    timeSpan.textContent = `(🕐 ${pr.created_at})`;
+                    itemLi.appendChild(timeSpan);
+                    
+                    const stateSpan = document.createElement('span');
+                    stateSpan.innerHTML = state;
+                    itemLi.appendChild(stateSpan);
                     pullRequestList.appendChild(itemLi);
                 });
 
                 accountDiv.appendChild(pullRequestList);
                 groupedContainer.appendChild(accountDiv);
             }
+        }
+
+        function escapeHtml(unsafe) {
+        	return unsafe
+        	.replace(/&/g, "&amp;")
+        	.replace(/</g, "&lt;")
+        	.replace(/>/g, "&gt;")
+        	.replace(/"/g, "&quot;")
+        	.replace(/'/g, "&#039;");
         }
 
         function getStateBadge(state) {
