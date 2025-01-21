@@ -17,6 +17,15 @@ if (isset($user["first_name"])) {
 } else if (isset($user["name"])) {
     $name = $user["name"];
 }
+
+$groupedIssues = [];
+foreach ($data["openIssues"] as $pr) {
+    $owner = $pr['owner'] ?? 'Unknown';
+    if (!isset($groupedIssues[$owner])) {
+        $groupedIssues[$owner] = [];
+    }
+    $groupedIssues[$owner][] = $pr;
+}
 ?>
 
 <!DOCTYPE html>
