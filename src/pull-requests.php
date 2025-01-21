@@ -60,16 +60,16 @@ foreach ($data["openPullRequests"] as $pr) {
                         <ul class="list-group mb-4">
                             <?php foreach ($pullRequests as $pr): ?>
                                 <li class="list-group-item">
-                                    <strong><a href='<?php echo htmlspecialchars($pr['url'], ENT_QUOTES, 'UTF-8'); ?>'
+                                    <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
                                             rel="noopener noreferrer"
-                                            target='_blank'><?php echo htmlspecialchars($pr['title']); ?></a></strong>
+                                            target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
                                     <br />
                                     <span class="text-muted">
-                                        <a href='https://github.com/<?php echo htmlspecialchars($pr['full_name'], ENT_QUOTES, 'UTF-8'); ?>'
+                                        <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
                                             rel="noopener noreferrer"
-                                            target='_blank'><?php echo htmlspecialchars($pr['repository']); ?></a>
+                                            target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
                                     </span> -
-                                    <span class="text-muted">(🕐 <?php echo $pr['created_at']; ?>)</span>
+                                    <span class="text-muted">(🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?>)</span>
                                     <?php if (isset($pr["state"])): ?>
                                         <?php if ($pr["state"] === "success"): ?>
                                             <span class="badge bg-success">
