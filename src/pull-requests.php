@@ -61,39 +61,45 @@ foreach ($data["openPullRequests"] as $pr) {
                             <ul class="list-group mb-4">
                                 <?php foreach ($pullRequests as $pr): ?>
                                     <li class="list-group-item">
-                                        <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
-                                                rel="noopener noreferrer"
-                                                target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
-                                        <br />
-                                        <span class="text-muted">
-                                            <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
-                                                rel="noopener noreferrer"
-                                                target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
-                                        </span> -
-                                        <span class="text-muted">(🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?>)</span>
-                                        <?php if (isset($pr["state"])): ?>
-                                            <?php if ($pr["state"] === "success"): ?>
-                                                <span class="badge bg-success">
-                                                    <i class="fas fa-check-circle"></i> Success
-                                                </span>
-                                            <?php elseif ($pr["state"] === "failure"): ?>
-                                                <span class="badge bg-danger">
-                                                    <i class="fas fa-times-circle"></i> Failure
-                                                </span>
-                                            <?php elseif ($pr["state"] === "pending"): ?>
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="fas fa-hourglass-half"></i> Pending
-                                                </span>
-                                            <?php elseif ($pr["state"] === "error"): ?>
-                                                <span class="badge bg-danger">
-                                                    <i class="fas fa-exclamation-triangle"></i> Error
-                                                </span>
-                                            <?php else: ?>
-                                                <span class="badge bg-secondary">
-                                                    <i class="fas fa-question-circle"></i> Empty
-                                                </span>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
+                                                        rel="noopener noreferrer"
+                                                        target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
+                                                <br />
+                                                <span class="text-muted">
+                                                    <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
+                                                        rel="noopener noreferrer"
+                                                        target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                </span> -
+                                                <span class="text-muted">(🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?>)</span>
+                                            </div>
+                                            <div>
+                                                <?php if (isset($pr["state"])): ?>
+                                                    <?php if ($pr["state"] === "success"): ?>
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check-circle"></i> Success
+                                                        </span>
+                                                    <?php elseif ($pr["state"] === "failure"): ?>
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-times-circle"></i> Failure
+                                                        </span>
+                                                    <?php elseif ($pr["state"] === "pending"): ?>
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="fas fa-hourglass-half"></i> Pending
+                                                        </span>
+                                                    <?php elseif ($pr["state"] === "error"): ?>
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-exclamation-triangle"></i> Error
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary">
+                                                            <i class="fas fa-question-circle"></i> Empty
+                                                        </span>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
@@ -188,6 +194,14 @@ foreach ($data["openPullRequests"] as $pr) {
                     const state = getStateBadge(pr.state);
                     const itemLi = document.createElement('li');
                     itemLi.className = 'list-group-item';
+                    pullRequestList.appendChild(itemLi);
+
+                    const container = document.createElement("div");
+                    container.className = "d-flex justify-content-between align-items-start";
+                    itemLi.appendChild(container);
+
+                    const leftSection = document.createElement("div");
+                    container.appendChild(leftSection);
                     
                     const titleLink = document.createElement('a');
                     titleLink.href = escapeHtml(pr.url);
@@ -196,9 +210,9 @@ foreach ($data["openPullRequests"] as $pr) {
                     
                     const strong = document.createElement('strong');
                     strong.appendChild(titleLink);                    
-                    itemLi.appendChild(strong);
+                    leftSection.appendChild(strong);
                     
-                    itemLi.appendChild(document.createElement('br'));
+                    leftSection.appendChild(document.createElement('br'));
                     
                     const repoSpan = document.createElement('span');
                     repoSpan.className = 'text-muted';
@@ -208,19 +222,19 @@ foreach ($data["openPullRequests"] as $pr) {
                     repoLink.target = '_blank';
                     repoLink.textContent = pr.repository;
                     repoSpan.appendChild(repoLink);
-                    itemLi.appendChild(repoSpan);
-                    
-                    itemLi.appendChild(document.createTextNode(' - '));
-                    
+                    leftSection.appendChild(repoSpan);
+                                       
                     const timeSpan = document.createElement('span');
                     timeSpan.className = 'text-muted';
                     timeSpan.textContent = `(🕐 ${pr.created_at})`;
-                    itemLi.appendChild(timeSpan);
+                    leftSection.appendChild(timeSpan);
+
+                    const rightSection = document.createElement("div");
+                    container.appendChild(rightSection);
                     
                     const stateSpan = document.createElement('span');
                     stateSpan.innerHTML = state;
-                    itemLi.appendChild(stateSpan);
-                    pullRequestList.appendChild(itemLi);
+                    rightSection.appendChild(stateSpan);
                 });
 
                 ownerDiv.appendChild(pullRequestList);
