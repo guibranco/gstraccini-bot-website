@@ -21,11 +21,11 @@ if (isset($user["first_name"])) {
 
 $groupedPullRequests = [];
 foreach ($data["openPullRequests"] as $pr) {
-    $account = $pr['owner'] ?? 'Unknown';
-    if (!isset($groupedPullRequests[$account])) {
-        $groupedPullRequests[$account] = [];
+    $owner = $pr['owner'] ?? 'Unknown';
+    if (!isset($groupedPullRequests[$owner])) {
+        $groupedPullRequests[$owner] = [];
     }
-    $groupedPullRequests[$account][] = $pr;
+    $groupedPullRequests[$owner][] = $pr;
 }
 ?>
 
@@ -51,13 +51,13 @@ foreach ($data["openPullRequests"] as $pr) {
             <div class="col-md-12">
                 <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill"
                         id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
-                
-                <?php if (empty($groupedPullRequests)): ?>
-                    <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
-                <?php else: ?>
-                    <div id="groupedPullRequests">
-                        <?php foreach ($groupedPullRequests as $account => $pullRequests): ?>
-                            <h4><?php echo htmlspecialchars($account, ENT_QUOTES, 'UTF-8'); ?></h4>
+
+                <div id="groupedPullRequests">
+                    <?php if (empty($groupedPullRequests)): ?>
+                        <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
+                    <?php else: ?>                    
+                        <?php foreach ($groupedPullRequests as $owner => $pullRequests): ?>
+                            <h4><?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?></h4>
                             <ul class="list-group mb-4">
                                 <?php foreach ($pullRequests as $pr): ?>
                                     <li class="list-group-item">
@@ -98,8 +98,8 @@ foreach ($data["openPullRequests"] as $pr) {
                                 <?php endforeach; ?>
                             </ul>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -124,14 +124,14 @@ foreach ($data["openPullRequests"] as $pr) {
             }, 15000);
         }
 
-        function populateIssuesGroupedByAccount(items) {
+        function populateIssuesGroupedByOwner(items) {
             const groupedData = {};
             items.forEach(item => {
-                const account = item?.account || 'Unknown';
-                if (!groupedData[account]) {
-                    groupedData[account] = [];
+                const owner = item?.owner || 'Unknown';
+                if (!groupedData[owner]) {
+                    groupedData[owner] = [];
                 }
-                groupedData[account].push(item);
+                groupedData[owner].push(item);
             });
 
             const groupedContainer = document.getElementById("groupedPullRequests");
@@ -149,14 +149,14 @@ foreach ($data["openPullRequests"] as $pr) {
                 return;
             }
 
-            for (const [account, pullRequests] of Object.entries(groupedData)) {
-                const accountDiv = document.createElement('div');
-                accountDiv.className = 'mb-4';
+            for (const [owner, pullRequests] of Object.entries(groupedData)) {
+                const ownerDiv = document.createElement('div');
+                ownerDiv.className = 'mb-4';
 
-                const accountHeader = document.createElement('h5');
-                accountHeader.textContent = `${escapeHtml(account)} (${pullRequests.length})`;
-                accountHeader.className = 'text-primary mb-2';
-                accountDiv.appendChild(accountHeader);
+                const ownerHeader = document.createElement('h5');
+                ownerHeader.textContent = `${escapeHtml(owner)} (${pullRequests.length})`;
+                ownerHeader.className = 'text-primary mb-2';
+                ownerDiv.appendChild(ownerHeader);
 
                 const pullRequestList = document.createElement('ul');
                 pullRequestList.className = 'list-group';
@@ -199,8 +199,8 @@ foreach ($data["openPullRequests"] as $pr) {
                     pullRequestList.appendChild(itemLi);
                 });
 
-                accountDiv.appendChild(pullRequestList);
-                groupedContainer.appendChild(accountDiv);
+                ownerDiv.appendChild(pullRequestList);
+                groupedContainer.appendChild(ownerDiv);
             }
         }
 
@@ -232,7 +232,7 @@ foreach ($data["openPullRequests"] as $pr) {
             fetch('api.php')
                 .then(response => response.json())
                 .then(data => {
-                    populateIssuesGroupedByAccount(data.openPullRequests);
+                    populateIssuesGroupedByOwner(data.openPullRequests);
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
