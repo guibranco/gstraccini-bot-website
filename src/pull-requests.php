@@ -155,7 +155,7 @@ foreach ($data["openPullRequests"] as $pr) {
                 return;
             }
 
-            counterCOntainer.textContent = items.length;
+            counterContainer.textContent = items.length;
 
             for (const [owner, pullRequests] of Object.entries(groupedData)) {
                 const groupId = `group-${account.replace(/\s+/g, '-')}`;
