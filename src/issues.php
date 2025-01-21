@@ -68,7 +68,7 @@ foreach ($data["openIssues"] as $pr) {
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span>
                             <br />
-                            <span class="text-muted">🕐 <?php echo $issue['created_at']; ?></span>
+                            <span class="text-muted">🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
