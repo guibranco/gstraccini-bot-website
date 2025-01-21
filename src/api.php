@@ -109,6 +109,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             'repository' => $issue['repository']['name'],
             'full_name' => $issue['repository']['full_name'],
             'url' => $issue['html_url'],
+            'owner' => $issue['repository']['owner']['login'],
             'created_at' => $issue['created_at']
         ];
 
