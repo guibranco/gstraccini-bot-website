@@ -51,11 +51,11 @@ foreach ($data["openPullRequests"] as $pr) {
             <div class="col-md-12">
                 <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill"
                         id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
-                
-                <?php if (empty($groupedPullRequests)): ?>
-                    <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
-                <?php else: ?>
-                    <div id="groupedPullRequests">
+
+                <div id="groupedPullRequests">
+                    <?php if (empty($groupedPullRequests)): ?>
+                        <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
+                    <?php else: ?>                    
                         <?php foreach ($groupedPullRequests as $account => $pullRequests): ?>
                             <h4><?php echo htmlspecialchars($account, ENT_QUOTES, 'UTF-8'); ?></h4>
                             <ul class="list-group mb-4">
@@ -98,8 +98,8 @@ foreach ($data["openPullRequests"] as $pr) {
                                 <?php endforeach; ?>
                             </ul>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
