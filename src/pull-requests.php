@@ -158,7 +158,7 @@ foreach ($data["openPullRequests"] as $pr) {
             counterContainer.textContent = items.length;
 
             for (const [owner, pullRequests] of Object.entries(groupedData)) {
-                const groupId = `group-${account.replace(/\s+/g, '-')}`;
+                const groupId = `group-${owner.replace(/\s+/g, '-')}`;
                 const ownerDiv = document.createElement('div');
                 ownerDiv.className = 'mb-4';
 
