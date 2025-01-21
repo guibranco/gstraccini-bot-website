@@ -21,7 +21,7 @@ if (isset($user["first_name"])) {
 
 $groupedPullRequests = [];
 foreach ($data["openPullRequests"] as $pr) {
-    $account = $pr['owner'] ?? 'Unknown'; 
+    $account = $pr['owner'] ?? 'Unknown';
     if (!isset($groupedPullRequests[$account])) {
         $groupedPullRequests[$account] = [];
     }
