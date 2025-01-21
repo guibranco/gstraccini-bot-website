@@ -134,6 +134,12 @@ foreach ($data["openPullRequests"] as $pr) {
                 groupedData[owner].push(item);
             });
 
+            const counterContainer = document.getElementById("openPullRequestsCount");
+            if (!counterContainer) {
+                console.error('Counter container element not found');
+                return;
+            }
+            
             const groupedContainer = document.getElementById("groupedPullRequests");
             if (!groupedContainer) {
                 console.error('Container element not found');
@@ -149,17 +155,35 @@ foreach ($data["openPullRequests"] as $pr) {
                 return;
             }
 
+            counterCOntainer.textContent = items.length;
+
             for (const [owner, pullRequests] of Object.entries(groupedData)) {
+                const groupId = `group-${account.replace(/\s+/g, '-')}`;
                 const ownerDiv = document.createElement('div');
                 ownerDiv.className = 'mb-4';
 
                 const ownerHeader = document.createElement('h5');
-                ownerHeader.textContent = `${escapeHtml(owner)} (${pullRequests.length})`;
                 ownerHeader.className = 'text-primary mb-2';
                 ownerDiv.appendChild(ownerHeader);
 
+                const ownerButton = document.createElement('button');
+                ownerButton.className = 'btn btn-link text-decoration-none';
+                ownerButton.type = 'button';
+                ownerButton.setAttribute('data-bs-toggle', 'collapse');
+                ownerButton.setAttribute('data-bs-target', `#${groupId}`);
+                ownerButton.setAttribute('aria-expanded', 'true');
+                ownerButton.setAttribute('aria-controls', groupId);
+                ownerButton.textContent = `${escapeHtml(owner)} (${pullRequests.length}) `;
+                ownerHeader.appendChild(ownerButton);
+
+                const ownerChevron = document.createElement("i");
+                ownerChevron.className = 'fas fa-chevron-down';
+                ownerButton.appendChild(ownerChevron);
+                
                 const pullRequestList = document.createElement('ul');
-                pullRequestList.className = 'list-group';
+                pullRequestList.className = 'list-group collapse show';
+                pullRequestList.id = groupId;
+                
                 pullRequests.forEach(pr => {
                     const state = getStateBadge(pr.state);
                     const itemLi = document.createElement('li');
