@@ -53,7 +53,7 @@ foreach ($data["openPullRequests"] as $pr) {
                         id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 
                 <?php if (empty($groupedPullRequests)): ?>
-                    <p class="text-muted">No pull requests found.</p>
+                    <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
                 <?php else: ?>
                     <?php foreach ($groupedPullRequests as $account => $pullRequests): ?>
                         <h4><?php echo htmlspecialchars($account, ENT_QUOTES, 'UTF-8'); ?></h4>
