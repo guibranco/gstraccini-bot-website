@@ -82,8 +82,8 @@ $services = [
     ],
     [
         'name' => 'GitHub Integration (Service)',
-        'status' => $resultProcessor["status"],
-        'lastUpdated' => $resultProcessor["http_date"]
+        'status' => $resultHandler["status"],
+        'lastUpdated' => $resultHandler["http_date"]
     ],
     [
         'name' => 'GitHub Workflows',
