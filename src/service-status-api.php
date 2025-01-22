@@ -66,10 +66,19 @@ function checkServiceHealth(string $url): array
 
 try {
     $resultHandler = checkServiceHealth($webhooksApiUrl);
+} catch (Exception $e) {
+    error_log("Health check handler failed: " . $e->getMessage());
+    $resultHandler = [
+        'status' => 'Failure',
+        'http_date' => gmdate('Y-m-d h:i A T')
+    ];
+}
+
+try {
     $resultProcessor = checkServiceHealth($webhookUrl . "/health");
 } catch (Exception $e) {
-    error_log("Health check failed: " . $e->getMessage());
-    $resultHandler = $resultProcessor = [
+    error_log("Health check processor failed: " . $e->getMessage());
+    $resultProcessor = [
         'status' => 'Failure',
         'http_date' => gmdate('Y-m-d h:i A T')
     ];
