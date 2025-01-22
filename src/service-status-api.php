@@ -20,6 +20,9 @@ function checkServiceHealth(string $url): array
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HEADER => true,
         CURLOPT_TIMEOUT => 10,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_USERAGENT => 'GStraccini-Bot-Website/1.0',
     ]);
 
     $response = curl_exec($curl);
