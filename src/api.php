@@ -111,11 +111,11 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             'url' => $issue['html_url'],
             'owner' => $issue['repository']['owner']['login'],
             'labels' => array_map(function ($label) {
-                $newLabel = [];
-                $newLabel["color"] = $label["color"];
-                $newLabel["description"] = $label["description"];
-                $newLabel["name"] = $label["name"];
-                return $newLabel;
+                return [
+                    'color' => $label['color'] ?? null,
+                    'description' => $label['description'] ?? null,
+                    'name' => $label['name'] ?? null
+                ];
             }, $issue['labels']),
             'created_at' => $issue['created_at']
         ];
