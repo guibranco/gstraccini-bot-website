@@ -1,5 +1,5 @@
 <footer>
-  <p>© 2024 GStraccini-bot. All rights reserved.</p>
+  <p>© <?php echo date("Y"); ?> GStraccini-bot. All rights reserved.</p>
   <nav>
     <ul>
       <li><a href="privacy-policy.php">Privacy Policy</a></li>
