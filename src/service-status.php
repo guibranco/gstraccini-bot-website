@@ -45,17 +45,14 @@ require_once "includes/session.php";
       font-weight: bold;
     }
 
-    /* Badges section */
     .badges {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
-      /* Adjust the space between badges */
       margin: 20px 0;
     }
 
-    /* For each individual badge */
     .badges a {
       display: block;
     }
@@ -69,10 +66,8 @@ require_once "includes/session.php";
 
     .badges img:hover {
       transform: scale(1.1);
-      /* Optional: adds a hover effect for interactivity */
     }
 
-    /* Ensure responsiveness of badges on small screens */
     @media (max-width: 768px) {
       .badges {
         justify-content: flex-start;
@@ -91,23 +86,6 @@ require_once "includes/session.php";
       health and service availability.</p>
 
     <div class="badges">
-      <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/deploy.yml">
-        <img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/deploy.yml/badge.svg"
-          alt="Deploy via FTP Badge">
-      </a>
-      <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/php-lint.yml">
-        <img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/php-lint.yml/badge.svg"
-          alt="PHP Linting Badge">
-      </a>
-      <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/json-yaml-lint.yml">
-        <img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/json-yaml-lint.yml/badge.svg"
-          alt="JSON/YAML Validation Badge">
-      </a>
-      <a href="https://github.com/guibranco/gstraccini-bot/actions/workflows/shell-cheker.yml">
-        <img src="https://github.com/guibranco/gstraccini-bot/actions/workflows/shell-cheker.yml/badge.svg"
-          alt="Shell Checker Badge">
-      </a>
-      <!-- GitHub Actions Badge -->
       <img src="https://healthchecks.io/b/3/82d0dec5-3ec1-41cc-8a35-ef1da42899e5.svg" alt="GStraccini Bot - Branches">
       <img src="https://healthchecks.io/b/3/31b38cb0-f8bd-42b1-b662-d5905b22cd94.svg" alt="GStraccini Bot - Comments">
       <img src="https://healthchecks.io/b/3/05666a6b-d35f-4cb8-abc8-25584cc9029b.svg" alt="GStraccini Bot - Issues">
