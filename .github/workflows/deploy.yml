@@ -44,6 +44,7 @@ jobs:
           echo "<?php" > src/webhook.secrets.php
           echo "\$webhookSecret       = \"${{ secrets.WEBHOOK_SECRET }}\";" >> src/webhook.secrets.php
           echo "\$webhookUrl          = \"${{ secrets.WEBHOOK_URL }}\";" >> src/webhook.secrets.php
+          echo "\$webhooksApiUrl      = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php
 
       - name: Upload site
         uses: sebastianpopp/ftp-action@releases/v2
