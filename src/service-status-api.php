@@ -82,12 +82,12 @@ try {
     ];
 }
 
-$date = new DateTime('now', new DateTimeZone('UTC'));
+$date = new DateTime('now', new DateTimeZone('GMT'));
 $services = [
     [
         'name' => 'API',
         'status' => 'Operational',
-        'lastUpdated' => '2025-01-22 12:33 AM UTC'
+        'lastUpdated' => '2025-01-22 12:33 AM GMT'
     ],
     [
         'name' => 'Dashboard',
@@ -97,7 +97,7 @@ $services = [
     [
         'name' => 'Documentation',
         'status' => 'Maintenance',
-        'lastUpdated' => '2025-01-22 12:33 AM UTC'
+        'lastUpdated' => '2025-01-22 12:33 AM GMT'
     ],
     [
         'name' => 'GitHub Integration (Service)',
@@ -107,7 +107,7 @@ $services = [
     [
         'name' => 'GitHub Workflows',
         'status' => 'Operational',
-        'lastUpdated' => '2025-01-22 12:33 AM UTC'
+        'lastUpdated' => '2025-01-22 12:33 AM GMT'
     ],
     [
         'name' => 'Webhook Processing',
