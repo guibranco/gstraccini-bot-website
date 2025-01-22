@@ -110,6 +110,13 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             'full_name' => $issue['repository']['full_name'],
             'url' => $issue['html_url'],
             'owner' => $issue['repository']['owner']['login'],
+            'labels' => array_map(function ($label) {
+                return [
+                    'color' => $label['color'] ?? null,
+                    'description' => $label['description'] ?? null,
+                    'name' => $label['name'] ?? null
+                ];
+            }, $issue['labels']),
             'created_at' => $issue['created_at']
         ];
 
