@@ -66,8 +66,9 @@ foreach ($data["openIssues"] as $pr) {
                                 <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name'], ENT_QUOTES, 'UTF-8'); ?>'
                                     rel="noopener noreferrer"
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
-                            </span> -
-                            <span class="text-muted">(🕐 <?php echo $issue['created_at']; ?>)</span>
+                            </span>
+                            <br />
+                            <span class="text-muted">🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -113,8 +114,15 @@ foreach ($data["openIssues"] as $pr) {
                 itemLi.className = 'list-group-item';
                 let content = '';
                 content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
-                content += `<span class="text-muted"><a href='https://github.com/${item.full_name}' target='_blank'>${item.repository}</a></span> - `;
-                content += `<span class="text-muted">(🕐 ${item.created_at})</span>`;
+                const sanitize = (str) => str.replace(/[&<>"']/g, (char) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[char]);
+                content += `<span class="text-muted"><a href='https://github.com/${sanitize(item.full_name)}' target='_blank'>${sanitize(item.repository)}</a></span><br />`;
+                content += `<span class="text-muted">🕐 ${sanitize(item.created_at)}</span>`;
                 itemLi.innerHTML = content;
                 list.appendChild(itemLi);
             });
