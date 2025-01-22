@@ -6,8 +6,6 @@ if (!file_exists("secrets/webhook.secrets.php")) {
 }
 require_once("secrets/webhook.secrets.php");
 
-<?php
-
 /**
  * Performs an HTTP GET request and checks the response.
  *
