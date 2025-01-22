@@ -1,10 +1,10 @@
 <?php
 
-if (!file_exists("secrets/webhook.secrets.php")) {
+if (!file_exists("webhook.secrets.php")) {
     http_response_code(500);
     die(json_encode(['error' => 'Configuration file not found']));
 }
-require_once("secrets/webhook.secrets.php");
+require_once("webhook.secrets.php");
 
 /**
  * Performs an HTTP GET request and checks the response.
