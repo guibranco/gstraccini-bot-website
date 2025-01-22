@@ -61,85 +61,90 @@ foreach ($data["openPullRequests"] as $pr) {
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill"
-                        id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
-
+                <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
                 <div id="groupedPullRequests">
                     <?php if (empty($groupedPullRequests)): ?>
                         <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
                     <?php else: ?>                    
                         <?php foreach ($groupedPullRequests as $owner => $pullRequests): ?>
-                            <h4><?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?></h4>
-                            <ul class="list-group mb-4">
-                                <?php foreach ($pullRequests as $pr): ?>
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
-                                                        rel="noopener noreferrer"
-                                                        target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
-                                                <br />
-                                                <span class="text-muted">
-                                                    <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
-                                                        rel="noopener noreferrer"
-                                                        target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
-                                                </span> 
-                                                <span class="text-muted">🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                                <div class="mt-2">
-                                                    <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
-                                                        <?php foreach ($pr['labels'] as $label): ?>
-                                                            <?php
-                                                                if (!isset($label['color']) || !isset($label['name'])) {
-                                                                    continue;
-                                                                }
-                                                
-                                                                $color = $label['color'];
-                                                                $r = hexdec(substr($color, 0, 2));
-                                                                $g = hexdec(substr($color, 2, 2));
-                                                                $b = hexdec(substr($color, 4, 2));
-                                                                $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-                                                                $textColor = ($yiq >= 128) ? '#000' : '#fff';
-                                                            ?>
-                                                            <span class="badge label-badge" 
-                                                                  style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo $textColor; ?>;" 
-                                                                  title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
-                                                                <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                            <?php 
+                                $groupId = "group-{$owner}";
+                            ?>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-2">
+                                    <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#<?php echo $groupId;?>" aria-expanded="true" aria-controls="<?php echo $groupId;?>"><?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($pullRequests); ?>) <i class="fas fa-chevron-down"></i></button>
+                                </h5>
+                                <ul class="list-group collapse show" id="<?php echo $groupId; ?>">
+                                    <?php foreach ($pullRequests as $pr): ?>
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
+                                                            rel="noopener noreferrer"
+                                                            target='_blank'><?php echo htmlspecialchars($pr['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
+                                                    <br />
+                                                    <span class="text-muted">
+                                                        <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
+                                                            rel="noopener noreferrer"
+                                                            target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                    </span> 
+                                                    <span class="text-muted">🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    <div class="mt-2">
+                                                        <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
+                                                            <?php foreach ($pr['labels'] as $label): ?>
+                                                                <?php
+                                                                    if (!isset($label['color']) || !isset($label['name'])) {
+                                                                        continue;
+                                                                    }
+                                                    
+                                                                    $color = $label['color'];
+                                                                    $r = hexdec(substr($color, 0, 2));
+                                                                    $g = hexdec(substr($color, 2, 2));
+                                                                    $b = hexdec(substr($color, 4, 2));
+                                                                    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+                                                                    $textColor = ($yiq >= 128) ? '#000' : '#fff';
+                                                                ?>
+                                                                <span class="badge label-badge" 
+                                                                      style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo $textColor; ?>;" 
+                                                                      title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                                    <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                                                </span>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <?php if (isset($pr["state"])): ?>
+                                                        <?php if ($pr["state"] === "success"): ?>
+                                                            <span class="badge bg-success">
+                                                                <i class="fas fa-check-circle"></i> Success
                                                             </span>
-                                                        <?php endforeach; ?>
+                                                        <?php elseif ($pr["state"] === "failure"): ?>
+                                                            <span class="badge bg-danger">
+                                                                <i class="fas fa-times-circle"></i> Failure
+                                                            </span>
+                                                        <?php elseif ($pr["state"] === "pending"): ?>
+                                                            <span class="badge bg-warning text-dark">
+                                                                <i class="fas fa-hourglass-half"></i> Pending
+                                                            </span>
+                                                        <?php elseif ($pr["state"] === "error"): ?>
+                                                            <span class="badge bg-danger">
+                                                                <i class="fas fa-exclamation-triangle"></i> Error
+                                                            </span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-secondary">
+                                                                <i class="fas fa-question-circle"></i> Empty
+                                                            </span>
+                                                        <?php endif; ?>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <?php if (isset($pr["state"])): ?>
-                                                    <?php if ($pr["state"] === "success"): ?>
-                                                        <span class="badge bg-success">
-                                                            <i class="fas fa-check-circle"></i> Success
-                                                        </span>
-                                                    <?php elseif ($pr["state"] === "failure"): ?>
-                                                        <span class="badge bg-danger">
-                                                            <i class="fas fa-times-circle"></i> Failure
-                                                        </span>
-                                                    <?php elseif ($pr["state"] === "pending"): ?>
-                                                        <span class="badge bg-warning text-dark">
-                                                            <i class="fas fa-hourglass-half"></i> Pending
-                                                        </span>
-                                                    <?php elseif ($pr["state"] === "error"): ?>
-                                                        <span class="badge bg-danger">
-                                                            <i class="fas fa-exclamation-triangle"></i> Error
-                                                        </span>
-                                                    <?php else: ?>
-                                                        <span class="badge bg-secondary">
-                                                            <i class="fas fa-question-circle"></i> Empty
-                                                        </span>
-                                                    <?php endif; ?>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
