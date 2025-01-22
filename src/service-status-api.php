@@ -52,7 +52,7 @@ function checkServiceHealth(string $url): array
 
     curl_close($curl);
 
-    $status = ($httpCode === 200 && trim($body) === 'Healthy') ? 'Operational' : 'Failure';
+    $status = ($httpCode === 200 && strtolower(trim($body)) === 'healthy') ? 'Operational' : 'Failure';
 
     return [
         'status' => $status,
