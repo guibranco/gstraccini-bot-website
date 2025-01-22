@@ -87,8 +87,8 @@ foreach ($data["openPullRequests"] as $pr) {
                                                         <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
                                                             rel="noopener noreferrer"
                                                             target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
-                                                    </span> 
-                                                    <span class="text-muted">🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    </span>
+                                                    <span class="text-muted"> 🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
                                                     <div class="mt-2">
                                                         <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
                                                             <?php foreach ($pr['labels'] as $label): ?>
@@ -263,12 +263,10 @@ foreach ($data["openPullRequests"] as $pr) {
                     repoLink.textContent = pr.repository;
                     repoSpan.appendChild(repoLink);
                     leftSection.appendChild(repoSpan);
-
-                    leftSection.appendChild(document.createElement('br'));
                                        
                     const timeSpan = document.createElement('span');
                     timeSpan.className = 'text-muted';
-                    timeSpan.textContent = `🕐 ${pr.created_at}`;
+                    timeSpan.textContent = ` 🕐 ${pr.created_at}`;
                     leftSection.appendChild(timeSpan);
 
                     const containerLabels = document.createElement('div');
