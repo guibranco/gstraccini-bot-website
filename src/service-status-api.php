@@ -60,8 +60,16 @@ function checkServiceHealth(string $url): array
     ];
 }
 
-$resultHandler = checkServiceHealth($webhooksApiUrl);
-$resultProcessor = checkServiceHealth($webhookUrl . "/health");
+try {
+    $resultHandler = checkServiceHealth($webhooksApiUrl);
+    $resultProcessor = checkServiceHealth($webhookUrl . "/health");
+} catch (Exception $e) {
+    error_log("Health check failed: " . $e->getMessage());
+    $resultHandler = $resultProcessor = [
+        'status' => 'Failure',
+        'http_date' => gmdate('Y-m-d h:i A T')
+    ];
+}
 
 $date = new DateTime('now', new DateTimeZone('UTC'));
 $services = [
