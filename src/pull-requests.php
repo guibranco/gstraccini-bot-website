@@ -39,6 +39,18 @@ foreach ($data["openPullRequests"] as $pr) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/user.css">
+    <style>
+    .label-badge {
+        padding: 0.3em 0.5em;
+        font-size: 0.85em;
+        border-radius: 0.25rem;
+        margin-right: 0.3em;
+        white-space: nowrap;
+    }
+    .label-badge:hover {
+        opacity: 0.9;
+    }
+    </style>
 </head>
 
 <body>
@@ -71,9 +83,19 @@ foreach ($data["openPullRequests"] as $pr) {
                                                     <a href='https://github.com/<?php echo filter_var($pr['full_name'], FILTER_SANITIZE_URL); ?>'
                                                         rel="noopener noreferrer"
                                                         target='_blank'><?php echo htmlspecialchars($pr['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
-                                                </span>
-                                                <br />
+                                                </span> 
                                                 <span class="text-muted">🕐 <?php echo htmlspecialchars($pr['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                                <div class="mt-2">
+                                                    <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
+                                                        <?php foreach ($pr['labels'] as $label): ?>
+                                                            <span class="badge label-badge" 
+                                                                  style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: #fff;" 
+                                                                  title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                                <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                                            </span>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                             <div>
                                                 <?php if (isset($pr["state"])): ?>
@@ -231,6 +253,18 @@ foreach ($data["openPullRequests"] as $pr) {
                     timeSpan.className = 'text-muted';
                     timeSpan.textContent = `🕐 ${pr.created_at}`;
                     leftSection.appendChild(timeSpan);
+
+                    const containerLabels = document.createElement('div');
+                    containerLabels.className = 'mt-2';
+                    leftSection.appendChild(containerLabels);
+
+                    const labelSpan = document.createElement("span");
+                    labelSpan.classList.add("badge", "label-badge");
+                    labelSpan.style.backgroundColor = `#${label.color}`;
+                    labelSpan.style.color = "#fff";
+                    labelSpan.setAttribute("title", label.description);
+                    labelSpan.textContent = label.name;
+                    containerLabels.appendChild(labelSpan);
 
                     const rightSection = document.createElement("div");
                     container.appendChild(rightSection);
