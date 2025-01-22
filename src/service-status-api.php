@@ -63,20 +63,20 @@ function checkServiceHealth(string $url): array
 }
 
 try {
-    $resultHandler = checkServiceHealth($webhooksApiUrl);
+    $resultService = checkServiceHealth($webhooksServiceUrl);
 } catch (Exception $e) {
     error_log("Health check handler failed: " . $e->getMessage());
-    $resultHandler = [
+    $resultService = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
     ];
 }
 
 try {
-    $resultProcessor = checkServiceHealth($webhookUrl . "/health");
+    $resultProcessing = checkServiceHealth($webhooksProcessingUrl);
 } catch (Exception $e) {
     error_log("Health check processor failed: " . $e->getMessage());
-    $resultProcessor = [
+    $resultProcessing = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
     ];
@@ -101,8 +101,8 @@ $services = [
     ],
     [
         'name' => 'GitHub Integration (Service)',
-        'status' => $resultHandler["status"],
-        'lastUpdated' => $resultHandler["http_date"]
+        'status' => $resultService["status"],
+        'lastUpdated' => $resultService["lastUpdated"]
     ],
     [
         'name' => 'GitHub Workflows',
@@ -111,8 +111,8 @@ $services = [
     ],
     [
         'name' => 'Webhook Processing',
-        'status' => $resultProcessor["status"],
-        'lastUpdated' => $resultProcessor["http_date"]
+        'status' => $resultProcessing["status"],
+        'lastUpdated' => $resultProcessing["lastUpdated"]
     ]
 ];
 
