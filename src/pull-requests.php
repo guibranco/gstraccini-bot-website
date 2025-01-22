@@ -289,7 +289,7 @@ foreach ($data["openPullRequests"] as $pr) {
                             labelSpan.style.backgroundColor = `#${escapeHtml(label.color)}`;
                             labelSpan.style.color = textColor;
                             labelSpan.setAttribute("title", escapeHtml(label.description || ''));
-                            labelSpan.textContent = escapeHtml(label.name);
+                            labelSpan.textContent = ` ${escapeHtml(label.name)}`;
                             containerLabels.appendChild(labelSpan);
                         });
                     }
