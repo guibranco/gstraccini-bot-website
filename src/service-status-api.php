@@ -1,5 +1,9 @@
 <?php
 
+if (!file_exists("secrets/webhook.secrets.php")) {
+    http_response_code(500);
+    die(json_encode(['error' => 'Configuration file not found']));
+}
 require_once("secrets/webhook.secrets.php");
 
 <?php
