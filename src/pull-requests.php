@@ -88,8 +88,20 @@ foreach ($data["openPullRequests"] as $pr) {
                                                 <div class="mt-2">
                                                     <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
                                                         <?php foreach ($pr['labels'] as $label): ?>
+                                                            <?php
+                                                                if (!isset($label['color']) || !isset($label['name'])) {
+                                                                    continue;
+                                                                }
+                                                
+                                                                $color = $label['color'];
+                                                                $r = hexdec(substr($color, 0, 2));
+                                                                $g = hexdec(substr($color, 2, 2));
+                                                                $b = hexdec(substr($color, 4, 2));
+                                                                $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+                                                                $textColor = ($yiq >= 128) ? '#000' : '#fff';
+                                                            ?>
                                                             <span class="badge label-badge" 
-                                                                  style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: #fff;" 
+                                                                  style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo $textColor; ?>;" 
                                                                   title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
                                                                 <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
                                                             </span>
@@ -258,13 +270,26 @@ foreach ($data["openPullRequests"] as $pr) {
                     containerLabels.className = 'mt-2';
                     leftSection.appendChild(containerLabels);
 
-                    const labelSpan = document.createElement("span");
-                    labelSpan.classList.add("badge", "label-badge");
-                    labelSpan.style.backgroundColor = `#${label.color}`;
-                    labelSpan.style.color = "#fff";
-                    labelSpan.setAttribute("title", label.description);
-                    labelSpan.textContent = label.name;
-                    containerLabels.appendChild(labelSpan);
+                    if (pr.labels && Array.isArray(pr.labels)) {
+                        pr.labels.forEach(label => {
+                            if (!label.color || !label.name) return;
+                            
+                            const color = label.color;
+                            const r = parseInt(color.substr(0, 2), 16);
+                            const g = parseInt(color.substr(2, 2), 16);
+                            const b = parseInt(color.substr(4, 2), 16);
+                            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                            const textColor = (yiq >= 128) ? '#000' : '#fff';
+                            
+                            const labelSpan = document.createElement("span");
+                            labelSpan.classList.add("badge", "label-badge");
+                            labelSpan.style.backgroundColor = `#${escapeHtml(label.color)}`;
+                            labelSpan.style.color = textColor;
+                            labelSpan.setAttribute("title", escapeHtml(label.description || ''));
+                            labelSpan.textContent = escapeHtml(label.name);
+                            containerLabels.appendChild(labelSpan);
+                        });
+                    }
 
                     const rightSection = document.createElement("div");
                     container.appendChild(rightSection);
