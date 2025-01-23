@@ -27,6 +27,15 @@ foreach ($data["openPullRequests"] as $pr) {
     }
     $groupedPullRequests[$owner][] = $pr;
 }
+
+function luminance($color)
+{
+    $r = hexdec(substr($color, 0, 2));
+    $g = hexdec(substr($color, 2, 2));
+    $b = hexdec(substr($color, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    return ($yiq >= 128) ? '#000' : '#fff';
+}
 ?>
 
 <!DOCTYPE html>
@@ -92,20 +101,8 @@ foreach ($data["openPullRequests"] as $pr) {
                                                     <div class="mt-2">
                                                         <?php if (isset($pr['labels']) && is_array($pr['labels'])): ?>
                                                             <?php foreach ($pr['labels'] as $label): ?>
-                                                                <?php
-                                                                    if (!isset($label['color']) || !isset($label['name'])) {
-                                                                        continue;
-                                                                    }
-                                                    
-                                                                    $color = $label['color'];
-                                                                    $r = hexdec(substr($color, 0, 2));
-                                                                    $g = hexdec(substr($color, 2, 2));
-                                                                    $b = hexdec(substr($color, 4, 2));
-                                                                    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-                                                                    $textColor = ($yiq >= 128) ? '#000' : '#fff';
-                                                                ?>
                                                                 <span class="badge label-badge" 
-                                                                      style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo $textColor; ?>;" 
+                                                                      style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo luminance($label['color']); ?>;" 
                                                                       title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
                                                                     <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
                                                                 </span>
