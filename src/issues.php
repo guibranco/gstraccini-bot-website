@@ -186,6 +186,15 @@ function luminance($color)
             });
         }
 
+        function escapeHtml(unsafe) {
+        	return unsafe
+        	.replace(/&/g, "&amp;")
+        	.replace(/</g, "&lt;")
+        	.replace(/>/g, "&gt;")
+        	.replace(/"/g, "&quot;")
+        	.replace(/'/g, "&#039;");
+        }
+
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
