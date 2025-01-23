@@ -37,19 +37,39 @@ require_once "includes/session.php";
 
   <section class="features fade-in">
     <div class="feature">
-      <img src="https://via.placeholder.com/100" alt="Feature 1 Icon">
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 1 Icon">
       <h3>Automated PRs</h3>
-      <p>Auto-create pull requests and label them based on size and impact.</p>
+      <p>Auto-label them based on size and impact.</p>
     </div>
     <div class="feature">
-      <img src="https://via.placeholder.com/100" alt="Feature 2 Icon">
-      <h3>Link Checker</h3>
-      <p>Automatically scan and validate links across your repositories.</p>
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 2 Icon">
+      <h3>Validates PRs description</h3>
+      <p>Requires check-lists to be completed on PR description.</p>
     </div>
     <div class="feature">
-      <img src="https://via.placeholder.com/100" alt="Feature 3 Icon">
-      <h3>Custom Workflows</h3>
-      <p>Generate commit messages, manage issues, and more through custom workflows.</p>
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 3 Icon">
+      <h3>Custom NPM Workflows</h3>
+      <p>Generate distribuition/build files from NPM/YARN projects, run Prettier, and more.</p>
+    </div>
+    <div class="feature">
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 3 Icon">
+      <h3>Custom .NET Workflows</h3>
+      <p>Run liters, CSharpier and dotnet format commands from pull requests.</p>
+    </div>
+    <div class="feature">
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 3 Icon">
+      <h3>Automate issues</h3>
+      <p>Generate issues description using AI (OpenAI, Llama, Claude).</p>
+    </div>
+    <div class="feature">
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 3 Icon">
+      <h3>CI/CD integration</h3>
+      <p>Bump version (GitHub Actions/GitVersion/Appveyor).</p>
+    </div>
+    <div class="feature">
+      <img src="https://dummyimage.com/100/d3d3d3/fff" alt="Feature 6 Icon">
+      <h3>Code Quality</h3>
+      <p>Integrate commands with CodeClimate, Codacy, Codecov, DeepSource, SonarQube, and more directly from pull requests.</p>
     </div>
   </section>
 
