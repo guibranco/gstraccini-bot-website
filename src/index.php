@@ -81,14 +81,6 @@ require_once "includes/session.php";
         <p>Shows available commands.</p>
       </div>
       <div class="command-card">
-        <strong>@gstraccini hello</strong>
-        <p>Greets the invoker.</p>
-      </div>
-      <div class="command-card">
-        <strong>@gstraccini thank you</strong>
-        <p>Replies with a "You're welcome" message.</p>
-      </div>
-      <div class="command-card">
         <strong>@gstraccini add project &lt;projectPath&gt;</strong>
         <p>Adds a project to the solution file (for .NET projects).</p>
       </div>
