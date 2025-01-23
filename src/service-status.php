@@ -9,7 +9,7 @@ require_once "includes/session.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
     content="GStraccini-bot Service Status - Check real-time updates about system health and uptime.">
-  <title>GStraccini-bot Service Status</title>
+  <title>GStraccini Bot | Service Status</title>
   <link rel="stylesheet" href="/static/main.css" />
   <style>
     .status-table {
