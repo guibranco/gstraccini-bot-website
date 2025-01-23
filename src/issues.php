@@ -26,6 +26,15 @@ foreach ($data["openIssues"] as $pr) {
     }
     $groupedIssues[$owner][] = $pr;
 }
+
+function luminance($color)
+{
+    $r = hexdec(substr($color, 0, 2));
+    $g = hexdec(substr($color, 2, 2));
+    $b = hexdec(substr($color, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    return ($yiq >= 128) ? '#000' : '#fff';
+}
 ?>
 
 <!DOCTYPE html>
@@ -38,6 +47,18 @@ foreach ($data["openIssues"] as $pr) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/user.css">
+    <style>
+    .label-badge {
+        padding: 0.3em 0.5em;
+        font-size: 0.85em;
+        border-radius: 0.25rem;
+        margin-right: 0.3em;
+        white-space: nowrap;
+    }
+    .label-badge:hover {
+        opacity: 0.9;
+    }
+    </style>
 </head>
 
 <body>
@@ -69,6 +90,17 @@ foreach ($data["openIssues"] as $pr) {
                             </span>
                             <br />
                             <span class="text-muted">🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <div class="mt-2">
+                                <?php if (isset($issue['labels']) && is_array($issue['labels'])): ?>
+                                    <?php foreach ($issue['labels'] as $label): ?>
+                                        <span class="badge label-badge"
+                                            style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo luminance($label['color']); ?>;"
+                                            title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -121,9 +153,35 @@ foreach ($data["openIssues"] as $pr) {
                     '"': '&quot;',
                     "'": '&#39;'
                 })[char]);
-                content += `<span class="text-muted"><a href='https://github.com/${sanitize(item.full_name)}' target='_blank'>${sanitize(item.repository)}</a></span><br />`;
-                content += `<span class="text-muted">🕐 ${sanitize(item.created_at)}</span>`;
+                content += `<span class="text-muted"><a href='https://github.com/${sanitize(item.full_name)}' target='_blank'>${sanitize(item.repository)}</a></span> `;
+                content += `<span class="text-muted">🕐 ${sanitize(item.created_at)}</span>`;                
                 itemLi.innerHTML = content;
+
+                const containerLabels = document.createElement("div");
+                containerLabels.className = "mt-2";
+                itemLi.appendChild(containerLabels);
+                
+                if (item.labels && Array.isArray(item.labels)) {
+                  item.labels.forEach((label) => {
+                    if (!label.color || !label.name) return;
+                
+                    const color = label.color;
+                    const r = parseInt(color.substr(0, 2), 16);
+                    const g = parseInt(color.substr(2, 2), 16);
+                    const b = parseInt(color.substr(4, 2), 16);
+                    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+                    const textColor = yiq >= 128 ? "#000" : "#fff";
+                
+                    const labelSpan = document.createElement("span");
+                    labelSpan.classList.add("badge", "label-badge");
+                    labelSpan.style.backgroundColor = `#${escapeHtml(label.color)}`;
+                    labelSpan.style.color = textColor;
+                    labelSpan.setAttribute("title", escapeHtml(label.description || ""));
+                    labelSpan.textContent = escapeHtml(label.name);
+                    containerLabels.appendChild(labelSpan);
+                  });
+                }
+                
                 list.appendChild(itemLi);
             });
         }
