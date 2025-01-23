@@ -91,7 +91,6 @@ function luminance($color)
                                     rel="noopener noreferrer"
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span>
-                            <br />
                             <span class="text-muted">🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
                             <div class="mt-2">
                                 <?php if (isset($issue['labels']) && is_array($issue['labels'])): ?>
