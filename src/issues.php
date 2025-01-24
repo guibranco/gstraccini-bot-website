@@ -97,8 +97,8 @@ function luminance($color)
                                     <?php foreach ($issue['labels'] as $label): ?>
                                         <span class="badge label-badge"
                                             style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo luminance($label['color']); ?>;"
-                                            title="<?php echo htmlspecialchars($label['description'], ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            title="<?php echo htmlspecialchars($label['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?php echo htmlspecialchars($label['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                                         </span>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
