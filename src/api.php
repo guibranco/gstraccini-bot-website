@@ -101,6 +101,7 @@ $openIssues = [];
 $repositories = [];
 
 $count = 0;
+$states = array();
 
 if ($responseIssues !== null && is_array($responseIssues) === true && count($responseIssues) > 0) {
     foreach ($responseIssues as $issue) {
@@ -121,7 +122,11 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         ];
 
         if (isset($issue['pull_request']) === true && isset($_GET['page']) === false) {
-            if ($count < 10) {
+            $repositoryId = $issue['repository']['id'];
+            $exists = in_array($repositoryId, $states);
+            $states[] = $repositoryId;
+            
+            if ($exists === false && $count < 10) {
                 $count++;
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
                 if ($pullRequest !== null && $pullRequest["body"] !== null) {
@@ -132,7 +137,10 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
                         $issueData["state"] = $state["body"]["state"];
                     }
                 }
+            } else if ($exists === true) {
+                $issueData["state"] = "skipped";
             }
+                
             $openPullRequests[] = $issueData;
         } else {
             $openIssues[] = $issueData;
