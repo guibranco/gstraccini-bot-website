@@ -180,6 +180,10 @@ if (isset($user["first_name"])) {
                                             <span class="badge bg-danger">
                                                 <i class="fas fa-exclamation-triangle"></i> Error
                                             </span>
+                            <?php } else if (isset($issue["state"]) && $issue["state"] === "skipped") { ?>
+                                            <span class="badge bg-dark">
+                                                <i class="fas fa-arrow-circle-right"></i> Skipped
+                                            </span>
                             <?php } else { ?>
                                             <span class="badge bg-secondary">
                                                 <i class="fas fa-question-circle"></i> Empty
@@ -276,6 +280,8 @@ if (isset($user["first_name"])) {
                     return '<span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> Pending</span>';
                 case 'error':
                     return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>';
+                case 'skipped':
+                    return '<span class="badge bg-dark"><i class="fas fa-arrow-circle-right"></i> Skipped</span>';    
                 default:
                     return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Empty</span>';
             }
