@@ -122,16 +122,15 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
         ];
 
         if (isset($issue['pull_request']) === true && isset($_GET['page']) === false) {
-
-            $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
-            $exists = in_array($repoUrl, $states);
-            $states[] = $repoUrl;
+            $repositoryId = $issue['repository']['id'];
+            $exists = in_array($repositoryId, $states);
+            $states[] = $repositoryId;
             
             if ($exists === false && $count < 10) {
                 $count++;
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
                 if ($pullRequest !== null && $pullRequest["body"] !== null) {
-                    
+                    $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
                     $branch = $pullRequest["body"]["head"]["ref"];
                     $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
                     if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
