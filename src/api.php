@@ -126,7 +126,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             $exists = in_array($repositoryId, $states);
             $states[] = $repositoryId;
             
-            if ($exists === false && $count < 10) {
+            if ($exists === false && $count < 20) {
                 $count++;
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
                 if ($pullRequest !== null && $pullRequest["body"] !== null) {
