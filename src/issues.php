@@ -242,6 +242,7 @@ function luminance($color)
                         issue.labels.forEach(label => {
                             if (!label.color || !label.name) return;
                             
+                            if (!/^[0-9A-Fa-f]{6}$/.test(label.color)) return;
                             const color = label.color;
                             const r = parseInt(color.substr(0, 2), 16);
                             const g = parseInt(color.substr(2, 2), 16);
