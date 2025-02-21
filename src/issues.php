@@ -170,7 +170,7 @@ function luminance($color)
             counterContainer.textContent = items.length;
 
             for (const [owner, issues] of Object.entries(groupedData)) {
-                const groupId = `group-${owner.replace(/\s+/g, '-')}`;
+                const groupId = `group-${owner.replace(/[^a-zA-Z0-9]+/g, '-')}`;
                 const ownerDiv = document.createElement('div');
                 ownerDiv.className = 'mb-4';
 
