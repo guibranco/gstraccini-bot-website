@@ -135,74 +135,146 @@ function luminance($color)
 
     <?php require_once "includes/footer.php"; ?>
     <script>
-        function populateIssues(items, id) {
-            $(`#${id}Count`).text(items.length);
-            const list = document.getElementById(id);
-            list.innerHTML = '';
+        function populateIssuesGroupedByOwner(items) {
+            const groupedData = {};
+            
+            items.forEach(item => {
+                const owner = item?.owner || 'Unknown';
+                if (!groupedData[owner]) {
+                    groupedData[owner] = [];
+                }
+                groupedData[owner].push(item);
+            });
+
+            const counterContainer = document.getElementById("openIssuesCount");
+            if (!counterContainer) {
+                console.error('Counter container element not found');
+                return;
+            }
+            
+            const groupedContainer = document.getElementById("groupedIssues");
+            if (!groupedContainer) {
+                console.error('Container element not found');
+                return;
+            }
+            groupedContainer.innerHTML = '';
 
             if (items.length === 0) {
-                const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item list-group-item-warning';
-                itemLi.innerHTML = `<strong>No items found!</strong>`;
-                list.appendChild(itemLi);
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'list-group-item list-group-item-warning';
+                emptyDiv.innerHTML = `<strong>No issues found!</strong>`;
+                groupedContainer.appendChild(emptyDiv);
                 return;
             }
 
-            items.forEach(item => {
-                const itemLi = document.createElement('li');
-                itemLi.className = 'list-group-item';
-                let content = '';
-                content += `<strong><a href='${item.url}' target='_blank'>${item.title}</a></strong><br />`;
-                const sanitize = (str) => str.replace(/[&<>"']/g, (char) => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#39;'
-                })[char]);
-                content += `<span class="text-muted"><a href='https://github.com/${sanitize(item.full_name)}' target='_blank'>${sanitize(item.repository)}</a></span> `;
-                content += `<span class="text-muted">🕐 ${sanitize(item.created_at)}</span>`;                
-                itemLi.innerHTML = content;
+            counterContainer.textContent = items.length;
 
-                const containerLabels = document.createElement("div");
-                containerLabels.className = "mt-2";
-                itemLi.appendChild(containerLabels);
+            for (const [owner, issues] of Object.entries(groupedData)) {
+                const groupId = `group-${owner.replace(/\s+/g, '-')}`;
+                const ownerDiv = document.createElement('div');
+                ownerDiv.className = 'mb-4';
+
+                const ownerHeader = document.createElement('h5');
+                ownerHeader.className = 'text-primary mb-2';
+                ownerDiv.appendChild(ownerHeader);
+
+                const ownerButton = document.createElement('button');
+                ownerButton.className = 'btn btn-link text-decoration-none';
+                ownerButton.type = 'button';
+                ownerButton.setAttribute('data-bs-toggle', 'collapse');
+                ownerButton.setAttribute('data-bs-target', `#${groupId}`);
+                ownerButton.setAttribute('aria-expanded', 'true');
+                ownerButton.setAttribute('aria-controls', groupId);
+                ownerButton.textContent = `${escapeHtml(owner)} (${issues.length}) `;
+                ownerHeader.appendChild(ownerButton);
+
+                const ownerChevron = document.createElement("i");
+                ownerChevron.className = 'fas fa-chevron-down';
+                ownerButton.appendChild(ownerChevron);
                 
-                if (item.labels && Array.isArray(item.labels)) {
-                  item.labels.forEach((label) => {
-                    if (!label.color || !label.name) return;
+                const issueList = document.createElement('ul');
+                issueList.className = 'list-group collapse show';
+                issueList.id = groupId;
                 
-                    const color = label.color;
-                    const r = parseInt(color.substr(0, 2), 16);
-                    const g = parseInt(color.substr(2, 2), 16);
-                    const b = parseInt(color.substr(4, 2), 16);
-                    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-                    const textColor = yiq >= 128 ? "#000" : "#fff";
-                
-                    const labelSpan = document.createElement("span");
-                    labelSpan.classList.add("badge", "label-badge");
-                    labelSpan.style.backgroundColor = `#${escapeHtml(label.color)}`;
-                    labelSpan.style.color = textColor;
-                    labelSpan.setAttribute("title", escapeHtml(label.description || ""));
-                    labelSpan.textContent = escapeHtml(label.name);
-                    containerLabels.appendChild(labelSpan);
-                  });
-                }
-                
-                list.appendChild(itemLi);
-            });
-        }
+                issues.forEach(issue => {
+                    const itemLi = document.createElement('li');
+                    itemLi.className = 'list-group-item';
+                    issueList.appendChild(itemLi);
+
+                    const container = document.createElement("div");
+                    container.className = "d-flex justify-content-between align-items-start";
+                    itemLi.appendChild(container);
+
+                    const leftSection = document.createElement("div");
+                    container.appendChild(leftSection);
+                    
+                    const titleLink = document.createElement('a');
+                    titleLink.href = escapeHtml(issue.url);
+                    titleLink.target = '_blank';
+                    titleLink.textContent = issue.title;
+                    
+                    const strong = document.createElement('strong');
+                    strong.appendChild(titleLink);                    
+                    leftSection.appendChild(strong);
+                    
+                    leftSection.appendChild(document.createElement('br'));
+                    
+                    const repoSpan = document.createElement('span');
+                    repoSpan.className = 'text-muted';
+                    
+                    const repoLink = document.createElement('a');
+                    repoLink.href = `https://github.com/${escapeHtml(issue.full_name)}`;
+                    repoLink.target = '_blank';
+                    repoLink.textContent = issue.repository;
+                    repoSpan.appendChild(repoLink);
+                    leftSection.appendChild(repoSpan);
+                                       
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'text-muted';
+                    timeSpan.textContent = ` 🕐 ${issue.created_at}`;
+                    leftSection.appendChild(timeSpan);
+
+                    const containerLabels = document.createElement('div');
+                    containerLabels.className = 'mt-2';
+                    leftSection.appendChild(containerLabels);
+
+                    if (issue.labels && Array.isArray(issue.labels)) {
+                        issue.labels.forEach(label => {
+                            if (!label.color || !label.name) return;
+                            
+                            const color = label.color;
+                            const r = parseInt(color.substr(0, 2), 16);
+                            const g = parseInt(color.substr(2, 2), 16);
+                            const b = parseInt(color.substr(4, 2), 16);
+                            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                            const textColor = (yiq >= 128) ? '#000' : '#fff';
+                            
+                            const labelSpan = document.createElement("span");
+                            labelSpan.classList.add("badge", "label-badge");
+                            labelSpan.style.backgroundColor = `#${escapeHtml(label.color)}`;
+                            labelSpan.style.color = textColor;
+                            labelSpan.setAttribute("title", escapeHtml(label.description || ''));
+                            labelSpan.textContent = escapeHtml(label.name);
+                            containerLabels.appendChild(labelSpan);
+                        });
+                    }
+                });
+
+                ownerDiv.appendChild(issueList);
+                groupedContainer.appendChild(ownerDiv);
+            }
+        } 
 
         function loadData() {
             fetch('api.php')
                 .then(response => response.json())
                 .then(data => {
-                    populateIssues(data.openIssues, "openIssues");
+                    populateIssuesGroupedByOwner(data.openIssues);
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showErrorAlert('Failed to complete the request. Please try again later.');;
+                    showErrorAlert('Failed to complete the request. Please try again later.');
                 });
         }
 
