@@ -86,7 +86,9 @@ function luminance($color)
                     <?php endif; ?>
                         <?php foreach ($groupedIssues as $owner => $issues): ?>
                             <?php 
-                                $groupId = "group-{$owner}";
+                                $sanitizedOwner = preg_replace('/[^a-z0-9]+/', '-', strtolower($owner));
+                                $sanitizedOwner = trim($sanitizedOwner, '-');
+                                $groupId = "group-{$sanitizedOwner}";
                             ?>
                             <div class="mb-4">
                                 <h5 class="text-primary mb-2">
