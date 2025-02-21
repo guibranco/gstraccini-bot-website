@@ -34,7 +34,7 @@
             }
 
             notifications.forEach(notification => {
-                const title = notification.subject.title;
+                const {title} = notification.subject;
                 const repo = notification.repository.full_name;
                 const url = notification.subject.url.replace('api.github.com/repos', 'github.com').replace('/issues', '/issues/');
 
