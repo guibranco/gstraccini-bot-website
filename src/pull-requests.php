@@ -161,24 +161,6 @@ function luminance($color)
 
     <?php require_once "includes/footer.php"; ?>
     <script>
-        function showErrorAlert(message) {
-            var alertHtml = `
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Error!</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>`;
-
-            $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
-
-            setTimeout(function () {
-                var alertElement = document.querySelector('.alert');
-                if (alertElement) {
-                    var alertInstance = new bootstrap.Alert(alertElement);
-                    alertInstance.close();
-                }
-            }, 15000);
-        }
-
         function populateIssuesGroupedByOwner(items) {
             const groupedData = {};
             const stateOrder = ['success', 'failure', 'pending', 'error', 'skipped', ''];
@@ -322,16 +304,7 @@ function luminance($color)
                 ownerDiv.appendChild(pullRequestList);
                 groupedContainer.appendChild(ownerDiv);
             }
-        }
-
-        function escapeHtml(unsafe) {
-        	return unsafe
-        	.replace(/&/g, "&amp;")
-        	.replace(/</g, "&lt;")
-        	.replace(/>/g, "&gt;")
-        	.replace(/"/g, "&quot;")
-        	.replace(/'/g, "&#039;");
-        }
+        }        
 
         function getStateBadge(state) {
             switch (state) {
