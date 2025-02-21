@@ -4,7 +4,12 @@
                 .then(data => {
                     if (data.error) {
                         console.error('Error fetching notifications:', data.error);
-                        document.getElementById('notificationsMenu').innerHTML = `<li class="dropdown-item text-bg-danger">${data.error}</li>`;
+                        const notificationsMenu = document.getElementById('notificationsMenu');
+                        notificationsMenu.innerHTML = ''; // Clear any previous content
+                        const errorItem = document.createElement('li');
+                        errorItem.className = 'dropdown-item text-bg-danger';
+                        errorItem.textContent = data.error;
+                        notificationsMenu.appendChild(errorItem);
                     } else {
                         processNotifications(data);
                     }
