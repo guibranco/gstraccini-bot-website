@@ -231,7 +231,7 @@ function luminance($color)
                                        
                     const timeSpan = document.createElement('span');
                     timeSpan.className = 'text-muted';
-                    timeSpan.textContent = ` 🕐 ${issue.created_at}`;
+                    timeSpan.textContent = ` 🕐 ${escapeHtml(issue.created_at)}`;
                     leftSection.appendChild(timeSpan);
 
                     const containerLabels = document.createElement('div');
