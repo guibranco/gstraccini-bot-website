@@ -66,6 +66,11 @@
 document.addEventListener('DOMContentLoaded', function () {
 
         const notificationsDropdown = document.getElementById('notificationsDropdown');
+        if (!notificationsDropdown) {
+            console.error('Notifications dropdown element not found');
+            return;
+        }
+
         notificationsDropdown.addEventListener('click', function () {
             fetchNotifications();
         });
