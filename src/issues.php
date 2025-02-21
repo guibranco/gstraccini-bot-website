@@ -19,12 +19,12 @@ if (isset($user["first_name"])) {
 }
 
 $groupedIssues = [];
-foreach ($data["openIssues"] as $pr) {
-    $owner = $pr['owner'] ?? 'Unknown';
+foreach ($data["openIssues"] as $issue) {
+    $owner = $issue['owner'] ?? 'Unknown';
     if (!isset($groupedIssues[$owner])) {
         $groupedIssues[$owner] = [];
     }
-    $groupedIssues[$owner][] = $pr;
+    $groupedIssues[$owner][] = $issue;
 }
 
 function luminance($color)
@@ -72,40 +72,63 @@ function luminance($color)
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Assigned Issues <span class="badge text-bg-warning rounded-pill"
-                        id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                <h3>Assigned Issues <span class="badge text-bg-warning rounded-pill" id="openIssuesCount"><?php echo count($data["openIssues"]); ?></span></h3>
+                <div id="groupedIssues">
+                    <?php if (empty($groupedIssues)): ?>
+                        <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
+                    <?php else: ?>       
+                
                 <ul class="list-group" id="openIssues">
                     <?php if (count($data["openIssues"]) === 0): ?>
                         <li class="list-group-item">
                             <i class="fas fa-spinner fa-spin"></i> Loading data...
                         </li>
                     <?php endif; ?>
-                    <?php foreach ($data["openIssues"] as $issue): ?>
-                        <li class="list-group-item">
-                            <strong><a href='<?php echo htmlspecialchars($issue['url'], ENT_QUOTES, 'UTF-8'); ?>'
-                                    rel="noopener noreferrer"
-                                    target='_blank'><?php echo htmlspecialchars($issue['title']); ?></a></strong>
-                            <br />
-                            <span class="text-muted">
-                                <a href='https://github.com/<?php echo htmlspecialchars($issue['full_name'], ENT_QUOTES, 'UTF-8'); ?>'
-                                    rel="noopener noreferrer"
-                                    target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
-                            </span>
-                            <span class="text-muted">🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
-                            <div class="mt-2">
-                                <?php if (isset($issue['labels']) && is_array($issue['labels'])): ?>
-                                    <?php foreach ($issue['labels'] as $label): ?>
-                                        <span class="badge label-badge"
-                                            style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo luminance($label['color']); ?>;"
-                                            title="<?php echo htmlspecialchars($label['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?php echo htmlspecialchars($label['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
-                                        </span>
+                        <?php foreach ($groupedIssues as $owner => $issues): ?>
+                            <?php 
+                                $sanitizedOwner = preg_replace('/[^a-z0-9]+/', '-', strtolower($owner));
+                                $sanitizedOwner = trim($sanitizedOwner, '-');
+                                $groupId = "group-{$sanitizedOwner}";
+                            ?>
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-2">
+                                    <button class="btn btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#<?php echo $groupId;?>" aria-expanded="true" aria-controls="<?php echo $groupId;?>"><?php echo htmlspecialchars($owner, ENT_QUOTES, 'UTF-8'); ?> (<?php echo count($issues); ?>) <i class="fas fa-chevron-down"></i></button>
+                                </h5>
+                                <ul class="list-group collapse show" id="<?php echo $groupId; ?>">
+                                    <?php foreach ($issues as $issue): ?>
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <strong><a href='<?php echo filter_var($issue['url'], FILTER_SANITIZE_URL); ?>'
+                                                            rel="noopener noreferrer"
+                                                            target='_blank'><?php echo htmlspecialchars($issue['title'], ENT_QUOTES, 'UTF-8'); ?></a></strong>
+                                                    <br />
+                                                    <span class="text-muted">
+                                                        <a href='https://github.com/<?php echo filter_var($issue['full_name'], FILTER_SANITIZE_URL); ?>'
+                                                            rel="noopener noreferrer"
+                                                            target='_blank'><?php echo htmlspecialchars($issue['repository'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                    </span>
+                                                    <span class="text-muted"> 🕐 <?php echo htmlspecialchars($issue['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    <div class="mt-2">
+                                                        <?php if (isset($issue['labels']) && is_array($issue['labels'])): ?>
+                                                            <?php foreach ($issue['labels'] as $label): ?>
+                                                                <span class="badge label-badge" 
+                                                                      style="background-color: #<?php echo htmlspecialchars($label['color'], ENT_QUOTES, 'UTF-8'); ?>; color: <?php echo luminance($label['color']); ?>;" 
+                                                                      title="<?php echo htmlspecialchars($label['description'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                                                    <?php echo htmlspecialchars($label['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                                                </span>
+                                                            <?php endforeach; ?>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>                                               
+                                            </div>
+                                        </li>
                                     <?php endforeach; ?>
-                                <?php endif; ?>
-                            </div>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+                                </ul>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
