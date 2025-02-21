@@ -28,6 +28,14 @@ foreach ($data["openPullRequests"] as $pr) {
     $groupedPullRequests[$owner][] = $pr;
 }
 
+$stateOrder = ['success', 'failure', 'pending', 'error', 'skipped', ''];
+foreach ($groupedPullRequests as &$prs) {
+    usort($prs, function ($a, $b) use ($stateOrder) {
+        return array_search($a['state'] ?? '', $stateOrder) - array_search($b['state'] ?? '', $stateOrder);
+    });
+}
+unset($prs);
+
 function luminance($color)
 {
     $r = hexdec(substr($color, 0, 2));
@@ -173,12 +181,20 @@ function luminance($color)
 
         function populateIssuesGroupedByOwner(items) {
             const groupedData = {};
+            const stateOrder = ['success', 'failure', 'pending', 'error', 'skipped', ''];
+            
             items.forEach(item => {
                 const owner = item?.owner || 'Unknown';
                 if (!groupedData[owner]) {
                     groupedData[owner] = [];
                 }
                 groupedData[owner].push(item);
+            });
+            
+            Object.keys(groupedData).forEach(owner => {
+                groupedData[owner].sort((a, b) => {
+                    return stateOrder.indexOf(a.state || '') - stateOrder.indexOf(b.state || '');
+                });
             });
 
             const counterContainer = document.getElementById("openPullRequestsCount");
