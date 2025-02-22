@@ -111,24 +111,6 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
 
     <?php require_once "includes/footer.php"; ?>
     <script>
-        function showErrorAlert(message) {
-            var alertHtml = `
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Error!</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>`;
-
-            $("#alert-container").toggleClass("d-none").toggleClass("d-block").html(alertHtml);
-
-            setTimeout(function () {
-                var alertElement = document.querySelector('.alert');
-                if (alertElement) {
-                    var alertInstance = new bootstrap.Alert(alertElement);
-                    alertInstance.close();
-                }
-            }, 15000);
-        }
-
         function loadData() {
             fetch('api.php')
                 .then(response => {
@@ -211,9 +193,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
 
         document.getElementById('organizationFilter').addEventListener('change', filterRepositories);
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadData(); // Load repository data when the page is ready
-        });
+        window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 
