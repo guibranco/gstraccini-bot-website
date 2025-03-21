@@ -351,9 +351,9 @@ $title = "Account Details";
         });
 
         function changeTheme() {
-        const theme = document.getElementById('theme').value;
-        localStorage.setItem('theme', theme);
-        applyTheme(theme);
+            const theme = document.getElementById('theme').value;
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
         }
     
         function applyTheme(theme) {
