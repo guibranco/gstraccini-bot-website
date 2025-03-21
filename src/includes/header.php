@@ -19,7 +19,7 @@
         </nav>
 
         <div class="d-flex align-items-center">
-            <span id="themeSwitcher" class="theme-switcher text-white me-3" style="font-size: 24px;">
+            <span id="theme-icon" class="theme-switcher text-white me-3" style="font-size: 24px;">
                 <i class="fas fa-sun"></i>
             </span>
             <div class="dropdown me-3">
