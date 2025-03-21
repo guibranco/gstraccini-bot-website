@@ -355,34 +355,6 @@ $title = "Account Details";
             localStorage.setItem('theme', theme);
             applyTheme(theme);
         }
-    
-        function applyTheme(theme) {
-            const themeIcon = document.getElementById('theme-icon');
-    
-            if (theme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                document.body.classList.remove('dark-theme');
-                themeIcon.className = 'fas fa-sun'; // Light mode icon
-            } else if (theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.body.classList.add('dark-theme');
-                themeIcon.className = 'fas fa-moon'; // Dark mode icon
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                document.body.classList.remove('dark-theme');
-                themeIcon.className = 'fas fa-adjust'; // Default/system icon
-    
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    themeIcon.className = 'fas fa-moon'; // Set icon to dark if system prefers dark
-                }
-            }
-        }
-    
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'system';
-            document.getElementById('theme').value = savedTheme;
-            applyTheme(savedTheme);
-        });
     </script>
 </body>
 
