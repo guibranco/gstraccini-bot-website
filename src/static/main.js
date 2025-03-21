@@ -39,3 +39,31 @@ const showErrorAlert = (message) => {
     console.error('Error showing alert:', error.message);
   }
 };
+
+function applyTheme(theme) {
+    const themeIcon = document.getElementById('theme-icon');
+
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.body.classList.remove('dark-theme');
+        themeIcon.className = 'fas fa-sun';
+    } else if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fas fa-moon';
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        document.body.classList.remove('dark-theme');
+        themeIcon.className = 'fas fa-adjust';
+
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            themeIcon.className = 'fas fa-moon';
+        }
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    document.getElementById('theme').value = savedTheme;
+    applyTheme(savedTheme);
+});
