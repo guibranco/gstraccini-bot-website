@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastName = htmlspecialchars($_POST['lastName']);
     $password = $_POST['password'] ?? '';
     $passwordConfirm = $_POST['passwordConfirm'] ?? '';
-
+    
     if ($password !== '' && $password !== $passwordConfirm) {
         header("Location: settings.php?password_mismatch=true");
         exit();
@@ -208,8 +208,21 @@ $title = "Account Details";
                                         name="passwordConfirm">
                                     <div class="invalid-feedback">Passwords must match.</div>
                                 </div>
-                                <small class="form-text text-muted">Leave blank if you don't want to change your
-                                    password.</small>
+                                <small class="form-text text-muted">Leave blank if you don't want to change your password.</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="theme" class="form-label">Select Theme:</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-adjust"></i>
+                                    </span>
+                                    <select id="theme" name="theme" onchange="changeTheme()">
+                                        <option value="light">☀️ Light</option>
+                                        <option value="dark">🌙 Dark</option>
+                                        <option value="system">🖥️ Use System Theme</option>
+                                    </select>
+                                </div>
                             </div>
 
                         </div>
@@ -336,6 +349,12 @@ $title = "Account Details";
                 }
             });
         });
+
+        function changeTheme() {
+            const theme = document.getElementById('theme').value;
+            localStorage.setItem('theme', theme);
+            applyTheme(theme);
+        }
     </script>
 </body>
 
