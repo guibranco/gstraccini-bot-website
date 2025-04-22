@@ -96,7 +96,7 @@ $date = new DateTime('now', new DateTimeZone('GMT'));
 $services = [
     [
         'name' => 'API',
-        'status' => $resulApi["status"],
+        'status' => $resultApi["status"],
         'lastUpdated' =>  $resultApi["lastUpdated"]
     ],
     [
