@@ -63,6 +63,16 @@ function checkServiceHealth(string $url): array
 }
 
 try {
+    $resultApi = checkServiceHealth($gstracciniApiUrl);
+} catch (Exception $e) {
+    error_log("Health check handler failed: " . $e->getMessage());
+    $resultApi = [
+        'status' => 'Failure',
+        'lastUpdated' => gmdate('Y-m-d h:i A T')
+    ];
+}
+
+try {
     $resultService = checkServiceHealth($webhooksServiceUrl);
 } catch (Exception $e) {
     error_log("Health check handler failed: " . $e->getMessage());
@@ -86,8 +96,8 @@ $date = new DateTime('now', new DateTimeZone('GMT'));
 $services = [
     [
         'name' => 'API',
-        'status' => 'Operational',
-        'lastUpdated' => '2025-04-14 8:53 PM GMT'
+        'status' => $resultApi["status"],
+        'lastUpdated' =>  $resultApi["lastUpdated"]
     ],
     [
         'name' => 'Dashboard',
@@ -97,7 +107,7 @@ $services = [
     [
         'name' => 'Documentation',
         'status' => 'Maintenance',
-        'lastUpdated' => '2025-04-14 8:53 PM GMT'
+        'lastUpdated' => '2025-04-22 01:23 AM GMT'
     ],
     [
         'name' => 'GitHub Integration (Service)',
@@ -107,7 +117,7 @@ $services = [
     [
         'name' => 'GitHub Workflows',
         'status' => 'Operational',
-        'lastUpdated' => '2025-04-14 8:53 PM GMT'
+        'lastUpdated' => '2025-04-22 01:23 AM GMT'
     ],
     [
         'name' => 'Webhook Processing',
