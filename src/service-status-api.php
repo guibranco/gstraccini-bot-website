@@ -63,7 +63,7 @@ function checkServiceHealth(string $url): array
 }
 
 try {
-    $resultApi = checkServiceHealth(gstracciniApiUrl);
+    $resultApi = checkServiceHealth($gstracciniApiUrl);
 } catch (Exception $e) {
     error_log("Health check handler failed: " . $e->getMessage());
     $resultApi = [
