@@ -42,6 +42,7 @@ jobs:
       - name: Create webhook.secrets.php
         run: |
           echo "<?php" > src/webhook.secrets.php
+          echo "\$gstracciniApiUrl      = \"${{ secrets.GSTRACCINI_API_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php
           echo "\$webhookSecret         = \"${{ secrets.WEBHOOK_SECRET }}\";" >> src/webhook.secrets.php
           echo "\$webhookUrl            = \"${{ secrets.WEBHOOK_URL }}\";" >> src/webhook.secrets.php
           echo "\$webhooksProcessingUrl = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php
