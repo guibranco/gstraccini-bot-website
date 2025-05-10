@@ -129,13 +129,20 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             if ($exists === false && $count < 10) {
                 $count++;
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
-                if ($pullRequest !== null && $pullRequest["body"] !== null && $pullRequest["body"]["head"] !== null) {
+                if ($pullRequest !== null
+                    && isset($pullRequest["body"]) === true
+                    && $pullRequest["body"] !== null
+                    && isset($pullRequest["body"]["head"]) === true
+                    && $pullRequest["body"]["head"] !== null
+                ) {
                     $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
                     $branch = $pullRequest["body"]["head"]["ref"];
                     $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
                     if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
                         $issueData["state"] = $state["body"]["state"];
                     }
+                } else {
+                    error_log("Missing head info in " . $issue['pull_request']['url']);
                 }
             } else if ($exists === true) {
                 $issueData["state"] = "skipped";
