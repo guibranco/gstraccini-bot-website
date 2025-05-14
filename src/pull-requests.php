@@ -31,6 +31,16 @@ foreach ($data["openPullRequests"] as $pr) {
 $stateOrder = ['success', 'failure', 'pending', 'error', 'skipped', ''];
 foreach ($groupedPullRequests as &$prs) {
     usort($prs, function ($a, $b) use ($stateOrder) {
+
+        if (isset($a['is_valid_pr']) && isset($b['is_valid_pr'])) {
+            if ($a['is_valid_pr'] && !$b['is_valid_pr']) return -1;
+            if (!$a['is_valid_pr'] && $b['is_valid_pr']) return 1;
+        } else if (isset($a['is_valid_pr']) && $a['is_valid_pr']) {
+            return -1;
+        } else if (isset($b['is_valid_pr']) && $b['is_valid_pr']) {
+            return 1;
+        }
+        
         return array_search($a['state'] ?? '', $stateOrder) - array_search($b['state'] ?? '', $stateOrder);
     });
 }
@@ -43,6 +53,38 @@ function luminance($color)
     $b = hexdec(substr($color, 4, 2));
     $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
     return ($yiq >= 128) ? '#000' : '#fff';
+}
+
+function getMergeableBadge($mergeable, $mergeable_state) {
+    if ($mergeable === null) {
+        return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Unknown</span>';
+    } else if ($mergeable === true) {
+        if ($mergeable_state === 'clean') {
+            return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Mergeable</span>';
+        } else if ($mergeable_state === 'unstable') {
+            return '<span class="badge bg-info"><i class="fas fa-info-circle"></i> Unstable</span>';
+        } else if ($mergeable_state === 'blocked') {
+            return '<span class="badge bg-warning text-dark"><i class="fas fa-lock"></i> Blocked</span>';
+        } else if ($mergeable_state === 'behind') {
+            return '<span class="badge bg-warning text-dark"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
+        } else if ($mergeable_state === 'dirty') {
+            return '<span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Dirty</span>';
+        } else {
+            return '<span class="badge bg-info"><i class="fas fa-info-circle"></i> ' . htmlspecialchars($mergeable_state, ENT_QUOTES, 'UTF-8') . '</span>';
+        }
+    } else {
+        return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Not Mergeable</span>';
+    }
+}
+
+function isValidPR($pr) {
+    if (isset($pr['is_valid_pr'])) {
+        return $pr['is_valid_pr'];
+    }
+    
+    return ($pr['state'] === 'success' && 
+            isset($pr['mergeable']) && $pr['mergeable'] === true && 
+            isset($pr['mergeable_state']) && in_array($pr['mergeable_state'], ['clean', 'unstable']));
 }
 ?>
 
@@ -67,6 +109,15 @@ function luminance($color)
     .label-badge:hover {
         opacity: 0.9;
     }
+    .badge-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+    }
+    .valid-pr {
+        border-left: 4px solid #198754;
+    }
     </style>
 </head>
 
@@ -78,14 +129,24 @@ function luminance($color)
     <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-12">
-                <h3>Assigned Pull Requests <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span></h3>
+                <h3>Assigned Pull Requests 
+                    <span class="badge text-bg-warning rounded-pill" id="openPullRequestsCount"><?php echo count($data["openPullRequests"]); ?></span>
+                    <span class="badge text-bg-success rounded-pill" id="validPullRequestsCount">
+                        <?php 
+                            $validPRs = array_filter($data["openPullRequests"], function($pr) {
+                                return isValidPR($pr);
+                            });
+                            echo count($validPRs);
+                        ?>
+                    </span>
+                </h3>
                 <div id="groupedPullRequests">
                     <?php if (empty($groupedPullRequests)): ?>
                         <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
                     <?php else: ?>                    
                         <?php foreach ($groupedPullRequests as $owner => $pullRequests): ?>
                             <?php 
-                                $groupId = "group-{$owner}";
+                                $groupId = "group-" . preg_replace('/\s+/', '-', $owner);
                             ?>
                             <div class="mb-4">
                                 <h5 class="text-primary mb-2">
@@ -93,7 +154,7 @@ function luminance($color)
                                 </h5>
                                 <ul class="list-group collapse show" id="<?php echo $groupId; ?>">
                                     <?php foreach ($pullRequests as $pr): ?>
-                                        <li class="list-group-item">
+                                        <li class="list-group-item <?php echo isValidPR($pr) ? 'valid-pr' : ''; ?>">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <strong><a href='<?php echo filter_var($pr['url'], FILTER_SANITIZE_URL); ?>'
@@ -118,33 +179,37 @@ function luminance($color)
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div class="badge-container">
                                                     <?php if (isset($pr["state"])): ?>
                                                         <?php if ($pr["state"] === "success"): ?>
                                                             <span class="badge bg-success">
-                                                                <i class="fas fa-check-circle"></i> Success
+                                                                <i class="fas fa-check-circle"></i> CI Success
                                                             </span>
                                                         <?php elseif ($pr["state"] === "failure"): ?>
                                                             <span class="badge bg-danger">
-                                                                <i class="fas fa-times-circle"></i> Failure
+                                                                <i class="fas fa-times-circle"></i> CI Failure
                                                             </span>
                                                         <?php elseif ($pr["state"] === "pending"): ?>
                                                             <span class="badge bg-warning text-dark">
-                                                                <i class="fas fa-hourglass-half"></i> Pending
+                                                                <i class="fas fa-hourglass-half"></i> CI Pending
                                                             </span>
                                                         <?php elseif ($pr["state"] === "error"): ?>
                                                             <span class="badge bg-danger">
-                                                                <i class="fas fa-exclamation-triangle"></i> Error
+                                                                <i class="fas fa-exclamation-triangle"></i> CI Error
                                                             </span>
                                                         <?php elseif ($pr["state"] === "skipped"): ?>
                                                             <span class="badge bg-dark">
-                                                                <i class="fas fa-arrow-circle-right"></i> Skipped
+                                                                <i class="fas fa-arrow-circle-right"></i> CI Skipped
                                                             </span>
                                                         <?php else: ?>
                                                             <span class="badge bg-secondary">
-                                                                <i class="fas fa-question-circle"></i> Empty
+                                                                <i class="fas fa-question-circle"></i> CI Unknown
                                                             </span>
                                                         <?php endif; ?>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if (isset($pr["mergeable"]) || isset($pr["mergeable_state"])): ?>
+                                                        <?php echo getMergeableBadge($pr["mergeable"] ?? null, $pr["mergeable_state"] ?? null); ?>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -173,15 +238,26 @@ function luminance($color)
                 groupedData[owner].push(item);
             });
             
+            let validPRCount = 0;
+            
             Object.keys(groupedData).forEach(owner => {
                 groupedData[owner].sort((a, b) => {
+                    const aValid = isValidPR(a);
+                    const bValid = isValidPR(b);
+                    
+                    if (aValid && !bValid) return -1;
+                    if (!aValid && bValid) return 1;
+                    
                     return stateOrder.indexOf(a.state || '') - stateOrder.indexOf(b.state || '');
                 });
+                
+                validPRCount += groupedData[owner].filter(pr => isValidPR(pr)).length;
             });
 
             const counterContainer = document.getElementById("openPullRequestsCount");
-            if (!counterContainer) {
-                console.error('Counter container element not found');
+            const validCounterContainer = document.getElementById("validPullRequestsCount");
+            if (!counterContainer || !validCounterContainer) {
+                console.error('Counter container elements not found');
                 return;
             }
             
@@ -201,6 +277,7 @@ function luminance($color)
             }
 
             counterContainer.textContent = items.length;
+            validCounterContainer.textContent = validPRCount;
 
             for (const [owner, pullRequests] of Object.entries(groupedData)) {
                 const groupId = `group-${owner.replace(/\s+/g, '-')}`;
@@ -230,9 +307,14 @@ function luminance($color)
                 pullRequestList.id = groupId;
                 
                 pullRequests.forEach(pr => {
-                    const state = getStateBadge(pr.state);
+                    const ciState = getStateBadge(pr.state);
+                    const mergeState = getMergeableBadge(pr.mergeable, pr.mergeable_state);
+                    
                     const itemLi = document.createElement('li');
                     itemLi.className = 'list-group-item';
+                    if (isValidPR(pr)) {
+                        itemLi.classList.add('valid-pr');
+                    }
                     pullRequestList.appendChild(itemLi);
 
                     const container = document.createElement("div");
@@ -294,11 +376,18 @@ function luminance($color)
                     }
 
                     const rightSection = document.createElement("div");
+                    rightSection.className = "badge-container";
                     container.appendChild(rightSection);
                     
-                    const stateSpan = document.createElement('span');
-                    stateSpan.innerHTML = state;
+                    const stateSpan = document.createElement('div');
+                    stateSpan.innerHTML = ciState;
                     rightSection.appendChild(stateSpan);
+                    
+                    if (pr.mergeable !== undefined || pr.mergeable_state !== undefined) {
+                        const mergeableSpan = document.createElement('div');
+                        mergeableSpan.innerHTML = mergeState;
+                        rightSection.appendChild(mergeableSpan);
+                    }
                 });
 
                 ownerDiv.appendChild(pullRequestList);
@@ -309,18 +398,60 @@ function luminance($color)
         function getStateBadge(state) {
             switch (state) {
                 case 'success':
-                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Success</span>';
+                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> CI Success</span>';
                 case 'failure':
-                    return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Failure</span>';
+                    return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> CI Failure</span>';
                 case 'pending':
-                    return '<span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> Pending</span>';
+                    return '<span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half"></i> CI Pending</span>';
                 case 'error':
-                    return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>';
+                    return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> CI Error</span>';
                 case 'skipped':
-                    return '<span class="badge bg-dark"><i class="fas fa-arrow-circle-right"></i> Skipped</span>';
+                    return '<span class="badge bg-dark"><i class="fas fa-arrow-circle-right"></i> CI Skipped</span>';
                 default:
-                    return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Empty</span>';
+                    return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> CI Unknown</span>';
             }
+        }
+        
+        function getMergeableBadge(mergeable, mergeable_state) {
+            if (mergeable === null || mergeable === undefined) {
+                return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Unknown</span>';
+            } else if (mergeable === true) {
+                if (mergeable_state === 'clean') {
+                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Mergeable</span>';
+                } else if (mergeable_state === 'unstable') {
+                    return '<span class="badge bg-info"><i class="fas fa-info-circle"></i> Unstable</span>';
+                } else if (mergeable_state === 'blocked') {
+                    return '<span class="badge bg-warning text-dark"><i class="fas fa-lock"></i> Blocked</span>';
+                } else if (mergeable_state === 'behind') {
+                    return '<span class="badge bg-warning text-dark"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
+                } else if (mergeable_state === 'dirty') {
+                    return '<span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Dirty</span>';
+                } else {
+                    return '<span class="badge bg-info"><i class="fas fa-info-circle"></i> ' + escapeHtml(mergeable_state) + '</span>';
+                }
+            } else {
+                return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Not Mergeable</span>';
+            }
+        }
+        
+        function isValidPR(pr) {
+            if (pr.is_valid_pr !== undefined) {
+                return pr.is_valid_pr;
+            }
+            
+            return (pr.state === 'success' && 
+                   pr.mergeable === true && 
+                   pr.mergeable_state && ['clean', 'unstable'].includes(pr.mergeable_state));
+        }
+        
+        function escapeHtml(unsafe) {
+            if (unsafe === undefined || unsafe === null) return '';
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function loadData() {
