@@ -125,7 +125,7 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
             $repositoryId = $issue['repository']['id'];
             $repositoryProcessed = isset($processedRepos[$repositoryId]);
 
-            if ($validPRCount < 10 || $repositoryProcessed) {
+            if ($validPRCount < 10) {
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
                 
                 if ($pullRequest !== null && isset($pullRequest["body"]) === true && $pullRequest["body"] !== null) {
@@ -136,16 +136,20 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
                     if (isset($pullRequest["body"]["head"]) === true && $pullRequest["body"]["head"] !== null) {
                         $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
                         $branch = $pullRequest["body"]["head"]["ref"];
-                        $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
-                        
+                        $sha   = $pullRequest["body"]["head"]["sha"] ?? $branch;
+                        $state = loadData(
+                            $repoUrl . "/commits/" . urlencode($sha) . "/status",
+                            $token
+                        );
+                    
                         if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
                             $issueData["state"] = $state["body"]["state"];
                             
                             $isValidPR = false;
 
                             if ($state["body"]["state"] === "success" && 
-                                $issueData["mergeable"] === true && 
-                                in_array($issueData["mergeable_state"], ["clean", "unstable"])) {
+                                ($issueData["mergeable"] === true || $issueData["mergeable"] === null) && 
+                                ($issueData["mergeable_state"] === null || in_array($issueData["mergeable_state"], ["clean", "unstable"]))) {
                                 
                                 $isValidPR = true;
                                 
