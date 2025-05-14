@@ -64,9 +64,9 @@ function applyTheme(theme) {
 
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'system';
-    const switcher = document.getELementById('theme');
-    if (switcher !== null && typeof (switcher) !== "undefined") {
-    	switcher.value = savedTheme;
+    const switcher = document.getElementById('theme');
+    if (switcher) {
+        switcher.value = savedTheme;
     }
     applyTheme(savedTheme);
 });
