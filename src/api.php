@@ -100,8 +100,8 @@ $openPullRequests = [];
 $openIssues = [];
 $repositories = [];
 
-$count = 0;
-$states = array();
+$validPRCount = 0;
+$processedRepos = array();
 
 if ($responseIssues !== null && is_array($responseIssues) === true && count($responseIssues) > 0) {
     foreach ($responseIssues as $issue) {
@@ -123,31 +123,52 @@ if ($responseIssues !== null && is_array($responseIssues) === true && count($res
 
         if (isset($issue['pull_request']) === true && isset($_GET['page']) === false) {
             $repositoryId = $issue['repository']['id'];
-            $exists = in_array($repositoryId, $states);
-            $states[] = $repositoryId;
-            
-            if ($exists === false && $count < 10) {
-                $count++;
+            $repositoryProcessed = isset($processedRepos[$repositoryId]);
+
+            if ($validPRCount < 10) {
                 $pullRequest = loadData($issue['pull_request']['url'], $token);
-                if ($pullRequest !== null
-                    && isset($pullRequest["body"]) === true
-                    && $pullRequest["body"] !== null
-                    && isset($pullRequest["body"]["head"]) === true
-                    && $pullRequest["body"]["head"] !== null
-                ) {
-                    $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
-                    $branch = $pullRequest["body"]["head"]["ref"];
-                    $state = loadData($repoUrl . "/commits/" . urlencode($branch) . "/status", $token);
-                    if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
-                        $issueData["state"] = $state["body"]["state"];
+                
+                if ($pullRequest !== null && isset($pullRequest["body"]) === true && $pullRequest["body"] !== null) {
+
+                    $issueData["mergeable"] = $pullRequest["body"]["mergeable"] ?? null;
+                    $issueData["mergeable_state"] = $pullRequest["body"]["mergeable_state"] ?? null;
+                    
+                    if (isset($pullRequest["body"]["head"]) === true && $pullRequest["body"]["head"] !== null) {
+                        $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
+                        $branch = $pullRequest["body"]["head"]["ref"];
+                        $sha   = $pullRequest["body"]["head"]["sha"] ?? $branch;
+                        $state = loadData(
+                            $repoUrl . "/commits/" . urlencode($sha) . "/status",
+                            $token
+                        );
+                    
+                        if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
+                            $issueData["state"] = $state["body"]["state"];
+                            
+                            $isValidPR = false;
+
+                            if ($state["body"]["state"] === "success" && 
+                                ($issueData["mergeable"] === true || $issueData["mergeable"] === null) && 
+                                ($issueData["mergeable_state"] === null || in_array($issueData["mergeable_state"], ["clean", "unstable"]))) {
+                                
+                                $isValidPR = true;
+                                
+                                if (!$repositoryProcessed && $validPRCount < 10) {
+                                    $validPRCount++;
+                                    $processedRepos[$repositoryId] = true;
+                                }
+                            }
+                            
+                            $issueData["is_valid_pr"] = $isValidPR;
+                        }
+                    } else {
+                        error_log("Missing head info in " . $issue['pull_request']['url']);
                     }
-                } else {
-                    error_log("Missing head info in " . $issue['pull_request']['url']);
                 }
-            } else if ($exists === true) {
+            } else {
                 $issueData["state"] = "skipped";
             }
-                
+            
             $openPullRequests[] = $issueData;
         } else {
             $openIssues[] = $issueData;
