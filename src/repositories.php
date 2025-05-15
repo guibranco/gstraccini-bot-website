@@ -230,13 +230,6 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 if (organization === existingValue) {
                     option.selected = true;
                 }
-            organizations.forEach(organization => {
-                const option = document.createElement('option');
-                option.value = organization;
-                option.textContent = organization;
-                if (organization === existingValue) {
-                    option.selected = true;
-                }
                 organizationFilter.appendChild(option);
             });
         }
@@ -348,7 +341,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
         document.getElementById('hasIssuesFilter').addEventListener('change', filterRepositories);
         document.getElementById('resetFilters').addEventListener('click', resetFilters);
     
-window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
             loadData();
             loadFiltersFromURL();
             filterRepositories();
