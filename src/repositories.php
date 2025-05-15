@@ -230,6 +230,13 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 if (organization === existingValue) {
                     option.selected = true;
                 }
+            organizations.forEach(organization => {
+                const option = document.createElement('option');
+                option.value = organization;
+                option.textContent = organization;
+                if (organization === existingValue) {
+                    option.selected = true;
+                }
                 organizationFilter.appendChild(option);
             });
         }
