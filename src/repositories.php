@@ -59,7 +59,62 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                     ?>
                 </select>
             </div>
+            
+            <div class="col-md-4">
+                <label for="languageFilter" class="form-label">Filter by Language</label>
+                <select id="languageFilter" class="form-select">
+                    <option value="">All Languages</option>
+                    <?php
+                    $languages = array_filter(array_unique(array_column($data['repositories'], 'language')));
+                    sort($languages);
+                    foreach ($languages as $language) {
+                        if (!empty($language)) {
+                            echo "<option value=\"" . htmlspecialchars($language) . "\">" . htmlspecialchars($language) . "</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+    
+            <div class="col-md-4">
+                <label for="visibilityFilter" class="form-label">Filter by Visibility</label>
+                <select id="visibilityFilter" class="form-select">
+                    <option value="">All</option>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
         </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="isForkFilter">
+                    <label class="form-check-label" for="isForkFilter">Is Fork</label>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hasForkFilter">
+                    <label class="form-check-label" for="hasForkFilter">Has Forks</label>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hasIssuesFilter">
+                    <label class="form-check-label" for="hasIssuesFilter">Has Issues</label>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <button id="resetFilters" class="btn btn-outline-secondary">Reset Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
         <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Your Repositories <span class="badge text-bg-warning rounded-pill"
@@ -122,6 +177,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 .then(data => {
                     populateRepositoriesTable(data.repositories);
                     updateOrganizationFilter(data.repositories);
+                    updateLanguageFilter(data.repositories);
                     setTimeout(loadData, 1000 * 60);
                 })
                 .catch(error => {
@@ -129,16 +185,22 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                     showErrorAlert('Failed to load repository data.');
                 });
         }
-
+    
         function populateRepositoriesTable(repositories) {
             const repositoriesTable = document.getElementById('repositories');
             repositoriesTable.innerHTML = '';
-
+    
             repositories.forEach(repo => {
                 const slash = repo.visibility === 'private' ? '-slash status-uninstalled' : ' status-installed';
                 const row = document.createElement('tr');
                 row.classList.add('repository-row');
                 row.setAttribute('data-organization', repo.organization);
+                row.setAttribute('data-language', repo.language || '');
+                row.setAttribute('data-visibility', repo.visibility);
+                row.setAttribute('data-fork', repo.fork ? 'true' : 'false');
+                row.setAttribute('data-has-forks', repo.forks > 0 ? 'true' : 'false');
+                row.setAttribute('data-has-issues', repo.issues > 0 ? 'true' : 'false');
+                
                 row.innerHTML = `
                 <td>${repo.organization}</td>
                 <td><a href='${repo.url}' target='_blank'>${repo.name}</a></td>
@@ -151,17 +213,23 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 `;
                 repositoriesTable.appendChild(row);
             });
-
-            document.getElementById('repositoriesCount').textContent = repositories.length;
+    
             filterRepositories();
         }
-
+    
         function updateOrganizationFilter(repositories) {
             const organizationFilter = document.getElementById('organizationFilter');
             const existingValue = organizationFilter.value;
-
+    
             const organizations = Array.from(new Set(repositories.map(repo => repo.organization)));
             organizationFilter.innerHTML = `<option value="">All Organizations</option>`;
+            organizations.forEach(organization => {
+                const option = document.createElement('option');
+                option.value = organization;
+                option.textContent = organization;
+                if (organization === existingValue) {
+                    option.selected = true;
+                }
             organizations.forEach(organization => {
                 const option = document.createElement('option');
                 option.value = organization;
@@ -172,28 +240,119 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 organizationFilter.appendChild(option);
             });
         }
-
+    
+        function updateLanguageFilter(repositories) {
+            const languageFilter = document.getElementById('languageFilter');
+            const existingValue = languageFilter.value;
+    
+            const languages = Array.from(new Set(repositories.map(repo => repo.language)))
+                .filter(lang => lang)
+                .sort();
+                
+            languageFilter.innerHTML = `<option value="">All Languages</option>`;
+            languages.forEach(language => {
+                const option = document.createElement('option');
+                option.value = language;
+                option.textContent = language;
+                if (language === existingValue) {
+                    option.selected = true;
+                }
+                languageFilter.appendChild(option);
+            });
+        }
+    
         function filterRepositories() {
             const organization = document.getElementById('organizationFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            const visibility = document.getElementById('visibilityFilter').value;
+            const isFork = document.getElementById('isForkFilter').checked;
+            const hasForks = document.getElementById('hasForkFilter').checked;
+            const hasIssues = document.getElementById('hasIssuesFilter').checked;
+    
+            // Update URL query parameters
             const queryString = new URLSearchParams(window.location.search);
             queryString.set('organization', organization);
+            if (language) queryString.set('language', language);
+            else queryString.delete('language');
+            if (visibility) queryString.set('visibility', visibility);
+            else queryString.delete('visibility');
+            queryString.set('isFork', isFork ? 'true' : '');
+            queryString.set('hasForks', hasForks ? 'true' : '');
+            queryString.set('hasIssues', hasIssues ? 'true' : '');
             window.history.replaceState({}, '', '?' + queryString.toString());
-
+    
             let counter = 0;
             document.querySelectorAll('.repository-row').forEach(row => {
-                const matches = !organization || row.dataset.organization === organization;
+                const organizationMatch = !organization || row.dataset.organization === organization;
+                const languageMatch = !language || row.dataset.language === language;
+                const visibilityMatch = !visibility || row.dataset.visibility === visibility;
+                const isForkMatch = !isFork || row.dataset.fork === 'true';
+                const hasForksMatch = !hasForks || row.dataset.hasForks === 'true';
+                const hasIssuesMatch = !hasIssues || row.dataset.hasIssues === 'true';
+    
+                const matches = organizationMatch && languageMatch && visibilityMatch && 
+                                isForkMatch && hasForksMatch && hasIssuesMatch;
+                
                 row.style.display = matches ? '' : 'none';
                 if (matches) {
                     counter++;
                 }
             });
-
+    
             document.getElementById('repositoriesCount').textContent = counter;
         }
-
+    
+        function resetFilters() {
+            document.getElementById('organizationFilter').value = '';
+            document.getElementById('languageFilter').value = '';
+            document.getElementById('visibilityFilter').value = '';
+            document.getElementById('isForkFilter').checked = false;
+            document.getElementById('hasForkFilter').checked = false;
+            document.getElementById('hasIssuesFilter').checked = false;
+            
+            filterRepositories();
+        }
+    
+        // Load saved filters from URL
+        function loadFiltersFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Set organization filter (already handled in PHP)
+            
+            // Set language filter
+            if (params.has('language')) {
+                const language = params.get('language');
+                const languageFilter = document.getElementById('languageFilter');
+                if (languageFilter.querySelector(`option[value="${language}"]`)) {
+                    languageFilter.value = language;
+                }
+            }
+            
+            // Set visibility filter
+            if (params.has('visibility')) {
+                document.getElementById('visibilityFilter').value = params.get('visibility');
+            }
+            
+            // Set checkbox filters
+            document.getElementById('isForkFilter').checked = params.get('isFork') === 'true';
+            document.getElementById('hasForkFilter').checked = params.get('hasForks') === 'true';
+            document.getElementById('hasIssuesFilter').checked = params.get('hasIssues') === 'true';
+        }
+    
+        // Event listeners
         document.getElementById('organizationFilter').addEventListener('change', filterRepositories);
-
-        window.addEventListener('DOMContentLoaded', loadData);
+        document.getElementById('languageFilter').addEventListener('change', filterRepositories);
+        document.getElementById('visibilityFilter').addEventListener('change', filterRepositories);
+        document.getElementById('isForkFilter').addEventListener('change', filterRepositories);
+        document.getElementById('hasForkFilter').addEventListener('change', filterRepositories);
+        document.getElementById('hasIssuesFilter').addEventListener('change', filterRepositories);
+        document.getElementById('resetFilters').addEventListener('click', resetFilters);
+    
+window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            loadFiltersFromURL();
+            filterRepositories();
+        });
     </script>
 </body>
 
