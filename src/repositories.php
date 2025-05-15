@@ -348,9 +348,10 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
         document.getElementById('hasIssuesFilter').addEventListener('change', filterRepositories);
         document.getElementById('resetFilters').addEventListener('click', resetFilters);
     
-        window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
             loadData();
             loadFiltersFromURL();
+            filterRepositories();
         });
     </script>
 </body>
