@@ -66,7 +66,7 @@ function getMergeableBadge($mergeable, $mergeable_state) {
         } else if ($mergeable_state === 'blocked') {
             return '<span class="badge bg-warning text-dark"><i class="fas fa-lock"></i> Blocked</span>';
         } else if ($mergeable_state === 'behind') {
-            return '<span class="badge bg-warning text-dark"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
+            return '<span class="badge bg-secondary"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
         } else if ($mergeable_state === 'dirty') {
             return '<span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Dirty</span>';
         } else {
@@ -423,7 +423,7 @@ function isValidPR($pr) {
                 } else if (mergeable_state === 'blocked') {
                     return '<span class="badge bg-warning text-dark"><i class="fas fa-lock"></i> Blocked</span>';
                 } else if (mergeable_state === 'behind') {
-                    return '<span class="badge bg-warning text-dark"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
+                    return '<span class="badge bg-secondary"><i class="fas fa-arrow-circle-down"></i> Behind</span>';
                 } else if (mergeable_state === 'dirty') {
                     return '<span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> Dirty</span>';
                 } else {
