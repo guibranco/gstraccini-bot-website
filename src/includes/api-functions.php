@@ -85,7 +85,7 @@ function fetchAllGitHubPages($url, $token)
 
     do {
         $result = loadData($url, $token);
-        if ($result === null || isset($result["body"]) === false) {
+        if ($result === null || isset($result["body"]) === false || $result["body"] === null) {
             break;
         }
 
