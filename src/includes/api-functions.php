@@ -26,7 +26,7 @@ function loadData($url, $token)
         "Authorization: Bearer $token",
         "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
         "Accept: application/vnd.github+json",
-        "X-GitHub-Api-Version: 2022-11-28"
+        "X-GitHub-Api-Version: 2022-11-28",
     ]);
 
     $response = curl_exec($curl);
@@ -36,9 +36,22 @@ function loadData($url, $token)
         return null;
     }
 
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($httpCode >= 400) {
+        curl_close($curl);
+        error_log("GitHub API error: HTTP $httpCode for URL $url");
+        return null;
+    }
+
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $header = substr($response, 0, $headerSize);
-    $body = json_decode(substr($response, $headerSize), true);
+    $body   = json_decode(substr($response, $headerSize), true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        curl_close($curl);
+        error_log("JSON decode error: " . json_last_error_msg());
+        return null;
+    }
 
     curl_close($curl);
 
