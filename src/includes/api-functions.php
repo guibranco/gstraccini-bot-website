@@ -136,9 +136,9 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     
     if (isset($pullRequest["body"]["head"]) === true && $pullRequest["body"]["head"] !== null) {
         $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
-        $branch = $pullRequest["body"]["head"]["ref"];
-        $sha = $pullRequest["body"]["head"]["sha"] ?? $branch;
-        $state = loadData(
+        $branch  = $pullRequest["body"]["head"]["ref"];
+        $sha     = $pullRequest["body"]["head"]["sha"] ?? $branch;
+        $state   = loadData(
             $repoUrl . "/commits/" . urlencode($sha) . "/status",
             $token
         );
@@ -146,16 +146,11 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
         if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
             $issueData["state"] = $state["body"]["state"];
             
-            $isValidPR = false;
-
-            if ($state["body"]["state"] === "success" && 
-                ($issueData["mergeable"] === true || $issueData["mergeable"] === null) && 
-                ($issueData["mergeable_state"] === null || in_array($issueData["mergeable_state"], ["clean", "unstable"]))) {
-                
-                $isValidPR = true;
-            }
-            
-            $issueData["is_valid_pr"] = $isValidPR;
+            $issueData["is_valid_pr"] = (
+                $state["body"]["state"] === "success" &&
+                isset($issueData["mergeable"]) && $issueData["mergeable"] === true &&
+                isset($issueData["mergeable_state"]) && in_array($issueData["mergeable_state"], ["clean", "unstable"])
+            );
         }
     } else {
         error_log("Missing head info in pull request");
