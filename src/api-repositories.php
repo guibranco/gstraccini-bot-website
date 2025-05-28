@@ -25,7 +25,9 @@ if (is_array($repositories) && count($repositories) > 0) {
     }
 }
 
-sort($formattedRepositories);
+usort($formattedRepositories, function ($a, $b) {
+    return strcmp($a['name'], $b['name']);
+});
 
 $data = [
     'repositories' => $formattedRepositories
