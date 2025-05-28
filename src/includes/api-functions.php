@@ -16,6 +16,9 @@ function loadData($url, $token)
 {
     $curl = curl_init($url);
 
+    curl_setopt($curl, CURLOPT_TIMEOUT, 0);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
+    curl_setopt($curl, CURLOPT_DNS_CACHE_TIMEOUT, 30);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLINFO_HEADER_OUT, true);
     curl_setopt($curl, CURLOPT_HEADER, true);
@@ -181,7 +184,6 @@ function sendJsonResponse($data, $time, $hitMiss = "miss", $expires = 60)
 {
     header('Content-Type: application/json');
     header('Cache-Control: public, max-age=' . $expires);
-    header('Pragma: cache');
     header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
     header("X-Cache: " . $hitMiss);
     
