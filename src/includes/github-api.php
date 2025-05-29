@@ -45,7 +45,7 @@ function loadData($url, $token)
 
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $header = substr($response, 0, $headerSize);
-    $body   = json_decode(substr($response, $headerSize), true);
+    $body = json_decode(substr($response, $headerSize), true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         curl_close($curl);
@@ -133,19 +133,19 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
 {
     $issueData["mergeable"] = $pullRequest["body"]["mergeable"] ?? null;
     $issueData["mergeable_state"] = $pullRequest["body"]["mergeable_state"] ?? null;
-    
+
     if (isset($pullRequest["body"]["head"]) === true && $pullRequest["body"]["head"] !== null) {
         $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
-        $branch  = $pullRequest["body"]["head"]["ref"];
-        $sha     = $pullRequest["body"]["head"]["sha"] ?? $branch;
-        $state   = loadData(
+        $branch = $pullRequest["body"]["head"]["ref"];
+        $sha = $pullRequest["body"]["head"]["sha"] ?? $branch;
+        $state = loadData(
             $repoUrl . "/commits/" . urlencode($sha) . "/status",
             $token
         );
-    
+
         if ($state !== null && $state["body"] !== null && isset($state["body"]["state"])) {
             $issueData["state"] = $state["body"]["state"];
-            
+
             $issueData["is_valid_pr"] = (
                 $state["body"]["state"] === "success" &&
                 isset($issueData["mergeable"]) && $issueData["mergeable"] === true &&
@@ -155,7 +155,7 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     } else {
         error_log("Missing head info in pull request");
     }
-    
+
     return $issueData;
 }
 
@@ -194,7 +194,7 @@ function sendJsonResponse($data, $time, $hitMiss = "miss", $expires = 60)
     header('Cache-Control: public, max-age=' . $expires);
     header('Expires: ' . gmdate('D, d M Y H:i:s', $time + $expires) . ' GMT');
     header("X-Cache: " . $hitMiss);
-    
+
     echo json_encode($data);
 }
 
@@ -206,13 +206,13 @@ function sendJsonResponse($data, $time, $hitMiss = "miss", $expires = 60)
 function checkAuth()
 {
     require_once "session.php";
-    
+
     if ($isAuthenticated === false) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
         exit();
     }
-    
+
     return $_SESSION['token'];
 }
 
@@ -230,12 +230,12 @@ function getCache($cacheKey = 'data', $ttl = 180)
         !isset($_GET['dashboard']) &&
         isset($_SESSION[$cacheKey]) &&
         isset($_SESSION[$cacheKey]['last_api_call']) &&
-        $_SESSION[$cacheKey]['last_api_call'] > (time() - $ttl)        
+        $_SESSION[$cacheKey]['last_api_call'] > (time() - $ttl)
     ) {
         sendJsonResponse($_SESSION[$cacheKey]["data"], $_SESSION[$cacheKey]['last_api_call'], "hit", $ttl);
         return true;
     }
-    
+
     return false;
 }
 
@@ -247,9 +247,9 @@ function getCache($cacheKey = 'data', $ttl = 180)
  */
 function setCache($data, $cacheKey = 'data')
 {
-    $_SESSION[$cacheKey] = 
-      [
-        "data" => $data,
-        "last_api_call" => time()
-      ];
+    $_SESSION[$cacheKey] =
+        [
+            "data" => $data,
+            "last_api_call" => time()
+        ];
 }

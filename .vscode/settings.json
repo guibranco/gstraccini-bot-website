@@ -31,5 +31,6 @@
         "guibranco",
         "Octocat",
         "sonarcloud"
-    ]    
+    ],
+    "sarif-viewer.connectToGithubCodeScanning": "on"
 }
