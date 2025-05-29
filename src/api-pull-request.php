@@ -38,17 +38,25 @@ if (is_array($issues) && count($issues) > 0) {
         $repositoryId = $issue['repository']['id'];
         $repositoryProcessed = isset($processedRepos[$repositoryId]);
 
-        if ($validPRCount < 10) {
+        // Only attempt to load once per repo and while under the limit
+        if ($validPRCount < 10 && !$repositoryProcessed) {
             $pullRequest = loadData($issue['pull_request']['url'], $token);
             
-            if ($pullRequest !== null && isset($pullRequest["body"]) === true && $pullRequest["body"] !== null) {
+            if ($pullRequest !== null 
+                && isset($pullRequest["body"]) === true 
+                && $pullRequest["body"] !== null
+            ) {
                 $issueData = enrichPullRequestData($issueData, $pullRequest, $token);
                 
-                if (isset($issueData["is_valid_pr"]) && $issueData["is_valid_pr"] === true && !$repositoryProcessed && $validPRCount < 10) {
+                if (isset($issueData["is_valid_pr"]) 
+                    && $issueData["is_valid_pr"] === true
+                ) {
                     $validPRCount++;
-                    $processedRepos[$repositoryId] = true;
                 }
             }
+
+            // Mark repo as processed regardless of validity to prevent rechecks
+            $processedRepos[$repositoryId] = true;
         } else {
             $issueData["state"] = "skipped";
         }
