@@ -6,8 +6,6 @@ require_once "includes/github-api.php";
 
 $cacheKey = "issues";
 $token = checkAuth();
-
-session_start();
 $_SESSION['last_api_call'] = time();
 session_write_close();
 
@@ -31,7 +29,7 @@ if (is_array($issues) && count($issues) > 0) {
         if (isset($issue['pull_request'])) {
             continue;
         }
-        
+
         $openIssues[] = formatIssueData($issue);
     }
 }

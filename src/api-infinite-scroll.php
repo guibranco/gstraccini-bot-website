@@ -5,8 +5,6 @@
 require_once "includes/github-api.php";
 
 $token = checkAuth();
-
-session_start();
 $_SESSION['last_api_call'] = time();
 session_write_close();
 
@@ -27,7 +25,7 @@ $openIssues = [];
 if (is_array($issues) && count($issues) > 0) {
     foreach ($issues as $issue) {
         $issueData = formatIssueData($issue);
-        
+
         if (isset($issue['pull_request'])) {
             $openPullRequests[] = $issueData;
         } else {

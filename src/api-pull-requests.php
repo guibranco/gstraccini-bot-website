@@ -6,8 +6,6 @@ require_once "includes/github-api.php";
 
 $cacheKey = "pull-requests";
 $token = checkAuth();
-
-session_start();
 $_SESSION['last_api_call'] = time();
 session_write_close();
 
@@ -33,7 +31,7 @@ if (is_array($issues) && count($issues) > 0) {
         if (!isset($issue['pull_request'])) {
             continue;
         }
-        
+
         $issueData = formatIssueData($issue);
         $repositoryId = $issue['repository']['id'];
         $repositoryProcessed = isset($processedRepos[$repositoryId]);
@@ -41,14 +39,16 @@ if (is_array($issues) && count($issues) > 0) {
         // Only attempt to load once per repo and while under the limit
         if ($validPRCount < 10 && !$repositoryProcessed) {
             $pullRequest = loadData($issue['pull_request']['url'], $token);
-            
-            if ($pullRequest !== null 
-                && isset($pullRequest["body"]) === true 
+
+            if (
+                $pullRequest !== null
+                && isset($pullRequest["body"]) === true
                 && $pullRequest["body"] !== null
             ) {
                 $issueData = enrichPullRequestData($issueData, $pullRequest, $token);
-                
-                if (isset($issueData["is_valid_pr"]) 
+
+                if (
+                    isset($issueData["is_valid_pr"])
                     && $issueData["is_valid_pr"] === true
                 ) {
                     $validPRCount++;
@@ -60,7 +60,7 @@ if (is_array($issues) && count($issues) > 0) {
         } else {
             $issueData["state"] = "skipped";
         }
-        
+
         $openPullRequests[] = $issueData;
     }
 }

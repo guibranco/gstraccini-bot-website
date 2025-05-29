@@ -6,8 +6,6 @@ require_once "includes/github-api.php";
 
 $cacheKey = "repositories";
 $token = checkAuth();
-
-session_start();
 $_SESSION['last_api_call'] = time();
 session_write_close();
 
