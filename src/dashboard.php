@@ -51,7 +51,7 @@ if (isset($user["first_name"])) {
     </div>
 
     <?php if (isset($_GET["error"]) && intval($_GET["error"]) === 404): ?>
-        <div class="container mt-5 d-none">
+        <div class="container mt-5">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Page not found!</strong>
                 <p>The page <b><?php echo htmlspecialchars($_GET["path"]); ?></b> could not be found.</p>
