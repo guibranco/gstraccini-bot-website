@@ -455,7 +455,7 @@ function isValidPR($pr) {
         }
 
         function loadData() {
-            fetch('api-gateway.php??pull_requests=true')
+            fetch('api-gateway.php?pull_requests=true')
                 .then(response => response.json())
                 .then(data => {
                     populateIssuesGroupedByOwner(data.openPullRequests);
