@@ -3,6 +3,8 @@ require_once "includes/session.php";
 require_once "github.secrets.php";
 require_once "webhook.secrets.php";
 
+use Exception;
+
 /**
  * GitHub OAuth Callback Handler
  * 
