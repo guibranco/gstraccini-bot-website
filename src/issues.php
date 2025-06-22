@@ -267,7 +267,7 @@ function luminance($color)
         } 
 
         function loadData() {
-            fetch('api.php')
+            fetch('api-gateway.php?issues=true')
                 .then(response => response.json())
                 .then(data => {
                     populateIssuesGroupedByOwner(data.openIssues);
