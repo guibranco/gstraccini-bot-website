@@ -2,11 +2,8 @@
 /**
  * API endpoint for infinite scroll (paged issues and pull requests)
  */
-require_once "includes/github-api.php";
 
 $token = checkAuth();
-$_SESSION['last_api_call'] = time();
-session_write_close();
 
 if (!isset($_GET['page']) || !is_numeric($_GET['page']) || $_GET['page'] < 1) {
     http_response_code(400);

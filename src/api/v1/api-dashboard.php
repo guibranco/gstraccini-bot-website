@@ -2,12 +2,9 @@
 /**
  * API endpoint for dashboard view (mix of assigned issues and pull requests)
  */
-require_once "includes/github-api.php";
 
 $cacheKey = "dashboard";
 $token = checkAuth();
-$_SESSION['last_api_call'] = time();
-session_write_close();
 
 $cache = getCache($cacheKey);
 if ($cache !== false) {

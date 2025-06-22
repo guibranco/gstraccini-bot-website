@@ -7,7 +7,7 @@ if ($isAuthenticated === false) {
 }
 
 $user = $_SESSION['user'];
-$data = $_SESSION["data"] ?? array("openIssues" => []);
+$data = $_SESSION["issues"]["data"] ?? array("openIssues" => []);
 
 $title = "Issues";
 
@@ -267,7 +267,7 @@ function luminance($color)
         } 
 
         function loadData() {
-            fetch('api-gateway.php?issues=true')
+            fetch('/api/v1/issues')
                 .then(response => response.json())
                 .then(data => {
                     populateIssuesGroupedByOwner(data.openIssues);

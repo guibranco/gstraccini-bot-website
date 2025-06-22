@@ -1,0 +1,14 @@
+Options -Indexes
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^dashboard/?$ api-gateway.php?dashboard=true [NC,L]
+RewriteRule ^infinite/(\d+)/?$ api-gateway.php?page=$1 [NC,L]
+RewriteRule ^issues/?$ api-gateway.php?issues=true [NC,L]
+RewriteRule ^notifications/?$ notifications.php [NC,L]
+RewriteRule ^pull-requests/?$ api-gateway.php?pull_requests=true [NC,L]
+RewriteRule ^repositories/?$ api-gateway.php?repositories=true [NC,L]
+RewriteRule ^service-status/?$ service_status.php [NC,L]
