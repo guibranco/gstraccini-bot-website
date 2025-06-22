@@ -280,7 +280,7 @@ if (isset($user["first_name"])) {
         }
 
         function loadData() {
-            fetch('api-gateway.php?dashboard=true')
+            fetch('/api/v1/dashboard')
                 .then(response => response.json())
                 .then(data => {
                     populateIssues(data.openPullRequestsDashboard, "openPullRequests");

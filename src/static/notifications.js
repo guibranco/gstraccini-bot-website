@@ -1,5 +1,5 @@
         function fetchNotifications() {
-            fetch('api/v1/notifications')
+            fetch('/api/v1/notifications')
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

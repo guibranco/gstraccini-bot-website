@@ -167,7 +167,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
     <?php require_once "includes/footer.php"; ?>
     <script>
         function loadData() {
-            fetch('api/v1/repositories')
+            fetch('/api/v1/repositories')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch repositories');

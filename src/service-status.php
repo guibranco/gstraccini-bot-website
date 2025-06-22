@@ -113,7 +113,7 @@ require_once "includes/session.php";
   <?php require_once "includes/footer-public.php"; ?>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      fetch('api/v1/service-status')
+      fetch('/api/v1/service-status')
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch status data');
