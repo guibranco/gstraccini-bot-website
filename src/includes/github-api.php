@@ -205,6 +205,7 @@ function sendJsonResponse($data, $time, $hitMiss = "miss", $expires = 60)
  */
 function checkAuth()
 {
+    global $isAuthenticated;
     require_once "session.php";
 
     if ($isAuthenticated === false) {

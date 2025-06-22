@@ -34,4 +34,4 @@ $data = [
 session_start();
 setCache($data, $cacheKey);
 session_write_close();
-sendJsonResponse($data);
+sendJsonResponse($data, time());
