@@ -39,4 +39,4 @@ $data = [
     'openIssues' => $openIssues
 ];
 
-sendJsonResponse($data);
+sendJsonResponse($data, time());

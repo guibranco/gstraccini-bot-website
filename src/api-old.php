@@ -69,4 +69,4 @@ $data = [
 session_start();
 setCache($data);
 session_write_close();
-sendJsonResponse($data);
+sendJsonResponse($data, time());
