@@ -59,7 +59,7 @@ if (isset($user["first_name"])) {
     </div>
     <?php require_once "includes/footer.php"; ?>
     <script>
-        const apiUrl = 'api.php';
+        const apiUrl = 'api-gateway.php';
         let page = 1;
         let loading = false;
         let infiniteScrollCount = 0;
