@@ -6,6 +6,8 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{HTTP_HOST} !^bot\.straccini\.com$ [NC]
 RewriteRule ^(.*)$ https://bot.straccini.com/$1 [L,R=301]
 
+ErrorDocument 404 /404-handler.php
+
 Header set X-Content-Type-Options "nosniff"
 Header set X-Frame-Options "SAMEORIGIN"
 Header set X-XSS-Protection "1; mode=block"

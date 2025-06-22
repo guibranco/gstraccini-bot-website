@@ -7,8 +7,7 @@ if ($isAuthenticated === false) {
 }
 
 $user = $_SESSION['user'];
-
-$data = $_SESSION["data"] ?? array("openPullRequests" => []);
+$data = $_SESSION["pull-requests"]["data"] ?? array("openPullRequests" => []);
 
 $title = "Pull Requests";
 
@@ -455,7 +454,7 @@ function isValidPR($pr) {
         }
 
         function loadData() {
-            fetch('api-gateway.php?pull_requests=true')
+            fetch('api/v1/pull-requests')
                 .then(response => response.json())
                 .then(data => {
                     populateIssuesGroupedByOwner(data.openPullRequests);

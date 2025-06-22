@@ -2,7 +2,8 @@
 /**
  * Main API router that directs requests to the appropriate endpoint
  */
-require_once "includes/session.php";
+require_once "../../includes/session.php";
+require_once "../../includes/github-api.php";
 
 if ($isAuthenticated === false) {
     http_response_code(401);
@@ -21,5 +22,5 @@ if (isset($_GET['repositories'])) {
 } else if (isset($_GET['page'])) {
     require_once "api-infinite-scroll.php";
 } else {
-    require_once "api-old.php";
+    require_once "api-dashboard.php";
 }

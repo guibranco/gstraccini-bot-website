@@ -2,12 +2,9 @@
 /**
  * API endpoint for listing assigned GitHub pull requests with CI and Git mergeable status
  */
-require_once "includes/github-api.php";
 
 $cacheKey = "pull-requests";
 $token = checkAuth();
-$_SESSION['last_api_call'] = time();
-session_write_close();
 
 $cache = getCache($cacheKey);
 if ($cache !== false) {

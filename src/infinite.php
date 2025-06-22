@@ -50,7 +50,7 @@ if (isset($user["first_name"])) {
     <?php require_once 'includes/header.php'; ?>
 
     <div class="container mt-5">
-        <h1 class="mb-4">Infinite Scroll List Group <span class="badge text-bg-warning rounded-pill" id="count">0</span>
+        <h1 class="mb-4">Assigned Issues <span class="badge text-bg-warning rounded-pill" id="count">0</span>
         </h1>
         <div id="scrollable-list" class="list-group">
             <!-- Items will be appended here dynamically -->
@@ -59,7 +59,7 @@ if (isset($user["first_name"])) {
     </div>
     <?php require_once "includes/footer.php"; ?>
     <script>
-        const apiUrl = 'api-gateway.php';
+        const apiUrl = 'api/v1/infinite';
         let page = 1;
         let loading = false;
         let infiniteScrollCount = 0;
@@ -92,7 +92,7 @@ if (isset($user["first_name"])) {
 
             appendLoadingItem();
 
-            fetch(`${apiUrl}?page=${page}`)
+            fetch(`${apiUrl}/${page}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);

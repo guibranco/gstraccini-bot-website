@@ -10,8 +10,8 @@ $user = $_SESSION['user'];
 
 $data = array("openPullRequestsDashboard" => [], "openIssuesDashboard" => []);
 
-if (isset($_SESSION["data_dashboard"])) {
-    $data = $_SESSION["data_dashboard"];
+if (isset($_SESSION["dashboard"])) {
+    $data = $_SESSION["dashboard"]["data"];
 }
 
 $title = "Dashboard";
@@ -49,6 +49,16 @@ if (isset($user["first_name"])) {
             </div>
         </div>
     </div>
+
+    <?php if (isset($_GET["error"]) && intval($_GET["error"]) === 404): ?>
+        <div class="container mt-5 d-none">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Page not found!</strong>
+                <p>The page <b><?php echo htmlspecialchars($_GET["path"]); ?></b> could not be found.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="container mt-5 d-none" id="alert-container"></div>
 
@@ -163,7 +173,7 @@ if (isset($user["first_name"])) {
                                     target='_blank'><?php echo htmlspecialchars($issue['repository']); ?></a>
                             </span>
                             <br />
-                            <span class="text-muted">🕐 <?php echo $issue['created_at']; ?></span> 
+                            <span class="text-muted">🕐 <?php echo $issue['created_at']; ?></span>
                             <?php if (isset($issue["state"]) && $issue["state"] === "success") { ?>
                                 <span class="badge bg-success">
                                     <i class="fas fa-check-circle"></i> Success
@@ -181,13 +191,13 @@ if (isset($user["first_name"])) {
                                                 <i class="fas fa-exclamation-triangle"></i> Error
                                             </span>
                             <?php } else if (isset($issue["state"]) && $issue["state"] === "skipped") { ?>
-                                            <span class="badge bg-dark">
-                                                <i class="fas fa-arrow-circle-right"></i> Skipped
-                                            </span>
+                                                <span class="badge bg-dark">
+                                                    <i class="fas fa-arrow-circle-right"></i> Skipped
+                                                </span>
                             <?php } else { ?>
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-question-circle"></i> Empty
-                                            </span>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-question-circle"></i> Empty
+                                                </span>
                             <?php } ?>
                         </li>
                     <?php endforeach; ?>
@@ -263,7 +273,7 @@ if (isset($user["first_name"])) {
                 case 'error':
                     return '<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Error</span>';
                 case 'skipped':
-                    return '<span class="badge bg-dark"><i class="fas fa-arrow-circle-right"></i> Skipped</span>';    
+                    return '<span class="badge bg-dark"><i class="fas fa-arrow-circle-right"></i> Skipped</span>';
                 default:
                     return '<span class="badge bg-secondary"><i class="fas fa-question-circle"></i> Empty</span>';
             }

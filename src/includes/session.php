@@ -10,5 +10,4 @@ session_set_cookie_params([
     'samesite' => 'LAX'
 ]);
 session_start();
-
 $isAuthenticated = isset($_SESSION['user']) === true && isset($_SESSION['token']) === true;

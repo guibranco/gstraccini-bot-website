@@ -214,7 +214,9 @@ function checkAuth()
         exit();
     }
 
-    return $_SESSION['token'];
+    $token = $_SESSION['token'];
+    session_write_close();
+    return $token;
 }
 
 /**

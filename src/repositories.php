@@ -7,7 +7,7 @@ if ($isAuthenticated === false) {
 }
 
 $user = $_SESSION['user'];
-$data = $_SESSION["data"] ?? array("repositories" => []);
+$data = $_SESSION["repositories"]["data"] ?? array("repositories" => []);
 
 $title = "Repositories";
 
@@ -167,7 +167,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
     <?php require_once "includes/footer.php"; ?>
     <script>
         function loadData() {
-            fetch('api-gateway.php?repositories=true')
+            fetch('api/v1/repositories')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch repositories');
