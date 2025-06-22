@@ -1,5 +1,5 @@
 <?php
-require_once "includes/session.php";
+require_once "../../includes/session.php";
 
 if ($isAuthenticated === false) {
     http_response_code(401); 
