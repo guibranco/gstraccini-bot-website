@@ -1,4 +1,4 @@
-name: Deploy via ftp
+name: Deploy via FTP
 
 on:
   push:
@@ -11,67 +11,90 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy to FTP
+    name: 📦 Deploy Application to FTP
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
-      semVer: ${{ steps.gitversion.outputs.semVer }}
-
+      fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3
+      - name: 🔧 Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
 
-      - name: Determine Version
+      - name: 🏷️ Determine Version Number
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3
+        uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
 
-      - name: Create github.secrets.php
+      - name: 🔑 Generate GitHub Secrets Configuration
         run: |
-          echo "<?php" > src/github.secrets.php
-          echo "\$gitHubClientId      = \"${{ secrets.GH_CLIENT_ID }}\";" >> src/github.secrets.php
-          echo "\$gitHubClientSecret  = \"${{ secrets.GH_CLIENT_SECRET }}\";" >> src/github.secrets.php
-          echo "\$gitHubRedirectUri   = \"${{ secrets.GH_REDIRECT_URI }}\";" >> src/github.secrets.php
+          cd src
+          echo "<?php" >> github.secrets.php
+          echo "\$gitHubClientId      = \"${{ secrets.GH_CLIENT_ID }}\";" >> github.secrets.php
+          echo "\$gitHubClientSecret  = \"${{ secrets.GH_CLIENT_SECRET }}\";" >> github.secrets.php
+          echo "\$gitHubRedirectUri   = \"${{ secrets.GH_REDIRECT_URI }}\";" >> github.secrets.php
 
-      - name: Create webhook.secrets.php
+      - name: 🔑 Generate Webhook Configuration
         run: |
-          echo "<?php" > src/webhook.secrets.php
-          echo "\$gstracciniApiUrl      = \"${{ secrets.GSTRACCINI_API_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php
-          echo "\$webhookSecret         = \"${{ secrets.WEBHOOK_SECRET }}\";" >> src/webhook.secrets.php
-          echo "\$webhookUrl            = \"${{ secrets.WEBHOOK_URL }}\";" >> src/webhook.secrets.php
-          echo "\$webhooksProcessingUrl = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php
-          echo "\$webhooksServiceUrl    = \"${{ secrets.WEBHOOK_SERVICE_HEALTHCHECK_URL }}\";" >> src/webhook.secrets.php          
+          cd src
+          echo "<?php" >> webhook.secrets.php
+          echo "\$gstracciniApiUrl      = \"${{ secrets.GSTRACCINI_API_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
+          echo "\$webhookSecret         = \"${{ secrets.WEBHOOK_SECRET }}\";" >> webhook.secrets.php
+          echo "\$webhookUrl            = \"${{ secrets.WEBHOOK_URL }}\";" >> webhook.secrets.php
+          echo "\$webhooksProcessingUrl = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
+          echo "\$webhooksServiceUrl    = \"${{ secrets.WEBHOOK_SERVICE_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
 
-      - name: Upload site
+      - name: 📝 Create Version File for API
+        run: |
+          cd src       
+          echo ${{ env.fullSemVer }} > version.txt
+
+      - name: 📦 Package Files for Deployment
+        run: |
+          cd src
+          zip -r deploy.zip . -x install.php
+          cd ..
+          mkdir deploy
+          mv src/deploy.zip deploy
+          cp "src/install.php" deploy
+
+      - name: 📤 Upload Application via FTP
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{ secrets.FTP_SERVER }}
           user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: "src"
+          localDir: "deploy/"
           remoteDir: "/"
 
+      - name: 🚀 Trigger Installation Process
+        run: curl --fail-with-body "${{ secrets.INSTALLATION_ENDPOINT }}install.php"
+
   create_release:
-    name: Create release
-    needs: deploy
-    env:
-      SEMVER: ${{ needs.deploy.outputs.semVer }}
+    name: 📢 Create GitHub Release
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    needs: [deploy]
+    env:
+      fullSemVer: ${{ needs.deploy.outputs.fullSemVer }}
     steps:
-      - name: Create Release
+      - name: 🏷️ Create and Publish Release
         uses: ncipollo/release-action@v1.16.0
         with:
-          allowUpdates: false
           skipIfReleaseExists: true
+          allowUpdates: false
           draft: false
           makeLatest: true
-          tag: v${{ env.SEMVER }}
-          name: Release v${{ env.SEMVER }}
+          tag: v${{ env.fullSemVer }}
+          name: Release v${{ env.fullSemVer }}
           generateReleaseNotes: true
-          body: Release ${{ env.SEMVER }} of ${{ github.event.repository.name }}
+          body: Release ${{ env.fullSemVer }} of ${{ github.repository }}
