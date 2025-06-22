@@ -107,7 +107,7 @@ $services = [
     [
         'name' => 'Documentation',
         'status' => 'Maintenance',
-        'lastUpdated' => '2025-05-08 11:29 AM GMT'
+        'lastUpdated' => '2025-06-22 00:53 AM GMT'
     ],
     [
         'name' => 'GitHub Integration (Service)',
@@ -117,7 +117,7 @@ $services = [
     [
         'name' => 'GitHub Workflows',
         'status' => 'Operational',
-        'lastUpdated' => '2025-05-08 11:29 AM GMT'
+        'lastUpdated' => '2025-06-22 00:53 AM GMT'
     ],
     [
         'name' => 'Webhook Processing',
