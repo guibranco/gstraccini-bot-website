@@ -13,6 +13,9 @@ const MERGEABLE_STATES = {
     DIRTY: 'dirty'
 };
 
+/**
+ * Escapes HTML characters in a string to prevent XSS attacks.
+ */
 function escapeHtml(unsafe) {
     if (unsafe === undefined || unsafe === null) return '';
     const div = document.createElement('div');
@@ -20,6 +23,9 @@ function escapeHtml(unsafe) {
     return div.innerHTML;
 }
 
+/**
+ * Displays a loading indicator in the "groupedPullRequests" container.
+ */
 function showLoadingIndicator() {
     const groupedContainer = document.getElementById("groupedPullRequests");
     if (!groupedContainer) return;
@@ -38,6 +44,9 @@ function showLoadingIndicator() {
     groupedContainer.appendChild(loadingDiv);
 }
 
+/**
+ * Hides the loading indicator by removing it from the DOM.
+ */
 function hideLoadingIndicator() {
     const loadingIndicator = document.getElementById('loading-indicator');
     if (loadingIndicator) {
@@ -45,6 +54,16 @@ function hideLoadingIndicator() {
     }
 }
 
+/**
+ * Validates an array of PR data items.
+ *
+ * This function checks if the input is an array and iterates over a sample of its elements.
+ * It validates each item to ensure it is an object and checks for the presence of required fields.
+ * If any item fails validation, it logs an error or warning message and returns false.
+ * If all items pass validation, it returns true.
+ *
+ * @param {Array} items - The array of PR data items to validate.
+ */
 function validatePRData(items) {
     if (!Array.isArray(items)) {
         console.error('Invalid data format: expected array');
@@ -70,6 +89,15 @@ function validatePRData(items) {
     return true;
 }
 
+/**
+ * Formats a given date string into a human-readable relative time or locale-specific format.
+ *
+ * The function checks if the input is valid and calculates the difference between the current date and the provided date.
+ * It returns a string indicating how many days, weeks, months, or years ago the date was, or the formatted date itself if older than a year.
+ *
+ * @param dateString - A string representing the date to be formatted.
+ * @returns A human-readable string representing the relative time or locale-specific formatted date.
+ */
 function formatDate(dateString) {
     if (!dateString) return 'Unknown date';
     
@@ -93,6 +121,9 @@ function formatDate(dateString) {
     }
 }
 
+/**
+ * Retrieves HTML badge markup based on CI state.
+ */
 function getStateBadge(state) {
     const badges = {
         'success': {
@@ -133,6 +164,17 @@ function getStateBadge(state) {
     </span>`;
 }
 
+/**
+ * Generates a badge indicating the merge status of a pull request.
+ *
+ * The function checks the `mergeable` and `mergeable_state` parameters to determine the appropriate badge style, icon,
+ * text, and title. It returns an HTML span element with a Bootstrap badge class, Font Awesome icon, and descriptive
+ * text based on the merge state.
+ *
+ * @param mergeable - A boolean or null indicating whether the pull request is mergeable.
+ * @param mergeable_state - A string representing the current merge state of the pull request.
+ * @returns An HTML span element with a badge indicating the merge status.
+ */
 function getMergeableBadge(mergeable, mergeable_state) {
     if (mergeable === null || mergeable === undefined) {
         return `<span class="badge bg-secondary me-1 mb-1" title="Merge Status Unknown">
@@ -191,6 +233,16 @@ function getMergeableBadge(mergeable, mergeable_state) {
     </span>`;
 }
 
+/**
+ * Determines if a pull request (PR) is valid based on its state and mergeability.
+ *
+ * This function checks the `is_valid_pr` property of the PR object first. If it exists, the function returns that value.
+ * Otherwise, it evaluates the PR's state to determine validity. A PR is considered valid if its state is 'success',
+ * it is marked as mergeable, and its mergeable state is either 'clean' or 'unstable'.
+ *
+ * @param {Object} pr - The pull request object to validate.
+ * @returns {boolean} - True if the PR is valid, false otherwise.
+ */
 function isValidPR(pr) {
     if (pr.is_valid_pr !== undefined) {
         return pr.is_valid_pr;
@@ -202,6 +254,18 @@ function isValidPR(pr) {
            [MERGEABLE_STATES.CLEAN, MERGEABLE_STATES.UNSTABLE].includes(pr.mergeable_state));
 }
 
+/**
+ * Calculates the background and text colors based on a given hex color.
+ *
+ * This function first validates the input color string, ensuring it is a valid hex color.
+ * It then extracts the red, green, and blue components from the hex code.
+ * Using these components, it calculates the luminance of the color to determine
+ * whether a light or dark text color will be more readable against the background.
+ * The function returns an object containing both the background and text colors.
+ *
+ * @param {string} color - The hex color string for which to calculate the label colors.
+ * @returns {Object|null} An object with `backgroundColor` and `textColor` properties, or null if input is invalid.
+ */
 function calculateLabelColors(color) {
     if (!color || typeof color !== 'string') return null;
     
@@ -222,6 +286,14 @@ function calculateLabelColors(color) {
     };
 }
 
+/**
+ * Creates a label element with specified styling and attributes.
+ *
+ * This function takes a label object, calculates its colors, and creates an HTML span element
+ * styled according to those colors. It sets the text content and tooltip of the span based on
+ * the label's name and description. If any required properties are missing or color calculation fails,
+ * it returns null.
+ */
 function createLabelElement(label) {
     if (!label || !label.name) return null;
     
@@ -239,6 +311,16 @@ function createLabelElement(label) {
     return labelSpan;
 }
 
+/**
+ * Groups pull requests (PRs) by their owner and sorts them based on validity, state, and creation date.
+ *
+ * This function iterates over each item in the input array, grouping them under their respective owners.
+ * After grouping, it sorts each group of PRs first by validity, then by a predefined order of states,
+ * and finally by their creation date in descending order.
+ *
+ * @param items - An array of pull request objects to be grouped and sorted.
+ * @returns An object where keys are owner names and values are arrays of sorted pull requests.
+ */
 function groupPRsByOwner(items) {
     const groupedData = {};
     
@@ -273,6 +355,17 @@ function groupPRsByOwner(items) {
     return groupedData;
 }
 
+/**
+ * Creates a list item element representing a pull request.
+ *
+ * This function constructs an HTML list item element to display information about a given pull request,
+ * including its title, repository, creation time, labels, and merge state badges. It conditionally adds
+ * styling based on the validity of the pull request and appends various child elements for structured
+ * presentation.
+ *
+ * @param pr - An object containing pull request data.
+ * @returns The constructed list item element representing the pull request.
+ */
 function createPRListItem(pr) {
     const ciState = getStateBadge(pr.state);
     const mergeState = getMergeableBadge(pr.mergeable, pr.mergeable_state);
@@ -367,6 +460,16 @@ function createPRListItem(pr) {
     return itemLi;
 }
 
+/**
+ * Populates the UI with pull requests grouped by their owners.
+ *
+ * This function first checks if an update is already in progress and skips if true.
+ * It then validates the input data, throws errors if validation fails, and proceeds to populate the UI.
+ * The function groups PRs by owner, counts valid PRs, and updates counters accordingly.
+ * It also handles edge cases like empty data and appends error alerts on failure.
+ *
+ * @param items - An array of pull request objects.
+ */
 function populateIssuesGroupedByOwner(items) {
     if (isUpdatingPRs) {
         console.log('Update already in progress, skipping...');
@@ -503,6 +606,16 @@ function populateIssuesGroupedByOwner(items) {
     }
 }
 
+/**
+ * Initiates the process of loading pull requests data from the server.
+ *
+ * This function handles the lifecycle of data loading, including checking if the document is hidden,
+ * scheduling subsequent loads, showing and hiding a loading indicator, fetching data via an API call,
+ * processing the response, and managing retries in case of errors. It also updates the UI based on
+ * the fetched data and error handling.
+ *
+ * @returns void
+ */
 function loadData() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -554,6 +667,9 @@ function loadData() {
         });
 }
 
+/**
+ * Clears any existing load timeout and schedules a new one if the document is not hidden.
+ */
 function scheduleNextLoad() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -564,6 +680,9 @@ function scheduleNextLoad() {
     }
 }
 
+/**
+ * Handles visibility change events, clearing or triggering data loading as needed.
+ */
 function handleVisibilityChange() {
     if (document.hidden) {
         if (loadDataTimeout) {
@@ -575,6 +694,9 @@ function handleVisibilityChange() {
     }
 }
 
+/**
+ * Clears the loadDataTimeout to prevent further data loading on page unload.
+ */
 function handlePageUnload() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -582,12 +704,18 @@ function handlePageUnload() {
     }
 }
 
+/**
+ * Initializes event listeners for visibility change and page unload events.
+ */
 function initializeEventListeners() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handlePageUnload);
     window.addEventListener('pagehide', handlePageUnload);
 }
 
+/**
+ * Initializes the Pull Requests Management Script by checking for required DOM elements and setting up event listeners.
+ */
 function initialize() {
     console.log('Initializing Pull Requests Management Script...');
     
