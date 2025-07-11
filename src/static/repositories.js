@@ -290,7 +290,7 @@ function loadFiltersFromURL() {
 }
 
 /**
- * Sets up event listeners for filter elements and the reset button.
+ * Sets up event listeners for various filter elements and a reset button.
  */
 function setupEventListeners() {
     const elements = [
