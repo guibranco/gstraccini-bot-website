@@ -20,6 +20,9 @@ function escapeHtml(unsafe) {
     return div.innerHTML;
 }
 
+/**
+ * Displays a loading indicator in the grouped pull requests container.
+ */
 function showLoadingIndicator() {
     const groupedContainer = document.getElementById("groupedPullRequests");
     if (!groupedContainer) return;
