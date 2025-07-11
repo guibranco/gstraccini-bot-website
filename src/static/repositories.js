@@ -224,11 +224,6 @@ function loadFiltersFromURL() {
     if (hasIssuesFilter) hasIssuesFilter.checked = params.get('hasIssues') === 'true';
 }
 
-function showErrorAlert(message) {
-    console.error(message);
-    alert(message);
-}
-
 function setupEventListeners() {
     const elements = [
         { id: 'organizationFilter', event: 'change' },
