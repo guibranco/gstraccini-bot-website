@@ -6,6 +6,9 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
 const UPDATE_INTERVAL = 60000;
 
+/**
+ * Escapes HTML special characters in a given string.
+ */
 function escapeHtml(unsafe) {
     if (unsafe === undefined || unsafe === null) return '';
     const div = document.createElement('div');
@@ -13,6 +16,9 @@ function escapeHtml(unsafe) {
     return div.innerHTML;
 }
 
+/**
+ * Displays an error alert on the dashboard with the given message.
+ */
 function showErrorAlert(message, isRetriable = false) {
     console.error(message);
     
@@ -50,6 +56,11 @@ function showErrorAlert(message, isRetriable = false) {
     }, 6000);
 }
 
+/**
+ * Displays a loading indicator in the specified container element.
+ *
+ * @param {string} containerId - The ID of the container element where the loading indicator should be displayed.
+ */
 function showLoadingIndicator(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -69,6 +80,17 @@ function showLoadingIndicator(containerId) {
     container.appendChild(loadingDiv);
 }
 
+/**
+ * Formats a given date string into a human-readable relative time format or locale-specific date string.
+ *
+ * The function first checks if the input is valid; if not, it returns 'Unknown date'.
+ * It then attempts to parse the dateString using `Date`. If parsing fails, it returns 'Invalid date'.
+ * The current date and parsed date are used to calculate the difference in minutes, hours, days, weeks, months, or years.
+ * Depending on the difference, it returns a string representing how long ago the date was in terms of these units.
+ *
+ * @param dateString - A string representing the date to be formatted.
+ * @returns A human-readable relative time string or locale-specific date string, or 'Invalid date' if parsing fails.
+ */
 function formatDate(dateString) {
     if (!dateString) return 'Unknown date';
     
@@ -96,6 +118,9 @@ function formatDate(dateString) {
     }
 }
 
+/**
+ * Returns an HTML badge based on the CI state.
+ */
 function getStateBadge(state) {
     if (!state) return '';
     
@@ -144,6 +169,15 @@ function getStateBadge(state) {
     </span>`;
 }
 
+/**
+ * Validates an array of items to ensure they meet specific criteria.
+ * The function checks if the input is an array and verifies that each item
+ * in a sample subset (up to 3 items) is an object with required fields: 'title', 'url', and 'repository'.
+ *
+ * @param {Array} items - The array of items to validate.
+ * @param {string} type - The type of items being validated, used for error/warning messages.
+ * @returns {boolean} - Returns true if all checks pass, otherwise false.
+ */
 function validateItems(items, type) {
     if (!Array.isArray(items)) {
         console.error(`Invalid ${type} data format: expected array`);
@@ -169,6 +203,19 @@ function validateItems(items, type) {
     return true;
 }
 
+/**
+ * Creates a list item element with interactive features and additional details.
+ *
+ * This function generates an HTML list item (`<li>`) that represents an item,
+ * such as a pull request or issue, with various interactive elements including
+ * hover effects and links to the item's URL and repository. It also includes
+ * badges for pull requests based on their state. The function constructs the
+ * list item by creating multiple nested divs and appending them to form a structured
+ * layout.
+ *
+ * @param {Object} item - The data object containing details about the item.
+ * @param {boolean} [isPullRequest=false] - Indicates if the item is a pull request.
+ */
 function createListItem(item, isPullRequest = false) {
     const itemLi = document.createElement('li');
     itemLi.className = 'list-group-item border-0 py-3';
@@ -238,6 +285,17 @@ function createListItem(item, isPullRequest = false) {
     return itemLi;
 }
 
+/**
+ * Populates a list of issues or pull requests based on the provided items and identifier.
+ *
+ * This function first determines if the id corresponds to pull requests or issues.
+ * It validates the items against the type, then updates a counter element if available.
+ * If the item list is empty, it displays a message indicating no open issues or pull requests.
+ * Otherwise, it sorts the items by creation date and appends them to the list with animations.
+ *
+ * @param items - An array of issue or pull request objects.
+ * @param id - A string identifier for the container element.
+ */
 function populateIssues(items, id) {
     try {
         const isPullRequest = id === "openPullRequests";
@@ -313,6 +371,15 @@ function populateIssues(items, id) {
     }
 }
 
+/**
+ * Animates a counter from a start value to an end value over a specified duration.
+ * Uses `requestAnimationFrame` for smooth animation and cubic easing for effect.
+ *
+ * @param {HTMLElement} element - The DOM element where the counter will be displayed.
+ * @param {number} startValue - The initial value of the counter.
+ * @param {number} endValue - The target value to animate towards.
+ * @param {number} duration - The total time in milliseconds for the animation to complete. Defaults to 1500ms.
+ */
 function animateCounter(element, startValue, endValue, duration = 1500) {
     if (startValue === endValue) {
         element.textContent = endValue;
@@ -322,6 +389,9 @@ function animateCounter(element, startValue, endValue, duration = 1500) {
     const startTime = performance.now();
     const difference = endValue - startValue;
     
+    /**
+     * Updates the counter element with an eased progress value based on elapsed time.
+     */
     function updateCounter(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -343,6 +413,16 @@ function animateCounter(element, startValue, endValue, duration = 1500) {
     requestAnimationFrame(updateCounter);
 }
 
+/**
+ * Initiates the process of loading data for the dashboard.
+ *
+ * This function checks if a dashboard update is already in progress and skips further execution if so.
+ * It then clears any existing load timeouts, checks if the document is hidden, and proceeds to show loading indicators.
+ * The function fetches dashboard data from an API endpoint, processes the response, and updates the UI accordingly.
+ * In case of an error, it retries the load with exponential backoff until a maximum retry limit is reached.
+ *
+ * @returns {void}
+ */
 function loadData() {
     if (isDashboardUpdating) {
         console.log('Dashboard update already in progress, skipping...');
@@ -423,6 +503,9 @@ function loadData() {
         });
 }
 
+/**
+ * Displays an error message within a specified container element.
+ */
 function showErrorState(containerId, type) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -436,6 +519,9 @@ function showErrorState(containerId, type) {
     `;
 }
 
+/**
+ * Updates the last refresh time displayed on the page.
+ */
 function updateLastRefreshTime() {
     const refreshElement = document.getElementById('lastRefresh');
     if (refreshElement) {
@@ -445,6 +531,9 @@ function updateLastRefreshTime() {
     }
 }
 
+/**
+ * Schedules the next data load if the document is not hidden.
+ */
 function scheduleNextLoad() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -455,6 +544,9 @@ function scheduleNextLoad() {
     }
 }
 
+/**
+ * Handles visibility change of the document, clearing timeout or loading data as needed.
+ */
 function handleVisibilityChange() {
     if (document.hidden) {
         if (loadDataTimeout) {
@@ -468,6 +560,9 @@ function handleVisibilityChange() {
     }
 }
 
+/**
+ * Clears timers and animation frames on page unload to prevent memory leaks.
+ */
 function handlePageUnload() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -479,6 +574,9 @@ function handlePageUnload() {
     }
 }
 
+/**
+ * Initializes counter animations on elements with 'card-text' class and data-target attribute.
+ */
 function initializeCounterAnimations() {
     const counters = document.querySelectorAll('.card-text[data-target]');
     
@@ -491,6 +589,9 @@ function initializeCounterAnimations() {
     });
 }
 
+/**
+ * Adds a click event listener to the refresh button that updates the dashboard.
+ */
 function addRefreshButton() {
     const refreshBtn = document.getElementById('refreshDashboard');
     if (refreshBtn) {
@@ -514,6 +615,14 @@ function addRefreshButton() {
     }
 }
 
+/**
+ * Initializes event listeners for various document and window events.
+ *
+ * This function sets up several event listeners to handle different user interactions
+ * and browser events such as visibility changes, page unloads, and key presses.
+ * It also adds a refresh button and prevents default behavior for certain key combinations
+ * while checking if the dashboard is not updating.
+ */
 function initializeEventListeners() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handlePageUnload);
@@ -529,6 +638,10 @@ function initializeEventListeners() {
     });
 }
 
+/**
+ * Initializes the Enhanced Dashboard by checking for required DOM elements, setting up event listeners,
+ * animations, and loading data.
+ */
 function initialize() {
     console.log('Initializing Enhanced Dashboard...');
     
@@ -550,6 +663,9 @@ function initialize() {
     console.log('Dashboard initialization complete');
 }
 
+/**
+ * Executes a callback function when the DOM is fully loaded.
+ */
 function onDOMReady(callback) {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', callback);
