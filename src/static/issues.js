@@ -4,6 +4,9 @@ let retryCount = 0;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000; // 5 seconds
 
+/**
+ * Escapes HTML special characters in a given string.
+ */
 function escapeHtml(text) {
     if (typeof text !== 'string') return '';
     const div = document.createElement('div');
@@ -11,6 +14,9 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+/**
+ * Displays an error alert with a message and optional retry information.
+ */
 function showErrorAlert(message, isRetriable = false) {
     console.error(message);
     
@@ -42,6 +48,9 @@ function showErrorAlert(message, isRetriable = false) {
     }, 5000);
 }
 
+/**
+ * Displays a loading indicator in the grouped issues container.
+ */
 function showLoadingIndicator() {
     const groupedContainer = document.getElementById("groupedIssues");
     if (!groupedContainer) return;
@@ -60,6 +69,9 @@ function showLoadingIndicator() {
     groupedContainer.appendChild(loadingDiv);
 }
 
+/**
+ * Hides the loading indicator by removing it from the document.
+ */
 function hideLoadingIndicator() {
     const loadingIndicator = document.getElementById('loading-indicator');
     if (loadingIndicator) {
@@ -67,6 +79,17 @@ function hideLoadingIndicator() {
     }
 }
 
+/**
+ * Validates an array of issue data items to ensure they are properly formatted.
+ *
+ * This function checks if the input is an array and then iterates over a sample
+ * of up to 5 items to validate their structure. Each item must be an object with
+ * at least the 'title', 'url', and 'repository' fields present. If any validation
+ * fails, it logs an error or warning message and returns false. If all checks pass,
+ * it returns true.
+ *
+ * @param {Array} items - The array of issue data items to validate.
+ */
 function validateIssueData(items) {
     if (!Array.isArray(items)) {
         console.error('Invalid data format: expected array');
@@ -92,6 +115,17 @@ function validateIssueData(items) {
     return true;
 }
 
+/**
+ * Calculates label colors based on a given hexadecimal color value.
+ *
+ * This function first validates the input color string and ensures it is in a proper hexadecimal format.
+ * It then extracts the red, green, and blue components from the color.
+ * Using these components, it calculates the luminance to determine whether a dark or light text color should be used for readability.
+ * The function returns an object containing both the background color and the calculated text color.
+ *
+ * @param {string} color - The hexadecimal color value (with or without a leading '#').
+ * @returns {{backgroundColor: string, textColor: string}} An object with properties for background and text colors.
+ */
 function calculateLabelColors(color) {
     if (!color || typeof color !== 'string') return null;
     
@@ -112,6 +146,17 @@ function calculateLabelColors(color) {
     };
 }
 
+/**
+ * Creates a label element with styling and attributes based on the provided label data.
+ *
+ * This function first checks if the label object and its name are valid. If not, it returns null.
+ * It then calculates the colors for the label using the `calculateLabelColors` function.
+ * If color calculation fails, it also returns null. Otherwise, it creates a span element,
+ * applies necessary classes and styles, sets the title attribute with escaped HTML from
+ * the label's description or name, and sets the text content to the escaped name of the label.
+ *
+ * @param {Object} label - The label object containing information about the label.
+ */
 function createLabelElement(label) {
     if (!label || !label.name) return null;
     
@@ -129,6 +174,17 @@ function createLabelElement(label) {
     return labelSpan;
 }
 
+/**
+ * Formats a given date string into a human-readable relative or absolute date format.
+ *
+ * This function first checks if the input dateString is valid and returns 'Unknown date' if it's empty or invalid.
+ * It then calculates the difference between the current date and the input date to determine the time elapsed.
+ * Depending on the number of days, it formats the output as '1 day ago', '{days} days ago', '{weeks} weeks ago',
+ * '{months} months ago', or an absolute date using `toLocaleDateString()`.
+ *
+ * @param dateString - A string representing a date.
+ * @returns A formatted string indicating how long ago the input date was, or an error message if the date is invalid.
+ */
 function formatDate(dateString) {
     if (!dateString) return 'Unknown date';
     
@@ -152,6 +208,15 @@ function formatDate(dateString) {
     }
 }
 
+/**
+ * Groups a list of items by their owner and sorts each group by creation date in descending order.
+ *
+ * The function iterates over each item, assigns an 'Unknown' owner if none is provided,
+ * groups the items by owner in an object, and then sorts each group based on the created_at field.
+ * If an item lacks a created_at field, it defaults to 0 for sorting purposes.
+ *
+ * @param {Array} items - An array of objects, each representing an item with at least an 'owner' and 'created_at' property.
+ */
 function groupIssuesByOwner(items) {
     const groupedData = {};
     
@@ -174,6 +239,19 @@ function groupIssuesByOwner(items) {
     return groupedData;
 }
 
+/**
+ * Creates a list item element representing an issue.
+ *
+ * This function constructs an HTML list item (`<li>`) element with structured content
+ * including a title, repository link, creation time, and labels. It handles cases where
+ * optional properties of the issue might be missing or empty by providing default values.
+ * The function ensures that all dynamically created elements are properly appended to their
+ * respective parent elements.
+ *
+ * @param {Object} issue - An object containing details about the issue such as title, URL,
+ *                         repository, full_name, labels, and created_at.
+ * @returns {HTMLElement} A list item element (`<li>`) representing the issue.
+ */
 function createIssueListItem(issue) {
     const itemLi = document.createElement('li');
     itemLi.className = 'list-group-item';
@@ -244,6 +322,19 @@ function createIssueListItem(issue) {
     return itemLi;
 }
 
+/**
+ * Populates the issues grouped by owner in the UI.
+ *
+ * This function first checks if an update is already in progress and skips execution if true.
+ * It then hides the loading indicator, validates the issue data, and checks for the presence of necessary DOM elements.
+ * If any validation fails or required elements are missing, it throws an error.
+ * For non-empty issues, it groups them by owner, sorts the owners alphabetically, and creates UI components for each group.
+ * Each owner group includes a collapsible section displaying their issues.
+ * If there are no issues, it displays a message indicating that no open issues were found.
+ * In case of an error during execution, it logs the error, shows an alert, and updates the UI with an error message.
+ *
+ * @param items - An array of issue objects to be grouped and displayed.
+ */
 function populateIssuesGroupedByOwner(items) {
     if (isUpdatingIssues) {
         console.log('Update already in progress, skipping...');
@@ -360,6 +451,14 @@ function populateIssuesGroupedByOwner(items) {
     }
 }
 
+/**
+ * Loads data from the API and processes it to populate issues grouped by owner.
+ *
+ * This function handles loading logic, including scheduling retries in case of errors.
+ * It fetches issue data, validates the response, populates issues, and schedules the next load.
+ *
+ * @returns {void}
+ */
 function loadData() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -411,6 +510,9 @@ function loadData() {
         });
 }
 
+/**
+ * Schedules or reschedules data loading if the document is not hidden.
+ */
 function scheduleNextLoad() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -421,6 +523,9 @@ function scheduleNextLoad() {
     }
 }
 
+/**
+ * Handles visibility change events, clearing the load timeout if the document is hidden and loading data otherwise.
+ */
 function handleVisibilityChange() {
     if (document.hidden) {
         if (loadDataTimeout) {
@@ -432,6 +537,9 @@ function handleVisibilityChange() {
     }
 }
 
+/**
+ * Clears the loadDataTimeout to prevent data loading on page unload.
+ */
 function handlePageUnload() {
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
@@ -439,12 +547,18 @@ function handlePageUnload() {
     }
 }
 
+/**
+ * Sets up event listeners for visibility change and page unload events.
+ */
 function initializeEventListeners() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handlePageUnload);
     window.addEventListener('pagehide', handlePageUnload);
 }
 
+/**
+ * Initializes the issues management script by checking required DOM elements and setting up event listeners and data loading.
+ */
 function initialize() {
     console.log('Initializing Issues Management Script...');
     
