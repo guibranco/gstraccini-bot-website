@@ -7,38 +7,39 @@ function escapeHtml(unsafe) {
 		.replace(/'/g, "&#039;");
 }
 
-const showErrorAlert = (message) => {
-  const alertHtml = `
-	<div class="alert alert-danger alert-dismissible fade show" role="alert">
-		<strong>Error!</strong> ${message}
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	</div>`;
-
-  try {
-    if (typeof $ === 'undefined') {
-      throw new Error('jQuery is not loaded');
-    }
-    if (typeof bootstrap === 'undefined') {
-      throw new Error('Bootstrap is not loaded');
+/**
+ * Displays an error alert with a message and optional retry information.
+ */
+function showErrorAlert(message, isRetriable = false) {
+    console.error(message);
+    
+    let alertContainer = document.getElementById('error-alert-container');
+    if (!alertContainer) {
+        alertContainer = document.createElement('div');
+        alertContainer.id = 'error-alert-container';
+        alertContainer.className = 'position-fixed top-0 start-50 translate-middle-x';
+        alertContainer.style.zIndex = '9999';
+        alertContainer.style.marginTop = '20px';
+        document.body.appendChild(alertContainer);
     }
     
-    const container = $("#alert-container");
-    container
-      .toggleClass("d-none")
-      .toggleClass("d-block")
-      .html(alertHtml);
-
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-danger alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <strong>Error:</strong> ${escapeHtml(message)}
+        ${isRetriable ? '<br><small>Retrying automatically...</small>' : ''}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertContainer.innerHTML = '';
+    alertContainer.appendChild(alertDiv);
+    
     setTimeout(() => {
-      const alertElement = document.querySelector('.alert');
-      if (alertElement) {
-        const alertInstance = new bootstrap.Alert(alertElement);
-        alertInstance.close();
-      }
-    }, 15000);
-  } catch (error) {
-    console.error('Error showing alert:', error.message);
-  }
-};
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
 
 function applyTheme(theme) {
     const themeIcon = document.getElementById('theme-icon');
