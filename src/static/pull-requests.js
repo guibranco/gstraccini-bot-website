@@ -24,7 +24,7 @@ function escapeHtml(unsafe) {
 }
 
 /**
- * Displays a loading indicator in the "groupedPullRequests" container.
+ * Displays a loading indicator in the grouped pull requests container.
  */
 function showLoadingIndicator() {
     const groupedContainer = document.getElementById("groupedPullRequests");
