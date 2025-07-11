@@ -224,11 +224,9 @@ function loadFiltersFromURL() {
     if (hasIssuesFilter) hasIssuesFilter.checked = params.get('hasIssues') === 'true';
 }
 
-function showErrorAlert(message) {
-    console.error(message);
-    alert(message);
-}
-
+/**
+ * Sets up event listeners for various filter elements and a reset button.
+ */
 function setupEventListeners() {
     const elements = [
         { id: 'organizationFilter', event: 'change' },
