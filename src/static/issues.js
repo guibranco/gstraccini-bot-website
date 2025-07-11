@@ -15,40 +15,6 @@ function escapeHtml(text) {
 }
 
 /**
- * Displays an error alert with a message and optional retry information.
- */
-function showErrorAlert(message, isRetriable = false) {
-    console.error(message);
-    
-    let alertContainer = document.getElementById('error-alert-container');
-    if (!alertContainer) {
-        alertContainer = document.createElement('div');
-        alertContainer.id = 'error-alert-container';
-        alertContainer.className = 'position-fixed top-0 start-50 translate-middle-x';
-        alertContainer.style.zIndex = '9999';
-        alertContainer.style.marginTop = '20px';
-        document.body.appendChild(alertContainer);
-    }
-    
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-danger alert-dismissible fade show`;
-    alertDiv.innerHTML = `
-        <strong>Error:</strong> ${escapeHtml(message)}
-        ${isRetriable ? '<br><small>Retrying automatically...</small>' : ''}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    
-    alertContainer.innerHTML = '';
-    alertContainer.appendChild(alertDiv);
-    
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
-}
-
-/**
  * Displays a loading indicator in the grouped issues container.
  */
 function showLoadingIndicator() {

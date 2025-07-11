@@ -290,14 +290,6 @@ function loadFiltersFromURL() {
 }
 
 /**
- * Logs an error message to the console and displays it as an alert.
- */
-function showErrorAlert(message) {
-    console.error(message);
-    alert(message);
-}
-
-/**
  * Sets up event listeners for filter elements and the reset button.
  */
 function setupEventListeners() {
