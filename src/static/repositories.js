@@ -1,6 +1,9 @@
 let isUpdatingFilters = false;
 let filterTimeout = null;
 
+/**
+ * Fetches repository data and updates the UI with filters and a scheduled reload.
+ */
 function loadData() {
     fetch('/api/v1/repositories')
         .then(response => {
@@ -23,6 +26,18 @@ function loadData() {
         });
 }
 
+/**
+ * Populates the repositories table with data from an array of repository objects.
+ *
+ * This function first retrieves the DOM element for the repositories table and clears its contents.
+ * It then iterates over each repository object, creating a new table row for each one. Each row is populated
+ * with various attributes and HTML content based on the repository's properties, such as visibility,
+ * fork status, number of stars, forks, issues, language, and organization.
+ * After populating all rows, it conditionally calls the `debouncedFilterRepositories` function if global
+ * variable `isUpdatingFilters` is falsy.
+ *
+ * @param repositories - An array of repository objects containing data to populate the table.
+ */
 function populateRepositoriesTable(repositories) {
     const repositoriesTable = document.getElementById('repositories');
     if (!repositoriesTable) return; // Safety check
@@ -58,6 +73,9 @@ function populateRepositoriesTable(repositories) {
     }
 }
 
+/**
+ * Updates the organization filter dropdown with unique organizations from repositories.
+ */
 function updateOrganizationFilter(repositories) {
     const organizationFilter = document.getElementById('organizationFilter');
     if (!organizationFilter) return; // Safety check
@@ -77,6 +95,15 @@ function updateOrganizationFilter(repositories) {
     });
 }
 
+/**
+ * Updates the language filter dropdown based on the list of repositories provided.
+ *
+ * This function retrieves the current value of the language filter, extracts unique languages from the repositories,
+ * sorts them, and populates the dropdown with these languages. It also ensures that the previously selected language,
+ * if still present in the new list, remains selected.
+ *
+ * @param {Array} repositories - An array of repository objects, each containing a 'language' property.
+ */
 function updateLanguageFilter(repositories) {
     const languageFilter = document.getElementById('languageFilter');
     if (!languageFilter) return; // Safety check
@@ -99,6 +126,15 @@ function updateLanguageFilter(repositories) {
     });
 }
 
+/**
+ * Filters repositories based on user-selected criteria and updates the UI accordingly.
+ *
+ * This function retrieves filter values from the DOM, updates the URL parameters,
+ * and iterates through each repository row to determine if it matches the specified filters.
+ * It then toggles the display of matching rows and updates the count of visible repositories.
+ *
+ * @returns void
+ */
 function filterRepositories() {
     if (isUpdatingFilters) return;
     
@@ -141,6 +177,9 @@ function filterRepositories() {
     }
 }
 
+/**
+ * Clears and sets a timeout to delay the execution of filterRepositories.
+ */
 function debouncedFilterRepositories() {
     if (filterTimeout) {
         clearTimeout(filterTimeout);
@@ -148,6 +187,19 @@ function debouncedFilterRepositories() {
     filterTimeout = setTimeout(filterRepositories, 100);
 }
 
+/**
+ * Updates the URL parameters based on the given filter criteria.
+ *
+ * This function constructs a new query string using the provided filters and updates the current URL's search parameters accordingly.
+ * If a filter value is falsy, its corresponding parameter is removed from the query string.
+ *
+ * @param organization - The organization filter value to be set or removed.
+ * @param language - The language filter value to be set or removed.
+ * @param visibility - The visibility filter value to be set or removed.
+ * @param isFork - A boolean indicating whether to include forked repositories in the results.
+ * @param hasForks - A boolean indicating whether to include repositories that have forks in the results.
+ * @param hasIssues - A boolean indicating whether to include repositories with issues in the results.
+ */
 function updateURLParameters(organization, language, visibility, isFork, hasForks, hasIssues) {
     try {
         const queryString = new URLSearchParams(window.location.search);
@@ -177,6 +229,13 @@ function updateURLParameters(organization, language, visibility, isFork, hasFork
     }
 }
 
+/**
+ * Resets all filter options to their default states and triggers a filtered repository update.
+ *
+ * This function checks if filters are currently being updated. If not, it resets various filter elements
+ * such as dropdowns and checkboxes to their initial values. After resetting the filters, it calls
+ * `debouncedFilterRepositories` to apply the changes and update the displayed repositories.
+ */
 function resetFilters() {
     if (isUpdatingFilters) return;
     
@@ -197,6 +256,12 @@ function resetFilters() {
     debouncedFilterRepositories();
 }
 
+/**
+ * Loads filter settings from the current URL query parameters and applies them to corresponding UI elements.
+ *
+ * The function retrieves query parameters related to language, visibility, and various boolean filters (isFork, hasForks, hasIssues).
+ * It checks if the respective UI elements exist and sets their values or states based on the parsed query parameters.
+ */
 function loadFiltersFromURL() {
     const params = new URLSearchParams(window.location.search);
     
@@ -224,11 +289,17 @@ function loadFiltersFromURL() {
     if (hasIssuesFilter) hasIssuesFilter.checked = params.get('hasIssues') === 'true';
 }
 
+/**
+ * Logs an error message to the console and displays it as an alert.
+ */
 function showErrorAlert(message) {
     console.error(message);
     alert(message);
 }
 
+/**
+ * Sets up event listeners for filter elements and the reset button.
+ */
 function setupEventListeners() {
     const elements = [
         { id: 'organizationFilter', event: 'change' },
