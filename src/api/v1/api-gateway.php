@@ -13,13 +13,13 @@ if ($isAuthenticated === false) {
 
 if (isset($_GET['repositories'])) {
     require_once "api-repositories.php";
-} else if (isset($_GET['issues'])) {
+} elseif (isset($_GET['issues'])) {
     require_once "api-issues.php";
-} else if (isset($_GET['pull_requests'])) {
+} elseif (isset($_GET['pull_requests'])) {
     require_once "api-pull-requests.php";
-} else if (isset($_GET['dashboard'])) {
+} elseif (isset($_GET['dashboard'])) {
     require_once "api-dashboard.php";
-} else if (isset($_GET['page'])) {
+} elseif (isset($_GET['page'])) {
     require_once "api-infinite-scroll.php";
 } else {
     require_once "api-dashboard.php";
