@@ -64,14 +64,6 @@ foreach ($issues as $issue) {
     }
 
     $openPullRequests[] = $issueData;
-
-    // Stop enriching as soon as we have reached the cap; remaining items are
-    // already appended with state="skipped" above so we can break early.
-    if ($validPRCount >= 10) {
-        // Collect leftover PRs without further API calls
-        // (they will simply carry their basic formatIssueData shape)
-        // We do NOT break so that openIssues is still fully populated.
-    }
 }
 
 $data = [
