@@ -11,7 +11,8 @@ if ($cache !== false) {
     exit();
 }
 
-$issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
+// Cap at 2 pages (200 items) to avoid exhausting the API rate limit.
+$issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token, 2);
 
 if ($issues === false || !is_array($issues)) {
     http_response_code(500);
@@ -20,46 +21,41 @@ if ($issues === false || !is_array($issues)) {
 }
 
 $openPullRequests = [];
-$validPRCount = 0;
-$processedRepos = array();
+$validPRCount     = 0;
+$processedRepos   = [];
 
-if (is_array($issues) && count($issues) > 0) {
-    foreach ($issues as $issue) {
-        if (!isset($issue['pull_request'])) {
-            continue;
-        }
-
-        $issueData = formatIssueData($issue);
-        $repositoryId = $issue['repository']['id'];
-        $repositoryProcessed = isset($processedRepos[$repositoryId]);
-
-        // Only attempt to load once per repo and while under the limit
-        if ($validPRCount < 10 && !$repositoryProcessed) {
-            $pullRequest = loadData($issue['pull_request']['url'], $token);
-
-            if (
-                $pullRequest !== null
-                && isset($pullRequest["body"]) === true
-                && $pullRequest["body"] !== null
-            ) {
-                $issueData = enrichPullRequestData($issueData, $pullRequest, $token);
-
-                if (
-                    isset($issueData["is_valid_pr"])
-                    && $issueData["is_valid_pr"] === true
-                ) {
-                    $validPRCount++;
-                }
-            }
-
-            // Mark repo as processed regardless of validity to prevent rechecks
-            $processedRepos[$repositoryId] = true;
-        } else {
-            $issueData["state"] = "skipped";
-        }
-
-        $openPullRequests[] = $issueData;
+foreach ($issues as $issue) {
+    if (!isset($issue['pull_request'])) {
+        continue;
     }
+
+    $issueData           = formatIssueData($issue);
+    $repositoryId        = $issue['repository']['id'];
+    $repositoryProcessed = isset($processedRepos[$repositoryId]);
+
+    if ($validPRCount < 10 && !$repositoryProcessed) {
+        $pullRequest = loadData($issue['pull_request']['url'], $token);
+
+        if (
+            $pullRequest !== null
+            && isset($pullRequest["body"])
+            && $pullRequest["body"] !== null
+        ) {
+            $issueData = enrichPullRequestData($issueData, $pullRequest, $token);
+
+            if (isset($issueData["is_valid_pr"]) && $issueData["is_valid_pr"] === true) {
+                $validPRCount++;
+            }
+        }
+
+        // Always mark the repo as processed after the first enrichment attempt
+        // so subsequent PRs from the same repo are skipped without extra API calls.
+        $processedRepos[$repositoryId] = true;
+    } else {
+        $issueData["state"] = "skipped";
+    }
+
+    $openPullRequests[] = $issueData;
 }
 
 $data = [
