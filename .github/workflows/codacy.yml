@@ -2,9 +2,11 @@ name: Codacy Security Scan
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
   schedule:
     - cron: '39 8 * * 4'
 
@@ -13,42 +15,42 @@ permissions:
 
 jobs:
   codacy-security-scan:
+    name: Codacy security scan (${{ matrix.tool }})
+    runs-on: ubuntu-latest
+
     permissions:
       contents: read
       security-events: write
       actions: read
-    name: Codacy Security Scan
-    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        tool:
+          - bandit
+          - semgrep
+          - trivy
+          - hadolint
+          - eslint
+          - stylelint
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Run Codacy Analysis CLI
+      - name: Run Codacy analysis
         uses: codacy/codacy-analysis-cli-action@v4.4.7
         with:
           api-token: ${{ secrets.CODACY_API_TOKEN }}
-          verbose: true
-          output: results.sarif
+          tool: ${{ matrix.tool }}
           format: sarif
+          output: results-${{ matrix.tool }}.sarif
           gh-code-scanning-compat: true
+          verbose: true
           max-allowed-issues: 2147483647
 
-      # upload-sarif@v4 rejects a SARIF file containing multiple runs under the
-      # same category. Codacy emits one run per tool, so we split the combined
-      # file into individual single-run files and upload the whole directory.
-      - name: Split SARIF into one file per run
-        run: |
-          run_count=$(jq '.runs | length' results.sarif)
-          echo "Splitting $run_count run(s) into separate SARIF files..."
-          for i in $(seq 0 $((run_count - 1))); do
-            jq --argjson i "$i" \
-              '{version: .version, "$schema": ."$schema", runs: [.runs[$i]]}' \
-              results.sarif > "results_${i}.sarif"
-            echo "  Created results_${i}.sarif"
-          done
-
-      - name: Upload SARIF results
+      - name: Upload SARIF results to GitHub
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: .
-          category: codacy
+          sarif_file: results-${{ matrix.tool }}.sarif
+          category: codacy-${{ matrix.tool }}
