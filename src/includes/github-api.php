@@ -243,8 +243,7 @@ function checkAuth()
 function getCache($cacheKey = 'data', $ttl = 180)
 {
     if (
-        !isset($_GET['page']) &&
-        !isset($_GET['dashboard']) &&
+        !isset($_GET['page']) &&        // only infinite-scroll should bypass cache
         isset($_SESSION[$cacheKey]['last_api_call']) &&
         $_SESSION[$cacheKey]['last_api_call'] > (time() - $ttl)
     ) {
