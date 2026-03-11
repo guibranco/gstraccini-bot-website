@@ -1,5 +1,5 @@
 <?php
-
+set_time_limit(120);
 $cookie_lifetime = 604800;
 session_set_cookie_params([
     'lifetime' => $cookie_lifetime,
