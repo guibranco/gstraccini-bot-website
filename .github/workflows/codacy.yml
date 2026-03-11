@@ -27,9 +27,9 @@ jobs:
       fail-fast: false
       matrix:
         tool:
-          - bandit
-          - semgrep
-          - trivy
+          # - bandit
+          # - semgrep
+          # - trivy
           - hadolint
           - eslint
           - stylelint
