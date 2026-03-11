@@ -86,28 +86,25 @@ function getNextPageUrl($linkHeader)
  */
 function fetchAllGitHubPages($url, $token, $maxPages = 2)
 {
-    $results   = [];
-    $pagesFetched = 0;
+    $results        = [];
+    $pagesFetched   = 0;
+    $anySuccess     = false;
 
     do {
         $result = loadData($url, $token);
 
         if ($result === null || !isset($result["body"]) || $result["body"] === null) {
-            // Return false only if we got nothing at all; otherwise return what we have.
-            return empty($results) ? false : $results;
+            return $anySuccess ? $results : false;
         }
 
+        $anySuccess = true;
         $results      = array_merge($results, $result["body"]);
         $pagesFetched++;
 
-        // Stop if GitHub says there are no more pages
         $url = getNextPageUrl($result["headers"]);
     } while ($url && $pagesFetched < $maxPages);
 
-    // FIX: was "return $results" (empty array) on complete failure. The endpoint
-    // files check "=== false" to detect errors, so an empty array silently passed
-    // that check and produced a misleading empty-but-successful response.
-    return empty($results) ? false : $results;
+    return $anySuccess ? $results : false;
 }
 
 /**
