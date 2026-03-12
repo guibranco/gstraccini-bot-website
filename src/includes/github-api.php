@@ -37,14 +37,17 @@ function loadData($url, $token)
         return null;
     }
 
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $httpCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+
     if ($httpCode >= 400) {
+        $errorBody = trim(substr($response, $headerSize));
+        $decoded   = json_decode($errorBody, true);
+        $reason    = $decoded['message'] ?? $errorBody;
+        error_log("GitHub API error: HTTP $httpCode for URL $url | Reason: $reason");
         curl_close($curl);
-        error_log("GitHub API error: HTTP $httpCode for URL $url");
         return null;
     }
-
-    $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $header     = substr($response, 0, $headerSize);
     $body       = json_decode(substr($response, $headerSize), true);
 
