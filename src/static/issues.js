@@ -1,8 +1,11 @@
 let isUpdatingIssues = false;
+let isFetchingIssues = false;
 let loadDataTimeout = null;
 let retryCount = 0;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
+
+// ─── Data diffing ─────────────────────────────────────────────────────────────
 
 /** Serialised snapshot of the last successfully rendered payload. */
 let previousDataHash = null;
@@ -15,6 +18,8 @@ function hashItems(items) {
     const sorted = [...items].sort((a, b) => (a.url || '').localeCompare(b.url || ''));
     return JSON.stringify(sorted);
 }
+
+// ─── Collapse-state persistence ──────────────────────────────────────────────
 
 const COLLAPSE_STATE_KEY = 'issue_groups_collapse_state';
 
@@ -74,6 +79,8 @@ function initCollapseTracking() {
         if (btn) btn.classList.remove('chevron-collapsed');
     });
 }
+
+// ─── Utility helpers (unchanged) ─────────────────────────────────────────────
 
 /**
  * Escapes HTML special characters in a given string.
@@ -230,6 +237,8 @@ function groupIssuesByOwner(items) {
     return grouped;
 }
 
+// ─── Issue list-item builder ──────────────────────────────────────────────────
+
 /**
  * Creates a list item element representing an issue.
  * Sets `data-issue-url` and `data-item-hash` for diffing on future updates.
@@ -301,6 +310,8 @@ function createIssueListItem(issue) {
 
     return itemLi;
 }
+
+// ─── Owner-group builders ─────────────────────────────────────────────────────
 
 /**
  * Builds a complete owner-group card element (header + collapsible issue list).
@@ -418,6 +429,8 @@ function updateOwnerGroup(ownerDiv, issues) {
     });
 }
 
+// ─── Main render ──────────────────────────────────────────────────────────────
+
 /**
  * Populates (or incrementally updates) the UI with issues grouped by owner.
  * Re-renders only what has actually changed; collapse states are preserved.
@@ -531,11 +544,18 @@ function populateIssuesGroupedByOwner(items) {
     }
 }
 
+// ─── Data loading ─────────────────────────────────────────────────────────────
+
 /**
  * Fetches issue data from the API, updates the UI, and schedules the next
  * refresh. Retries up to MAX_RETRIES times with exponential back-off on failure.
  */
 function loadData() {
+    if (isFetchingIssues) {
+        console.log('Fetch already in progress, skipping...');
+        return;
+    }
+
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
         loadDataTimeout = null;
@@ -546,6 +566,7 @@ function loadData() {
         return;
     }
 
+    isFetchingIssues = true;
     showLoadingIndicator();
 
     fetch('/api/v1/issues')
@@ -575,6 +596,9 @@ function loadData() {
                 retryCount = 0;
                 scheduleNextLoad();
             }
+        })
+        .finally(() => {
+            isFetchingIssues = false;
         });
 }
 
@@ -636,7 +660,7 @@ function initialize() {
     }
 
     initializeEventListeners();
-    initCollapseTracking();
+    initCollapseTracking();   // start listening for collapse events immediately
     loadData();
 }
 
