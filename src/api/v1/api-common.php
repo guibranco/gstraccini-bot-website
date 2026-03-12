@@ -12,8 +12,7 @@
  */
 function fetchAssignedIssues(string $token): array
 {
-    // Cap at 2 pages (200 items) to avoid exhausting the API rate limit.
-    $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token, 2);
+    $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
 
     if ($issues === false || !is_array($issues)) {
         http_response_code(500);
