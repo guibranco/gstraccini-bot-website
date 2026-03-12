@@ -275,8 +275,7 @@ footer nav ul li a:hover {
 .fa-chevron-down {
     transition: transform 0.2s ease;
 }
-
-.fa-rotate-collapsed {
+.chevron-collapsed {
     transform: rotate(-90deg);
 }
 
