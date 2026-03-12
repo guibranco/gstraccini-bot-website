@@ -237,10 +237,10 @@ function checkAuth()
  * Sends the cached response directly if valid.
  *
  * @param string $cacheKey Session key for cached data
- * @param int    $ttl      Time to live in seconds (default 180)
+ * @param int    $ttl      Time to live in seconds (default 300)
  * @return bool True if a valid cache was found and response sent, false otherwise
  */
-function getCache($cacheKey = 'data', $ttl = 180)
+function getCache($cacheKey = 'data', $ttl = 300)
 {
     if (
         !isset($_GET['page']) &&        // only infinite-scroll should bypass cache
