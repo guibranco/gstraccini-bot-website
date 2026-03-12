@@ -1,4 +1,5 @@
 let isUpdatingPRs = false;
+let isFetchingPRs = false;
 let loadDataTimeout = null;
 let retryCount = 0;
 const MAX_RETRIES = 3;
@@ -13,6 +14,8 @@ const MERGEABLE_STATES = {
     DIRTY: 'dirty'
 };
 
+// ─── Data diffing ────────────────────────────────────────────────────────────
+
 /** Serialised snapshot of the last successfully rendered payload. */
 let previousDataHash = null;
 
@@ -25,6 +28,8 @@ function hashItems(items) {
     const sorted = [...items].sort((a, b) => (a.url || '').localeCompare(b.url || ''));
     return JSON.stringify(sorted);
 }
+
+// ─── Collapse-state persistence ──────────────────────────────────────────────
 
 const COLLAPSE_STATE_KEY = 'pr_groups_collapse_state';
 
@@ -86,6 +91,8 @@ function initCollapseTracking() {
         if (btn) btn.classList.remove('chevron-collapsed');
     });
 }
+
+// ─── Utility helpers (unchanged) ─────────────────────────────────────────────
 
 /**
  * Escapes HTML characters in a string to prevent XSS attacks.
@@ -318,6 +325,8 @@ function groupPRsByOwner(items) {
     return grouped;
 }
 
+// ─── PR list-item builder ─────────────────────────────────────────────────────
+
 /**
  * Creates a list item element representing a pull request.
  */
@@ -409,6 +418,8 @@ function createPRListItem(pr) {
 
     return itemLi;
 }
+
+// ─── Owner-group builders ─────────────────────────────────────────────────────
 
 /**
  * Builds a complete owner-group card element (header + collapsible PR list).
@@ -548,6 +559,8 @@ function updateOwnerGroup(ownerDiv, pullRequests) {
     });
 }
 
+// ─── Main render ─────────────────────────────────────────────────────────────
+
 /**
  * Populates (or incrementally updates) the UI with pull requests grouped by owner.
  * Re-renders only what has actually changed; collapse states are preserved.
@@ -670,12 +683,19 @@ function populateIssuesGroupedByOwner(items) {
     }
 }
 
+// ─── Data loading ─────────────────────────────────────────────────────────────
+
 /**
  * Fetches pull request data from the API, updates the UI, and schedules the
  * next refresh.  Retries up to MAX_RETRIES times with exponential back-off on
  * failure.
  */
 function loadData() {
+    if (isFetchingPRs) {
+        console.log('Fetch already in progress, skipping...');
+        return;
+    }
+
     if (loadDataTimeout) {
         clearTimeout(loadDataTimeout);
         loadDataTimeout = null;
@@ -686,6 +706,7 @@ function loadData() {
         return;
     }
 
+    isFetchingPRs = true;
     showLoadingIndicator();
 
     fetch('/api/v1/pull-requests')
@@ -715,6 +736,9 @@ function loadData() {
                 retryCount = 0;
                 scheduleNextLoad();
             }
+        })
+        .finally(() => {
+            isFetchingPRs = false;
         });
 }
 
