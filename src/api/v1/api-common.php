@@ -12,7 +12,7 @@
  */
 function fetchAssignedIssues(string $token): array
 {
-    $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
+    $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token, 1);
 
     if ($issues === false || !is_array($issues)) {
         http_response_code(500);
