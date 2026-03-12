@@ -306,6 +306,14 @@ footer nav ul li a:hover {
   text-decoration: underline;
 }
 
+.fa-chevron-down {
+    transition: transform 0.2s ease;
+}
+
+.fa-rotate-collapsed {
+    transform: rotate(-90deg);
+}
+
 @media (max-width: 768px) {
   footer nav ul {
     flex-direction: column;
