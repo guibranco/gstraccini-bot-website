@@ -13,6 +13,7 @@ const MERGEABLE_STATES = {
     DIRTY: 'dirty'
 };
 
+/** Serialised snapshot of the last successfully rendered payload. */
 let previousDataHash = null;
 
 /**
@@ -71,7 +72,7 @@ function initCollapseTracking() {
         saveCollapseState(state);
         // Rotate chevron
         const btn = container.querySelector(`[data-bs-target="#${id}"] .fa-chevron-down`);
-        if (btn) btn.classList.add('fa-rotate-collapsed');
+        if (btn) btn.classList.add('chevron-collapsed');
     });
 
     container.addEventListener('show.bs.collapse', e => {
@@ -82,7 +83,7 @@ function initCollapseTracking() {
         saveCollapseState(state);
         // Restore chevron
         const btn = container.querySelector(`[data-bs-target="#${id}"] .fa-chevron-down`);
-        if (btn) btn.classList.remove('fa-rotate-collapsed');
+        if (btn) btn.classList.remove('chevron-collapsed');
     });
 }
 
@@ -461,7 +462,7 @@ function createOwnerGroup(owner, pullRequests, groupId, startCollapsed) {
 
     const chevron = document.createElement('i');
     chevron.className = 'fas fa-chevron-down';
-    if (startCollapsed) chevron.classList.add('fa-rotate-collapsed');
+    if (startCollapsed) chevron.classList.add('chevron-collapsed');
     badgeAndChevron.appendChild(chevron);
 
     btn.appendChild(badgeAndChevron);
@@ -568,6 +569,7 @@ function populateIssuesGroupedByOwner(items) {
             throw new Error('Invalid pull request data format');
         }
 
+        // ── Early-exit if nothing changed ──────────────────────────────────
         const newHash = hashItems(items);
         if (newHash === previousDataHash) {
             console.log('PR data unchanged – skipping re-render.');
@@ -575,6 +577,7 @@ function populateIssuesGroupedByOwner(items) {
         }
         previousDataHash = newHash;
 
+        // ── Verify required DOM nodes ──────────────────────────────────────
         const counterContainer      = document.getElementById('openPullRequestsCount');
         const validCounterContainer = document.getElementById('validPullRequestsCount');
         const groupedContainer      = document.getElementById('groupedPullRequests');
@@ -583,6 +586,7 @@ function populateIssuesGroupedByOwner(items) {
             throw new Error('Counter container elements not found');
         }
 
+        // ── Empty-state ────────────────────────────────────────────────────
         if (items.length === 0) {
             groupedContainer.innerHTML = `
                 <div class="list-group-item list-group-item-light text-center py-5">
@@ -595,6 +599,7 @@ function populateIssuesGroupedByOwner(items) {
             return;
         }
 
+        // ── Group & count ──────────────────────────────────────────────────
         const groupedData = groupPRsByOwner(items);
 
         let validPRCount = 0;
@@ -605,8 +610,10 @@ function populateIssuesGroupedByOwner(items) {
         counterContainer.textContent      = items.length;
         validCounterContainer.textContent = validPRCount;
 
+        // ── Read persisted collapse state ──────────────────────────────────
         const collapseState = getCollapseState();
 
+        // ── Build index of existing owner cards ───────────────────────────
         const existingCards = new Map(); // owner → HTMLElement
         groupedContainer.querySelectorAll('[data-owner]').forEach(el => {
             existingCards.set(el.dataset.owner, el);
