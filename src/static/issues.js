@@ -61,7 +61,7 @@ function initCollapseTracking() {
         state.add(id);
         saveCollapseState(state);
         const btn = container.querySelector(`[data-bs-target="#${id}"] .fa-chevron-down`);
-        if (btn) btn.classList.add('fa-rotate-collapsed');
+        if (btn) btn.classList.add('chevron-collapsed');
     });
 
     container.addEventListener('show.bs.collapse', e => {
@@ -71,7 +71,7 @@ function initCollapseTracking() {
         state.delete(id);
         saveCollapseState(state);
         const btn = container.querySelector(`[data-bs-target="#${id}"] .fa-chevron-down`);
-        if (btn) btn.classList.remove('fa-rotate-collapsed');
+        if (btn) btn.classList.remove('chevron-collapsed');
     });
 }
 
@@ -345,7 +345,7 @@ function createOwnerGroup(owner, issues, groupId, startCollapsed) {
 
     const chevron = document.createElement('i');
     chevron.className = 'fas fa-chevron-down';
-    if (startCollapsed) chevron.classList.add('fa-rotate-collapsed');
+    if (startCollapsed) chevron.classList.add('chevron-collapsed');
     badgeAndChevron.appendChild(chevron);
 
     btn.appendChild(badgeAndChevron);
@@ -439,6 +439,7 @@ function populateIssuesGroupedByOwner(items) {
             throw new Error('Invalid issue data format');
         }
 
+        // ── Early-exit if nothing changed ──────────────────────────────────
         const newHash = hashItems(items);
         if (newHash === previousDataHash) {
             console.log('Issue data unchanged – skipping re-render.');
@@ -446,12 +447,14 @@ function populateIssuesGroupedByOwner(items) {
         }
         previousDataHash = newHash;
 
+        // ── Verify required DOM nodes ──────────────────────────────────────
         const counterContainer = document.getElementById('openIssuesCount');
         const groupedContainer = document.getElementById('groupedIssues');
 
         if (!counterContainer) throw new Error('Counter container element not found');
         if (!groupedContainer) throw new Error('Grouped issues container element not found');
 
+        // ── Empty-state ────────────────────────────────────────────────────
         if (items.length === 0) {
             groupedContainer.innerHTML = `
                 <div class="list-group-item list-group-item-light text-center py-5">
@@ -465,10 +468,13 @@ function populateIssuesGroupedByOwner(items) {
 
         counterContainer.textContent = items.length;
 
+        // ── Group ──────────────────────────────────────────────────────────
         const groupedData = groupIssuesByOwner(items);
 
+        // ── Read persisted collapse state ──────────────────────────────────
         const collapseState = getCollapseState();
 
+        // ── Build index of existing owner cards ───────────────────────────
         const existingCards = new Map();
         groupedContainer.querySelectorAll('[data-owner]').forEach(el => {
             existingCards.set(el.dataset.owner, el);
