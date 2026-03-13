@@ -84,10 +84,10 @@ function getNextPageUrl($linkHeader)
  *
  * @param string $url      The GitHub API URL (without &page= param)
  * @param string $token    The GitHub API token
- * @param int    $maxPages Maximum pages to fetch (default 5 = 500 items)
+ * @param int    $maxPages Maximum pages to fetch (default 2 = 200 items)
  * @return array|false Combined results from all pages, or false on failure
  */
-function fetchAllGitHubPages($url, $token, $maxPages = 5)
+function fetchAllGitHubPages($url, $token, $maxPages = 2)
 {
     $results        = [];
     $pagesFetched   = 0;
