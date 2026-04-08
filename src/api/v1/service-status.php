@@ -92,6 +92,16 @@ try {
     ];
 }
 
+try {
+    $resultDocs = checkServiceHealth("https://docs.bot.straccini.com/docs/intro");
+} catch (Exception $e) {
+    error_log("Health check processor failed: " . $e->getMessage());
+    $resultDocs = [
+        'status' => 'Failure',
+        'lastUpdated' => gmdate('Y-m-d h:i A T')
+    ];
+}
+
 $date = new DateTime('now', new DateTimeZone('GMT'));
 $services = [
     [
@@ -107,7 +117,7 @@ $services = [
     [
         'name' => 'Documentation',
         'status' => 'Maintenance',
-        'lastUpdated' => '2026-04-08 04:35 PM GMT'
+        'lastUpdated' => $resultDocs["lastUpdated"]
     ],
     [
         'name' => 'GitHub Integration (Service)',
