@@ -43,7 +43,7 @@ jobs:
         run: |
           cd src
           echo "<?php" >> webhook.secrets.php
-          echo "\$gstracciniApiUrl      = \"${{ secrets.GSTRACCINI_API }}\";" >> webhook.secrets.php
+          echo "\$gstracciniApiUrl      = \"${{ secrets.GSTRACCINI_API_URL }}\";" >> webhook.secrets.php
           echo "\$webhookSecret         = \"${{ secrets.WEBHOOK_SECRET }}\";" >> webhook.secrets.php
           echo "\$webhookUrl            = \"${{ secrets.WEBHOOK_URL }}\";" >> webhook.secrets.php
           echo "\$webhooksProcessingUrl = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
