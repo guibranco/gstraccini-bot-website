@@ -247,6 +247,25 @@ img.octocat {
   color: #555;
 }
 
+.commands-loading,
+.commands-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: #555;
+}
+
+.commands-error {
+  color: #dc3545;
+}
+
+.dev-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.85em;
+  color: #856404;
+}
+
 section.content {
   padding: 20px;
   max-width: 800px;
