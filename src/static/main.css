@@ -202,9 +202,9 @@ img.octocat {
 }
 
 .commands {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 30px auto;
   background: #ffffff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -216,54 +216,195 @@ img.octocat {
   margin-bottom: 20px;
 }
 
+.commands-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+#commands-search {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#commands-search:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.commands-count {
+  white-space: nowrap;
+  font-size: 0.85em;
+  color: #888;
+}
+
 .commands-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 20px;
 }
 
 .command-card {
   background: #f9f9f9;
-  padding: 15px;
+  padding: 16px 18px;
   border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid #007bff;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.07);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .command-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
 }
 
-.command-card strong {
-  display: block;
-  color: #007bff;
-  margin-bottom: 10px;
-  font-size: 1.1em;
+.command-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.command-card p {
+.command-sig {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.88em;
+  background: #e8f0fe;
+  color: #1a56db;
+  padding: 4px 8px;
+  border-radius: 4px;
+  word-break: break-all;
+  flex: 1;
+}
+
+.command-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.badge {
+  font-size: 0.7em;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-pr {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-dev {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.command-desc {
   margin: 0;
+  color: #444;
+  font-size: 0.92em;
+  line-height: 1.55;
+}
+
+.command-desc a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.command-desc a:hover {
+  text-decoration: underline;
+}
+
+.command-desc code {
+  background: #f0f0f0;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.param-list {
+  margin: 0;
+  padding: 10px 0 0 0;
+  list-style: none;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.param-list li {
+  font-size: 0.87em;
   color: #555;
+  line-height: 1.45;
+}
+
+.param-name {
+  background: #f0f0f0;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.95em;
+  margin-right: 4px;
+}
+
+.param-required {
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.param-optional {
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  margin-right: 4px;
 }
 
 .commands-loading,
-.commands-error {
+.commands-error,
+.commands-no-results {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 20px;
-  color: #555;
+  padding: 30px 20px;
+  color: #888;
+  font-size: 0.95em;
 }
 
 .commands-error {
   color: #dc3545;
 }
 
-.dev-badge {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 0.85em;
-  color: #856404;
+@media (max-width: 768px) {
+  .commands-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .command-header {
+    flex-direction: column;
+  }
 }
 
 section.content {

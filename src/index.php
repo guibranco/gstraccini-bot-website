@@ -76,6 +76,10 @@ require_once "includes/session.php";
 
   <section class="commands fade-in">
     <h2>Available Commands</h2>
+    <div class="commands-toolbar">
+      <input type="search" id="commands-search" placeholder="Filter commands&hellip;" aria-label="Filter commands" />
+      <span id="commands-count" class="commands-count"></span>
+    </div>
     <div class="commands-grid"></div>
   </section>
 
