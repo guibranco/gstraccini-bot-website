@@ -87,7 +87,7 @@ function getNextPageUrl($linkHeader)
  * @param int    $maxPages Maximum pages to fetch (default 2 = 200 items)
  * @return array|false Combined results from all pages, or false on failure
  */
-function fetchAllGitHubPages($url, $token, $maxPages = 2)
+function fetchAllGitHubPages($url, $token, $maxPages = 3)
 {
     $results        = [];
     $pagesFetched   = 0;
