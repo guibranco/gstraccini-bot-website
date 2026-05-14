@@ -116,7 +116,7 @@ $services = [
     ],
     [
         'name' => 'Documentation',
-        'status' => 'Maintenance',
+        'status' => 'Operational',
         'lastUpdated' => $resultDocs["lastUpdated"]
     ],
     [
