@@ -32,5 +32,6 @@
         "Octocat",
         "sonarcloud"
     ],
-    "sarif-viewer.connectToGithubCodeScanning": "on"
+    "sarif-viewer.connectToGithubCodeScanning": "on",
+    "snyk.advanced.autoSelectOrganization": true
 }

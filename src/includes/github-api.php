@@ -16,17 +16,21 @@ function loadData($url, $token)
 {
     $curl = curl_init($url);
 
-    curl_setopt($curl, CURLOPT_TIMEOUT, 15);
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
-    curl_setopt($curl, CURLOPT_DNS_CACHE_TIMEOUT, 30);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-    curl_setopt($curl, CURLOPT_HEADER, true);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-        "Authorization: Bearer $token",
-        "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
-        "Accept: application/vnd.github+json",
-        "X-GitHub-Api-Version: 2022-11-28",
+    curl_setopt_array($curl, [
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_DNS_CACHE_TIMEOUT => 30,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS => 3,
+        CURLINFO_HEADER_OUT => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer $token",
+            "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+            "Accept: application/vnd.github+json",
+            "X-GitHub-Api-Version: 2022-11-28",
+        ],
     ]);
 
     $response = curl_exec($curl);

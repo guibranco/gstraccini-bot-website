@@ -14,6 +14,8 @@ $curl = curl_init();
 curl_setopt_array($curl, [
     CURLOPT_URL => $url,
     CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_MAXREDIRS => 3,
     CURLOPT_TIMEOUT => 10,
     CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_USERAGENT => 'GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)',
