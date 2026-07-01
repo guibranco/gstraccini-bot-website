@@ -8,7 +8,7 @@ require_once "../../webhook.secrets.php";
 header('Content-Type: application/json');
 header('Cache-Control: public, max-age=300');
 
-$url = $gstracciniApiUrl."v1/commands?format=json";
+$url = $gstracciniApiUrl."v1/commands/?format=json";
 
 $curl = curl_init();
 curl_setopt_array($curl, [
