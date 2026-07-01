@@ -1,5 +1,6 @@
 <?php
 require_once "includes/session.php";
+require_once "includes/constants.php";
 require_once "github.secrets.php";
 require_once "webhook.secrets.php";
 
@@ -14,8 +15,7 @@ class GitHubOAuthHandler
 {
     private const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
     private const GITHUB_API_BASE = 'https://api.github.com';
-    private const USER_AGENT = 'GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)';
-    
+
     private string $clientId;
     private string $clientSecret;
     private string $redirectUri;
@@ -54,7 +54,7 @@ class GitHubOAuthHandler
         
         $headers = [
             'Accept: application/json',
-            'User-Agent: ' . self::USER_AGENT,
+            'User-Agent: ' . getUserAgent(),
             'Content-Type: application/x-www-form-urlencoded'
         ];
         
@@ -76,7 +76,7 @@ class GitHubOAuthHandler
         $url = self::GITHUB_API_BASE . $endpoint;
         $headers = [
             "Authorization: Bearer {$token}",
-            "User-Agent: " . self::USER_AGENT,
+            "User-Agent: " . getUserAgent(),
             "Accept: application/vnd.github+json",
             "X-GitHub-Api-Version: 2022-11-28"
         ];
@@ -162,7 +162,7 @@ class GitHubOAuthHandler
         
         $headers = [
             'Content-Type: application/json',
-            'User-Agent: ' . self::USER_AGENT,
+            'User-Agent: ' . getUserAgent(),
             'Authorization: token ' . $this->webhookSecret
         ];
         
