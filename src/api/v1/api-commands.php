@@ -4,6 +4,7 @@ if (!file_exists("../../webhook.secrets.php")) {
     die(json_encode(['error' => 'Configuration file not found']));
 }
 require_once "../../webhook.secrets.php";
+require_once "../../includes/constants.php";
 
 header('Content-Type: application/json');
 header('Cache-Control: public, max-age=300');
@@ -18,7 +19,7 @@ curl_setopt_array($curl, [
     CURLOPT_MAXREDIRS => 3,
     CURLOPT_TIMEOUT => 10,
     CURLOPT_CONNECTTIMEOUT => 5,
-    CURLOPT_USERAGENT => 'GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)',
+    CURLOPT_USERAGENT => getUserAgent(),
     CURLOPT_HTTPHEADER => ['Accept: application/json'],
 ]);
 

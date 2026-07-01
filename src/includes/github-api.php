@@ -5,6 +5,8 @@
  * Contains utility functions for interacting with the GitHub API.
  */
 
+require_once __DIR__ . '/constants.php';
+
 /**
  * Load data from the GitHub API
  *
@@ -27,7 +29,7 @@ function loadData($url, $token)
         CURLOPT_HEADER => true,
         CURLOPT_HTTPHEADER => [
             "Authorization: Bearer $token",
-            "User-Agent: GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)",
+            "User-Agent: " . getUserAgent(),
             "Accept: application/vnd.github+json",
             "X-GitHub-Api-Version: 2022-11-28",
         ],

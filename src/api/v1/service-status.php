@@ -5,6 +5,7 @@ if (!file_exists("../../webhook.secrets.php")) {
     die(json_encode(['error' => 'Configuration file not found']));
 }
 require_once "../../webhook.secrets.php";
+require_once "../../includes/constants.php";
 
 /**
  * Performs an HTTP GET request and checks the response.
@@ -26,7 +27,7 @@ function checkServiceHealth(string $url): array
         CURLOPT_TIMEOUT => 10,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
-        CURLOPT_USERAGENT => 'GStraccini-bot-website/1.0 (+https://github.com/guibranco/gstraccini-bot-website)',
+        CURLOPT_USERAGENT => getUserAgent(),
     ]);
 
     $response = curl_exec($curl);
