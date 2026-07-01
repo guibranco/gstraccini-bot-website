@@ -73,7 +73,7 @@ jobs:
           remoteDir: "/"
 
       - name: 🚀 Trigger Installation Process
-        run: curl --fail-with-body "${{ secrets.INSTALLATION_ENDPOINT }}install.php"
+        run: curl -L --fail-with-body "${{ secrets.INSTALLATION_ENDPOINT }}install.php"
 
   create_release:
     name: 📢 Create GitHub Release
