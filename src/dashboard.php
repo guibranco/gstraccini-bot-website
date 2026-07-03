@@ -72,7 +72,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Total Pull Requests</h5>
-                                <p class="card-text display-4" data-target="120">0</p>
+                                <p class="card-text display-4" id="statTotalPullRequests" data-target="0">0</p>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Pull Requests Merged</h5>
-                                <p class="card-text display-4" data-target="85">0</p>
+                                <p class="card-text display-4" id="statPullRequestsMerged" data-target="0">0</p>
                             </div>
                         </div>
                     </div>
@@ -90,7 +90,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Commits Analyzed</h5>
-                                <p class="card-text display-4" data-target="320">0</p>
+                                <p class="card-text display-4" id="statCommitsAnalyzed" data-target="0">0</p>
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Issues Closed</h5>
-                                <p class="card-text display-4" data-target="42">0</p>
+                                <p class="card-text display-4" id="statIssuesClosed" data-target="0">0</p>
                             </div>
                         </div>
                     </div>
@@ -110,7 +110,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Average Time to Merge (hrs)</h5>
-                                <p class="card-text display-4" data-target="12">0</p>
+                                <p class="card-text display-4" id="statAverageTimeToMerge" data-target="0">0</p>
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ if (isset($user["first_name"])) {
                         <div class="card text-center">
                             <div class="card-body">
                                 <h5 class="card-title">Active Repositories</h5>
-                                <p class="card-text display-4" data-target="6">0</p>
+                                <p class="card-text display-4" id="statActiveRepositories" data-target="0">0</p>
                             </div>
                         </div>
                     </div>

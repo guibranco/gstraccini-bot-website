@@ -590,6 +590,45 @@ function initializeCounterAnimations() {
 }
 
 /**
+ * Fetches usage statistics from the API and animates the stat cards to their values.
+ */
+function loadStats() {
+    const statElementIds = {
+        totalPullRequests: 'statTotalPullRequests',
+        pullRequestsMerged: 'statPullRequestsMerged',
+        commitsAnalyzed: 'statCommitsAnalyzed',
+        issuesClosed: 'statIssuesClosed',
+        averageTimeToMergeHours: 'statAverageTimeToMerge',
+        activeRepositories: 'statActiveRepositories',
+    };
+
+    fetch('/api/v1/stats')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(stats => {
+            if (!stats || typeof stats !== 'object') {
+                throw new Error('Invalid response format');
+            }
+
+            Object.entries(statElementIds).forEach(([key, elementId]) => {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+
+                const target = Number(stats[key]) || 0;
+                element.setAttribute('data-target', target);
+                animateCounter(element, 0, target, 2000);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading usage statistics:', error);
+        });
+}
+
+/**
  * Adds a click event listener to the refresh button that updates the dashboard.
  */
 function addRefreshButton() {
@@ -655,9 +694,11 @@ function initialize() {
     }
     
     initializeEventListeners();
-    
+
     initializeCounterAnimations();
-    
+
+    loadStats();
+
     loadData();
     
     console.log('Dashboard initialization complete');
