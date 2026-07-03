@@ -133,30 +133,91 @@ header p {
 }
 
 .features {
-  display: flex;
-  justify-content: space-around;
-  padding: 50px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 28px;
+  padding: 50px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
   background: #ffffff;
 }
 
 .feature {
   text-align: center;
-  max-width: 300px;
+  padding: 28px 20px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.feature img {
-  width: 100px;
-  height: 100px;
+.feature:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.feature-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.8;
+}
+
+.feature-icon-pr {
+  background: #e8f0fe;
+  color: #1a56db;
+}
+
+.feature-icon-checklist {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.feature-icon-npm {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.feature-icon-dotnet {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.feature-icon-ai {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.feature-icon-cicd {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.feature-icon-quality {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .feature h3 {
-  margin: 20px 0;
-  color: #007bff;
+  margin: 0 0 10px;
+  color: #222;
+  font-size: 1.15em;
 }
 
 .feature p {
-  font-size: 1em;
+  font-size: 0.95em;
   color: #555;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .fade-in {
@@ -265,6 +326,10 @@ img.octocat {
 .command-card:hover {
   transform: translateY(-3px);
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.command-card[hidden] {
+  display: none;
 }
 
 .command-header {
