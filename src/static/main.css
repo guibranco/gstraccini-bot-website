@@ -137,7 +137,7 @@ header p {
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 28px;
   padding: 50px 24px;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   background: #ffffff;
 }
@@ -264,7 +264,7 @@ img.octocat {
 
 .commands {
   padding: 40px 24px;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 30px auto;
   background: #ffffff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
