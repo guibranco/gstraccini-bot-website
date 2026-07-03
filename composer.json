@@ -14,7 +14,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Guibranco\\GstracciniBotWebsite\\": "src/"
+            "GuiBranco\\GstracciniBotWebsite\\": "src/"
         }
     },
     "autoload-dev": {
