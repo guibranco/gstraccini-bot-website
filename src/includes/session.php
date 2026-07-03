@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/log-stream.php';
+
 set_time_limit(120);
 $cookie_lifetime = 604800;
 session_set_cookie_params([

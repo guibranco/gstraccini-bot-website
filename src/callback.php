@@ -208,25 +208,31 @@ class GitHubOAuthHandler
         $response = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $error = curl_error($curl);
-        
+
         curl_close($curl);
-        
+
         if ($response === false) {
+            getLogStream()?->error("Remote call failed: {$url}", ['error' => $error], 'remote-calls');
             throw new Exception("cURL Error: {$error}");
         }
-        
+
         if ($httpCode >= 400) {
+            getLogStream()?->warning("Remote call returned HTTP {$httpCode}: {$url}", ['httpCode' => $httpCode], 'remote-calls');
             throw new Exception("HTTP Error {$httpCode}: Request failed");
         }
-        
+
+        getLogStream()?->info("Remote call succeeded: {$url}", ['httpCode' => $httpCode], 'remote-calls');
+
         return $response;
     }
-    
+
     /**
      * Redirects to error page with message
      */
     public function redirectWithError(string $message): void
     {
+        getLogStream()?->warning("Login failed: {$message}", [], 'auth');
+
         $encodedMessage = urlencode($message);
         header("Location: signin.php?error={$encodedMessage}");
         exit();
@@ -241,12 +247,18 @@ class GitHubOAuthHandler
         $_SESSION['user'] = $userData;
         $_SESSION['installations'] = $installations;
         $_SESSION['organizations'] = $organizations;
-        
+
+        getLogStream()?->info(
+            "User logged in: " . ($userData['login'] ?? 'unknown'),
+            ['username' => $userData['login'] ?? null, 'installations' => count($installations)],
+            'auth'
+        );
+
         $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
         unset($_SESSION['redirectUrl']);
-        
+
         session_regenerate_id(true); // More secure - delete old session
-        
+
         header("Location: {$redirectUrl}");
         exit();
     }

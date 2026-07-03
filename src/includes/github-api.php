@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/constants.php';
+require_once __DIR__ . '/log-stream.php';
 
 /**
  * Load data from the GitHub API
@@ -38,7 +39,9 @@ function loadData($url, $token)
     $response = curl_exec($curl);
 
     if (curl_errno($curl)) {
-        error_log("cURL error for $url: " . curl_error($curl));
+        $curlError = curl_error($curl);
+        error_log("cURL error for $url: " . $curlError);
+        getLogStream()?->error("Remote call failed: $url", ['error' => $curlError], 'remote-calls');
         curl_close($curl);
         return null;
     }
@@ -51,6 +54,7 @@ function loadData($url, $token)
         $decoded   = json_decode($errorBody, true);
         $reason    = $decoded['message'] ?? $errorBody;
         error_log("GitHub API error: HTTP $httpCode for URL $url | Reason: $reason");
+        getLogStream()?->warning("Remote call returned HTTP $httpCode: $url", ['reason' => $reason], 'remote-calls');
         curl_close($curl);
         return null;
     }
@@ -63,6 +67,8 @@ function loadData($url, $token)
         error_log("JSON decode error for $url: " . json_last_error_msg());
         return null;
     }
+
+    getLogStream()?->info("Remote call succeeded: $url", ['httpCode' => $httpCode], 'remote-calls');
 
     return ["headers" => $header, "body" => $body];
 }

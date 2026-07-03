@@ -49,10 +49,30 @@ jobs:
           echo "\$webhooksProcessingUrl = \"${{ secrets.WEBHOOK_PROCESSING_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
           echo "\$webhooksServiceUrl    = \"${{ secrets.WEBHOOK_SERVICE_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
 
+      - name: 🔑 Generate LogStream Configuration
+        run: |
+          cd src
+          echo "<?php" >> logstream.secrets.php
+          echo "\$logStreamUrl   = \"${{ secrets.LOGSTREAM_URL }}\";" >> logstream.secrets.php
+          echo "\$logStreamToken = \"${{ secrets.LOGSTREAM_TOKEN }}\";" >> logstream.secrets.php
+
       - name: 📝 Create Version File for API
         run: |
-          cd src       
+          cd src
           echo ${{ env.fullSemVer }} > version.txt
+
+      - name: 💾 Cache Composer dependencies
+        uses: actions/cache@v6
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: 📦 Install PHP Dependencies
+        uses: "php-actions/composer@v6"
+        with:
+          php_extensions: sockets
+          dev: no
+          progress: yes
 
       - name: 📦 Package Files for Deployment
         run: |

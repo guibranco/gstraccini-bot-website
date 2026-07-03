@@ -6,6 +6,7 @@ if (!file_exists("../../webhook.secrets.php")) {
 }
 require_once "../../webhook.secrets.php";
 require_once "../../includes/constants.php";
+require_once "../../includes/log-stream.php";
 
 /**
  * Performs an HTTP GET request and checks the response.
@@ -59,6 +60,12 @@ function checkServiceHealth(string $url): array
 
     $status = ($httpCode === 200 && strtolower(trim($body)) === 'healthy') ? 'Operational' : 'Failure';
 
+    if ($status === 'Failure') {
+        getLogStream()?->warning("Remote call unhealthy: $url", ['httpCode' => $httpCode], 'remote-calls');
+    } else {
+        getLogStream()?->debug("Remote call succeeded: $url", ['httpCode' => $httpCode], 'remote-calls');
+    }
+
     return [
         'status' => $status,
         'lastUpdated' =>  $httpDate ?? 'Unknown',
@@ -69,6 +76,7 @@ try {
     $resultApi = checkServiceHealth($gstracciniApiUrl."v1/health");
 } catch (Exception $e) {
     error_log("Health check handler failed: " . $e->getMessage());
+    getLogStream()?->error("Remote call failed: {$gstracciniApiUrl}v1/health", ['error' => $e->getMessage()], 'remote-calls');
     $resultApi = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
@@ -79,6 +87,7 @@ try {
     $resultService = checkServiceHealth($webhooksServiceUrl);
 } catch (Exception $e) {
     error_log("Health check handler failed: " . $e->getMessage());
+    getLogStream()?->error("Remote call failed: {$webhooksServiceUrl}", ['error' => $e->getMessage()], 'remote-calls');
     $resultService = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
@@ -89,6 +98,7 @@ try {
     $resultProcessing = checkServiceHealth($webhooksProcessingUrl);
 } catch (Exception $e) {
     error_log("Health check processor failed: " . $e->getMessage());
+    getLogStream()?->error("Remote call failed: {$webhooksProcessingUrl}", ['error' => $e->getMessage()], 'remote-calls');
     $resultProcessing = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
@@ -99,6 +109,7 @@ try {
     $resultDocs = checkServiceHealth("https://docs.bot.straccini.com/docs/intro");
 } catch (Exception $e) {
     error_log("Health check processor failed: " . $e->getMessage());
+    getLogStream()?->error("Remote call failed: https://docs.bot.straccini.com/docs/intro", ['error' => $e->getMessage()], 'remote-calls');
     $resultDocs = [
         'status' => 'Failure',
         'lastUpdated' => gmdate('Y-m-d h:i A T')
