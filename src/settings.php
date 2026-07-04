@@ -11,7 +11,7 @@ $userData = [
     'create_labels' => 1,
     'notify_issues' => 1,
     'require_acceptance_criteria_checklist' => 1,
-    'reminder_issues' => 1,    
+    'reminder_issues' => 1,
     'reminder_issues_days' => 10,
     'pr_template_description' => 1,
     'auto_review_pr' => 1,
@@ -66,12 +66,27 @@ $title = "Settings";
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/user.css">
+    <style>
+        .account-nav .list-group-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid transparent;
+        }
+
+        .account-nav .list-group-item.active {
+            background-color: #eef4ff;
+            color: #0d6efd;
+            border-left-color: #0d6efd;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body>
     <?php require_once 'includes/header.php'; ?>
 
-    <div class="container mt-5">
+    <div class="container mt-5 mb-5">
         <h1 class="text-center">Settings</h1>
         <p class="text-center">Manage your account settings below.</p>
 
@@ -83,177 +98,216 @@ $title = "Settings";
         <?php endif; ?>
 
         <div class="row">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-3 mb-4">
+                <div class="list-group account-nav" id="settingsTabs" role="tablist">
+                    <a class="list-group-item list-group-item-action active" data-bs-toggle="list"
+                        href="#tab-repository" role="tab"><i class="fas fa-folder-open"></i> Repository</a>
+                    <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-issues"
+                        role="tab"><i class="fas fa-exclamation-circle"></i> Issues</a>
+                    <a class="list-group-item list-group-item-action" data-bs-toggle="list"
+                        href="#tab-pull-requests" role="tab"><i class="fas fa-code-branch"></i> Pull Requests</a>
+                </div>
+            </div>
+
+            <div class="col-md-9">
                 <form action="settings.php" method="POST" id="settingsForm" novalidate>
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h3><i class="fas fa-folder-open"></i> Repository Settings</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="create_labels" class="form-label"><i class="fas fa-tags"></i> Create labels
-                                    on new repository</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="create_labels"
-                                        name="create_labels" <?php if ($userData['create_labels']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="create_labels">Automatically create labels on
-                                        new repositories</label>
+                    <div class="tab-content">
+
+                        <div class="tab-pane fade show active" id="tab-repository" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h5 mb-0"><i class="fas fa-folder-open"></i> Repository Settings</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-0">
+                                        <label for="create_labels" class="form-label"><i class="fas fa-tags"></i>
+                                            Create labels
+                                            on new repository</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="create_labels"
+                                                name="create_labels" <?php if ($userData['create_labels']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="create_labels">Automatically create
+                                                labels on
+                                                new repositories</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="tab-pane fade" id="tab-issues" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h5 mb-0"><i class="fas fa-exclamation-circle"></i> Issues Settings</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="require_acceptance_criteria_checklist" class="form-label">
+                                            <i class="fas fa-list-check"></i> Require Acceptance Criteria checklist
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="require_acceptance_criteria_checklist"
+                                                name="require_acceptance_criteria_checklist" <?php if ($userData['require_acceptance_criteria_checklist']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label"
+                                                for="require_acceptance_criteria_checklist">
+                                                Requires issue description to have an acceptance criteria checklist
+                                                section.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="reminder_issues" class="form-label"><i
+                                                class="fas fa-calendar-alt"></i>
+                                            Issues Reminder</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="reminder_issues"
+                                                name="reminder_issues" <?php if ($userData['reminder_issues']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="reminder_issues">
+                                                Remind the assigned user when the issue has been inactive (no pull
+                                                request and
+                                                no comments) for at least <input type="number"
+                                                    class="form-control d-inline-block text-center"
+                                                    id="reminder_issues_days" name="reminder_issues_days" min="1"
+                                                    max="99" style="width: 60px;" <?php if ($userData['reminder_issues_days']) {
+                                                        echo 'value="' . $userData["reminder_issues_days"] . '"';
+                                                    } else {
+                                                        echo "disabled";
+                                                    } ?>> days
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label for="notify_issues" class="form-label"><i class="fas fa-bell"></i>
+                                            Issues
+                                            Notification</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="notify_issues"
+                                                name="notify_issues" <?php if ($userData['notify_issues']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="notify_issues">Notify me when new
+                                                issues are
+                                                created</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-pull-requests" role="tabpanel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="h5 mb-0"><i class="fas fa-code-branch"></i> Pull Requests Settings</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="pr_template_description" class="form-label">
+                                            <i class="fas fa-file-alt"></i> Add PR description from template
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="pr_template_description" name="pr_template_description" <?php if ($userData['pr_template_description']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="pr_template_description">
+                                                Automatically add a description to pull requests based on a
+                                                predefined template
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            This action will only be applied if the pull request description is
+                                            empty.
+                                        </small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="auto_review_pr" class="form-label">
+                                            <i class="fas fa-user-check"></i> Auto Approval Pull Request
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto_review_pr"
+                                                name="auto_review_pr" <?php if ($userData['auto_review_pr']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="auto_review_pr">
+                                                Automatically approve the pull request if no issues are found
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="auto_merge_pr" class="form-label"><i
+                                                class="fas fa-code-merge"></i> Enable
+                                            Auto-Merge</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="auto_merge_pr"
+                                                name="auto_merge_pr" <?php if ($userData['auto_merge_pr']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="auto_merge_pr">Automatically merge
+                                                pull
+                                                requests when all checks pass from trusted senders</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="create_issue" class="form-label">
+                                            <i class="fas fa-tasks"></i>
+                                            Create issues for pending tasks in code comments
+                                            <span
+                                                style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
+                                                <i class="fas fa-wrench"></i> Fixme
+                                            </span>
+                                            <span
+                                                style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
+                                                <i class="fas fa-tasks"></i> Todo
+                                            </span>
+                                            <span
+                                                style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
+                                                <i class="fas fa-bug"></i> Bug
+                                            </span>
+                                        </label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="create_issue"
+                                                name="create_issue" <?php if ($userData['create_issue']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="create_issue">Automatically create
+                                                issues for
+                                                specific keywords found in pull request content</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label for="notify_pull_requests" class="form-label"><i
+                                                class="fas fa-bell"></i> Pull
+                                            Requests Notification</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="notify_pull_requests" name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
+                                                    echo 'checked';
+                                                } ?>>
+                                            <label class="form-check-label" for="notify_pull_requests">Notify me when
+                                                new pull
+                                                requests are created</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h3><i class="fas fa-exclamation-circle"></i> Issues Settings</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="require_acceptance_criteria_checklist" class="form-label">
-                                    <i class="fas fa-list-check"></i> Require Acceptance Criteria checklist
-                                </label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="require_acceptance_criteria_checklist"
-                                        name="require_acceptance_criteria_checklist" <?php if ($userData['require_acceptance_criteria_checklist']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="require_acceptance_criteria_checklist">
-                                        Requires issue description to have an acceptance criteria checklist section.
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="reminder_issues" class="form-label"><i class="fas fa-calendar-alt"></i>
-                                    Issues Reminder</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="reminder_issues"
-                                        name="reminder_issues" <?php if ($userData['reminder_issues']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="reminder_issues">
-                                        Remind the assigned user when the issue has been inactive (no pull request and
-                                        no comments) for at least <input type="number"
-                                            class="form-control d-inline-block text-center" id="reminder_issues_days"
-                                            name="reminder_issues_days" min="1" max="99" style="width: 60px;" <?php if ($userData['reminder_issues_days']) {
-                                                echo 'value="' . $userData["reminder_issues_days"] . '"';
-                                            } else {
-                                                echo "disabled";
-                                            } ?>> days
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="notify_issues" class="form-label"><i class="fas fa-bell"></i> Issues
-                                    Notification</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="notify_issues"
-                                        name="notify_issues" <?php if ($userData['notify_issues']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="notify_issues">Notify me when new issues are
-                                        created</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h3><i class="fas fa-code-branch"></i> Pull Requests Settings</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="pr_template_description" class="form-label">
-                                    <i class="fas fa-file-alt"></i> Add PR description from template
-                                </label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="pr_template_description"
-                                        name="pr_template_description" <?php if ($userData['pr_template_description']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="pr_template_description">
-                                        Automatically add a description to pull requests based on a predefined template
-                                    </label>
-                                </div>
-                                <small class="form-text text-muted">
-                                    This action will only be applied if the pull request description is empty.
-                                </small>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="auto_review_pr" class="form-label">
-                                    <i class="fas fa-user-check"></i> Auto Approval Pull Request
-                                </label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="auto_review_pr"
-                                        name="auto_review_pr" <?php if ($userData['auto_review_pr']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="auto_review_pr">
-                                        Automatically approve the pull request if no issues are found
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="auto_merge_pr" class="form-label"><i class="fas fa-code-merge"></i> Enable
-                                    Auto-Merge</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="auto_merge_pr"
-                                        name="auto_merge_pr" <?php if ($userData['auto_merge_pr']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="auto_merge_pr">Automatically merge pull
-                                        requests when all checks pass from trusted senders</label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="create_issue" class="form-label">
-                                    <i class="fas fa-tasks"></i>
-                                    Create issues for pending tasks in code comments
-                                    <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
-                                        <i class="fas fa-wrench"></i> Fixme
-                                    </span>
-                                    <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
-                                        <i class="fas fa-tasks"></i> Todo
-                                    </span>
-                                    <span
-                                        style="background-color: #f0f0f0; border: 1px solid #555; border-radius: 5px; padding: 5px; display: inline-block; font-size: 9px;">
-                                        <i class="fas fa-bug"></i> Bug
-                                    </span>
-                                </label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="create_issue"
-                                        name="create_issue" <?php if ($userData['create_issue']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="create_issue">Automatically create issues for
-                                        specific keywords found in pull request content</label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="notify_pull_requests" class="form-label"><i class="fas fa-bell"></i> Pull
-                                    Requests Notification</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="notify_pull_requests"
-                                        name="notify_pull_requests" <?php if ($userData['notify_pull_requests']) {
-                                            echo 'checked';
-                                        } ?>>
-                                    <label class="form-check-label" for="notify_pull_requests">Notify me when new pull
-                                        requests are created</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Settings</button>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save
+                            Settings</button>
                         <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
                     </div>
                 </form>
