@@ -43,24 +43,29 @@ function showErrorAlert(message, isRetriable = false) {
 
 function applyTheme(theme) {
     const themeIcon = document.getElementById('theme-icon');
+    const iconEl = themeIcon ? (themeIcon.querySelector('i') || themeIcon) : null;
 
     if (theme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         document.body.classList.remove('dark-theme');
-        themeIcon.className = 'fas fa-sun';
+        if (iconEl) iconEl.className = 'fas fa-sun';
     } else if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         document.body.classList.add('dark-theme');
-        themeIcon.className = 'fas fa-moon';
+        if (iconEl) iconEl.className = 'fas fa-moon';
     } else {
         document.documentElement.removeAttribute('data-theme');
         document.body.classList.remove('dark-theme');
-        themeIcon.className = 'fas fa-adjust';
+        if (iconEl) iconEl.className = 'fas fa-adjust';
 
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            themeIcon.className = 'fas fa-moon';
+        if (iconEl && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            iconEl.className = 'fas fa-moon';
         }
     }
+}
+
+function isDarkTheme(theme) {
+    return theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -70,4 +75,17 @@ window.addEventListener('DOMContentLoaded', () => {
         switcher.value = savedTheme;
     }
     applyTheme(savedTheme);
+
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.addEventListener('click', () => {
+            const current = localStorage.getItem('theme') || 'system';
+            const nextTheme = isDarkTheme(current) ? 'light' : 'dark';
+            localStorage.setItem('theme', nextTheme);
+            if (switcher) {
+                switcher.value = nextTheme;
+            }
+            applyTheme(nextTheme);
+        });
+    }
 });
