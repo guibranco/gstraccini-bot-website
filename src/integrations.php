@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'lastError' => 'N/A',
                     ];
                     $_SESSION['integrations'] = $integrations;
-                    $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
+                    $message = "Integration for <strong>$provider</strong> added successfully!";
                 } else {
-                    $error = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> already exists.";
+                    $error = "Integration for <strong>$provider</strong> already exists.";
                 }
             } else {
-                $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
+                $error = "Invalid API key for <strong>$provider</strong>.";
             }
         }
     } else {
