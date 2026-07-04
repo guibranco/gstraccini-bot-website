@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'lastError' => 'N/A',
                     ];
                     $_SESSION['integrations'] = $integrations;
-                    $message = "Integration for <strong>$provider</strong> added successfully!";
+                    $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
                 } else {
-                    $error = "Integration for <strong>$provider</strong> already exists.";
+                    $error = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> already exists.";
                 }
             } else {
-                $error = "Invalid API key for <strong>$provider</strong>.";
+                $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
             }
         }
     } else {
@@ -60,7 +60,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     unset($integrations[$providerToRemove]);
     $_SESSION['integrations'] = $integrations;
-    $message = "Integration for <strong>$providerToRemove</strong> removed successfully!";
+    $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
 }
 
 ksort($integrations);
@@ -112,13 +112,13 @@ function maskApiKey($apiKey)
 
         <?php if (isset($message)): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?php echo htmlspecialchars($message); ?>
+                <?php echo $message; ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
         <?php if (isset($error)): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?php echo htmlspecialchars($error); ?>
+                <?php echo $error; ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
