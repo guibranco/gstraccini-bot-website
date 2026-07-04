@@ -18,18 +18,18 @@ jobs:
       fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
 
       - name: 🔧 Install GitVersion
-        uses: gittools/actions/gitversion/setup@v4.5.0
+        uses: gittools/actions/gitversion/setup@bc6623af8fc07d5a8903052dd46da33403eec8e8 # v4.5.0
         with:
           versionSpec: "6.x"
 
       - name: 🏷️ Determine Version Number
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v4.5.0
+        uses: gittools/actions/gitversion/execute@bc6623af8fc07d5a8903052dd46da33403eec8e8 # v4.5.0
 
       - name: 🔑 Generate GitHub Secrets Configuration
         run: |
@@ -62,13 +62,13 @@ jobs:
           echo ${{ env.fullSemVer }} > version.txt
 
       - name: 💾 Cache Composer dependencies
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: /tmp/composer-cache
           key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
       - name: 📦 Install PHP Dependencies
-        uses: "php-actions/composer@v6"
+        uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
         with:
           php_extensions: sockets
           dev: no
@@ -84,7 +84,7 @@ jobs:
           cp "src/install.php" deploy
 
       - name: 📤 Upload Application via FTP
-        uses: sebastianpopp/ftp-action@releases/v2
+        uses: sebastianpopp/ftp-action@ca3f8d253d20ddd6aa658f8cb27fc847fd610882 # releases/v2
         with:
           host: ${{ secrets.FTP_SERVER }}
           user: ${{ secrets.FTP_USERNAME }}
@@ -106,7 +106,7 @@ jobs:
       fullSemVer: ${{ needs.deploy.outputs.fullSemVer }}
     steps:
       - name: 🏷️ Create and Publish Release
-        uses: ncipollo/release-action@v1.21.0
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           skipIfReleaseExists: true
           allowUpdates: false

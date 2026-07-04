@@ -17,10 +17,10 @@ jobs:
       actions: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/php@master
+        uses: snyk/actions/php@8e119fbb6c251787721d34ba683ed48eba792766 # master
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -28,6 +28,6 @@ jobs:
           args: --sarif-file-output=snyk.sarif
       
       - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4
         with:
           sarif_file: snyk.sarif
