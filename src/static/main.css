@@ -136,9 +136,8 @@ header p {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 28px;
-  padding: 50px 24px;
-  max-width: 1600px;
-  margin: 0 auto;
+  padding: 50px clamp(24px, 6vw, 96px);
+  margin: 0;
   background: #ffffff;
 }
 
