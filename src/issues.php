@@ -134,6 +134,7 @@ function luminance($color)
     </div>
 
     <?php require_once "includes/footer.php"; ?>
+    <script src="static/list-shared.js"></script>
     <script src="static/issues.js"></script>
 </body>
 

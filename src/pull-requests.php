@@ -224,6 +224,7 @@ function isValidPR($pr) {
     </div>
 
     <?php require_once "includes/footer.php"; ?>
+    <script src="static/list-shared.js"></script>
     <script src="static/pull-requests.js"></script>
 </body>
 
