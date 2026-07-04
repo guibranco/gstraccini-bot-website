@@ -9,42 +9,6 @@ if ($isAuthenticated === false) {
 $user = $_SESSION['user'];
 $integrations = $_SESSION['integrations'] ?? [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $provider = $_POST['provider'] ?? "";
-    $apiKey = $_POST['apiKey'] ?? "";
-    if (!empty($provider) && !empty($apiKey)) {
-        $isValid = strlen($apiKey) >= 10;
-        if ($isValid) {
-            if (!isset($integrations[$provider])) {
-                $integrations[$provider] = [
-                    'apiKey' => $apiKey,
-                    'status' => 'Validated',
-                    'lastUsage' => 'N/A',
-                    'lastError' => 'N/A',
-                ];
-                $_SESSION['integrations'] = $integrations;
-                $message = "Integration for <strong>$provider</strong> added successfully!";
-            } else {
-                $error = "Integration for <strong>$provider</strong> already exists.";
-            }
-        } else {
-            $error = "Invalid API key for <strong>$provider</strong>.";
-        }
-    } else {
-        $error = "Please select a provider and enter a valid API Key.";
-    }
-}
-
-if (isset($_GET['remove'])) {
-    $providerToRemove = $_GET['remove'];
-    unset($integrations[$providerToRemove]);
-    $_SESSION['integrations'] = $integrations;
-    $message = "Integration for <strong>$providerToRemove</strong> removed successfully!";
-}
-
-ksort($integrations);
-$usedIntegrations = array_keys($integrations);
-
 $title = "Integration Details";
 $providers = [
     "SonarCloud" => "https://cdn.simpleicons.org/SonarQubeCloud",
@@ -61,6 +25,47 @@ $providers = [
     "CloudAMQP" => "/images/CloudAMQP.jpg",
 ];
 ksort($providers);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $provider = $_POST['provider'] ?? "";
+    $apiKey = $_POST['apiKey'] ?? "";
+    if (!empty($provider) && !empty($apiKey)) {
+        if (!array_key_exists($provider, $providers)) {
+            $error = "Unknown provider selected.";
+        } else {
+            $isValid = strlen($apiKey) >= 10;
+            if ($isValid) {
+                if (!isset($integrations[$provider])) {
+                    $integrations[$provider] = [
+                        'apiKey' => $apiKey,
+                        'status' => 'Validated',
+                        'lastUsage' => 'N/A',
+                        'lastError' => 'N/A',
+                    ];
+                    $_SESSION['integrations'] = $integrations;
+                    $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
+                } else {
+                    $error = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> already exists.";
+                }
+            } else {
+                $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
+            }
+        }
+    } else {
+        $error = "Please select a provider and enter a valid API Key.";
+    }
+}
+
+if (isset($_GET['remove'])) {
+    $providerToRemove = $_GET['remove'];
+    unset($integrations[$providerToRemove]);
+    $_SESSION['integrations'] = $integrations;
+    $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
+}
+
+ksort($integrations);
+$usedIntegrations = array_keys($integrations);
+
 $availableProviders = array_filter($providers, function ($provider) use ($usedIntegrations) {
     return !in_array($provider, $usedIntegrations);
 }, ARRAY_FILTER_USE_KEY);
@@ -82,11 +87,26 @@ function maskApiKey($apiKey)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/user.css">
+    <style>
+        .account-nav .list-group-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid transparent;
+        }
+
+        .account-nav .list-group-item.active {
+            background-color: #eef4ff;
+            color: #0d6efd;
+            border-left-color: #0d6efd;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body>
     <?php require_once 'includes/header.php'; ?>
-    <div class="container mt-5">
+    <div class="container mt-5 mb-5">
         <h1 class="text-center">Integrations</h1>
         <p class="text-center">Manage your account integrations below.</p>
 
@@ -103,95 +123,134 @@ function maskApiKey($apiKey)
             </div>
         <?php endif; ?>
 
-        <div class="card mt-4">
-            <div class="card-header">
-                <h2>Add Integration</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="list-group account-nav" id="integrationsTabs" role="tablist">
+                    <a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#tab-add"
+                        role="tab"><i class="fas fa-plus-circle"></i> Add Integration</a>
+                    <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#tab-configured"
+                        role="tab"><i class="fas fa-list"></i> Configured
+                        <span class="badge text-bg-warning rounded-pill"><?php echo count($integrations); ?></span>
+                    </a>
+                </div>
             </div>
-            <div class="card-body">
-                <?php if (count($availableProviders) === 0): ?>
-                    <div class="alert alert-warning fade show" role="alert">
-                        All providers are already configured
-                    </div>
-                <?php else: ?>
-                <form action="integrations.php" method="POST" id="addIntegrationForm" novalidate>
-                    <div class="mb-3 position-relative">
-                        <label for="providerDropdown" class="form-label">Select Provider</label>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="providerDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Select a provider
-                            </button>
-                            <ul class="dropdown-menu w-100" aria-labelledby="providerDropdown">
-                                <?php foreach ($availableProviders as $providerName => $logo): ?>
-                                    <a class="dropdown-item d-flex align-items-center" data-value="<?php echo $providerName; ?>"
-                                        data-logo="<?php echo $logo; ?>">
-                                        <img src="<?php echo $logo; ?>" alt="<?php echo $providerName; ?> logo"
-                                            class="provider-logo me-2" /> <?php echo $providerName; ?>
-                                    </a>
-                                <?php endforeach; ?>
-                                <input type="hidden" name="provider" id="providerSelect">
-                            </ul>
+
+            <div class="col-md-9">
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active" id="tab-add" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="h5 mb-0"><i class="fas fa-plus-circle"></i> Add Integration</h3>
+                            </div>
+                            <div class="card-body">
+                                <?php if (count($availableProviders) === 0): ?>
+                                    <div class="alert alert-warning fade show" role="alert">
+                                        All providers are already configured
+                                    </div>
+                                <?php else: ?>
+                                    <form action="integrations.php" method="POST" id="addIntegrationForm" novalidate>
+                                        <div class="mb-3 position-relative">
+                                            <label for="providerDropdown" class="form-label">Select Provider</label>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle w-100" type="button"
+                                                    id="providerDropdown" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    Select a provider
+                                                </button>
+                                                <ul class="dropdown-menu w-100" aria-labelledby="providerDropdown">
+                                                    <?php foreach ($availableProviders as $providerName => $logo): ?>
+                                                        <a class="dropdown-item d-flex align-items-center"
+                                                            data-value="<?php echo $providerName; ?>"
+                                                            data-logo="<?php echo $logo; ?>">
+                                                            <img src="<?php echo $logo; ?>"
+                                                                alt="<?php echo $providerName; ?> logo"
+                                                                class="provider-logo me-2" /> <?php echo $providerName; ?>
+                                                        </a>
+                                                    <?php endforeach; ?>
+                                                    <input type="hidden" name="provider" id="providerSelect">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 position-relative">
+                                            <label for="apiKey" class="form-label">API Key</label>
+                                            <div class="input-group">
+                                                <input type="password" name="apiKey" id="apiKey" class="form-control"
+                                                    placeholder="Enter API Key" aria-label="API Key">
+                                                <span class="input-group-text" id="toggleVisibility">
+                                                    <i class="fas fa-eye"></i>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <span id="badgeStatus" class="badge" style="display:none;"></span>
+                                                <button class="btn btn-primary" id="saveBtn">Save API Key</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3 position-relative">
-                        <label for="apiKey" class="form-label">API Key</label>
-                        <div class="input-group">
-                            <input type="password" name="apiKey" id="apiKey" class="form-control"
-                                placeholder="Enter API Key" aria-label="API Key">
-                            <span class="input-group-text" id="toggleVisibility">
-                                <i class="fas fa-eye"></i>
-                            </span>
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <span id="badgeStatus" class="badge" style="display:none;"></span>
-                            <button class="btn btn-primary" id="saveBtn">Save API Key</button>
+
+                    <div class="tab-pane fade" id="tab-configured" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="h5 mb-0"><i class="fas fa-list"></i> Configured Integrations
+                                    <span
+                                        class="badge text-bg-warning rounded-pill"><?php echo count($integrations); ?></span>
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <?php if (count($integrations) === 0): ?>
+                                    <p class="text-muted mb-0">You haven't configured any integrations yet. Add one
+                                        from the "Add Integration" tab.</p>
+                                <?php else: ?>
+                                    <table class="table table-bordered align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Provider</th>
+                                                <th>API Key</th>
+                                                <th>Status</th>
+                                                <th>Last Usage</th>
+                                                <th>Last Error</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($integrations as $provider => $details): ?>
+                                                <tr>
+                                                    <td>
+                                                        <img src="<?php echo $providers[$provider]; ?>"
+                                                            alt="<?php echo $provider; ?>" class="provider-logo">
+                                                        <?php echo htmlspecialchars($provider); ?>
+                                                    </td>
+                                                    <td><code><?php echo htmlspecialchars(maskApiKey($details['apiKey'])); ?></code>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge <?php echo $details['status'] === 'Validated' ? 'text-bg-success' : 'text-bg-secondary'; ?>">
+                                                            <?php echo htmlspecialchars($details['status']); ?>
+                                                        </span>
+                                                    </td>
+                                                    <td><?php echo htmlspecialchars($details['lastUsage']); ?></td>
+                                                    <td><?php echo htmlspecialchars($details['lastError']); ?></td>
+                                                    <td>
+                                                        <a href="integrations.php?remove=<?php echo urlencode($provider); ?>"
+                                                            class="btn btn-danger btn-sm"><i class="fas fa-trash"></i>
+                                                            Remove</a>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                </form>
-                <?php endif; ?>
+
+                </div>
             </div>
         </div>
-
-        <?php if (count($integrations) > 0): ?>
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h2>Integrations</h2>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Provider</th>
-                                <th>API Key</th>
-                                <th>Status</th>
-                                <th>Last Usage</th>
-                                <th>Last Error</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($integrations as $provider => $details): ?>
-                                <tr>
-                                    <td>
-                                        <img src="<?php echo $providers[$provider]; ?>" alt="<?php echo $provider; ?>"
-                                            class="provider-logo">
-                                        <?php echo htmlspecialchars($provider); ?>
-                                    </td>
-                                    <td><?php echo htmlspecialchars(maskApiKey($details['apiKey'])); ?></td>
-                                    <td><?php echo htmlspecialchars($details['status']); ?></td>
-                                    <td><?php echo htmlspecialchars($details['lastUsage']); ?></td>
-                                    <td><?php echo htmlspecialchars($details['lastError']); ?></td>
-                                    <td>
-                                        <a href="integrations.php?remove=<?php echo urlencode($provider); ?>"
-                                            class="btn btn-danger btn-sm">Remove</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
 
     <?php require_once "includes/footer.php"; ?>
@@ -220,7 +279,7 @@ function maskApiKey($apiKey)
 
         function toggleVisibility() {
             const input = $('#apiKey');
-            const icon = $('#toggleVisibility svg');
+            const icon = $('#toggleVisibility i');
 
             if (isVisible) {
                 input.attr('type', 'password');
