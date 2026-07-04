@@ -263,7 +263,7 @@ img.octocat {
 }
 
 .commands {
-  padding: 40px 24px;
+  padding: 40px clamp(24px, 6vw, 96px);
   margin: 30px 0;
   background: #ffffff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
