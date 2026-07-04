@@ -60,7 +60,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     unset($integrations[$providerToRemove]);
     $_SESSION['integrations'] = $integrations;
-    $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
+    $message = "Integration for <strong>$providerToRemove</strong> removed successfully!";
 }
 
 ksort($integrations);
@@ -220,8 +220,8 @@ function maskApiKey($apiKey)
                                             <?php foreach ($integrations as $provider => $details): ?>
                                                 <tr>
                                                     <td>
-                                                        <img src="<?php echo $providers[$provider]; ?>"
-                                                            alt="<?php echo $provider; ?>" class="provider-logo">
+                                                        <img src="<?php echo htmlspecialchars($providers[$provider] ?? ''); ?>"
+                                                            alt="<?php echo htmlspecialchars($provider); ?>" class="provider-logo">
                                                         <?php echo htmlspecialchars($provider); ?>
                                                     </td>
                                                     <td><code><?php echo htmlspecialchars(maskApiKey($details['apiKey'])); ?></code>
