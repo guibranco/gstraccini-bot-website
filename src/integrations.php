@@ -47,17 +47,18 @@ $usedIntegrations = array_keys($integrations);
 
 $title = "Integration Details";
 $providers = [
-    "SonarCloud" => "https://cdn.simpleicons.org/Sonarcloud",
+    "SonarCloud" => "https://cdn.simpleicons.org/SonarQubeCloud",
     "AppVeyor" => "https://cdn.simpleicons.org/Appveyor",
+    "Claude" => "https://cdn.simpleicons.org/Claude",
     "Codacy" => "https://cdn.simpleicons.org/Codacy",
     "Codecov" => "https://cdn.simpleicons.org/Codecov",
     "DeepSource" => "/images/Deepsource.png",
     "CodeClimate" => "https://cdn.simpleicons.org/Codeclimate",
     "Snyk" => "https://cdn.simpleicons.org/Snyk",
-    "OpenAI" => "https://cdn.simpleicons.org/Openai",
+    "OpenAI" => "/images/OpenAI.png",
     "Llama" => "/images/Llama.png",
     "CPanel" => "https://cdn.simpleicons.org/Cpanel",
-    "CloudAMQP" => "/images/CloudAMQP.png",
+    "CloudAMQP" => "/images/CloudAMQP.jpg",
 ];
 ksort($providers);
 $availableProviders = array_filter($providers, function ($provider) use ($usedIntegrations) {
