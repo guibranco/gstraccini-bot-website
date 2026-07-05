@@ -72,14 +72,14 @@ GStraccini-bot runs automated tasks at regular intervals on its infrastructure:
 
 | Job | Status | Interval |
 | --- | --- | --- |
-| Branches | ![Branches](https://healthchecks.io/b/3/82d0dec5-3ec1-41cc-8a35-ef1da42899e5.svg) | every 1 minute |
-| Comments | ![Comments](https://healthchecks.io/b/3/31b38cb0-f8bd-42b1-b662-d5905b22cd94.svg) | every 1 minute |
-| Installations | ![Installations](https://healthchecks.io/b/3/ca0a08b4-8bd7-4d24-85ef-7b0623d8cb0b.svg) | every 1 minute |
-| Issues | ![Issues](https://healthchecks.io/b/3/05666a6b-d35f-4cb8-abc8-25584cc9029b.svg) | every 1 minute |
-| Pull Requests | ![Pull Requests](https://healthchecks.io/b/3/05c48393-c700-45b4-880f-59cb7b9b9f25.svg) | every 1 minute |
-| Pushes | ![Pushes](https://healthchecks.io/b/3/1e8724fa-8361-47d7-a4f6-901e8d4ff265.svg) | every 1 minute |
-| Repositories | ![Repositories](https://healthchecks.io/b/3/4ef0ee6c-38f8-4c79-b9f7-049438bd39a9.svg) | every 1 minute |
-| Users | ![Users](https://healthchecks.io/b/3/fb14f4cc-0ee1-4da2-94eb-bd5f3be46e9b.svg) | every 1 minute |
+| Branches | ![Branches](https://healthchecks.io/b/3/82d0dec5-3ec1-41cc-8a35-ef1da42899e5.svg) | 🕛 every 1 minute |
+| Comments | ![Comments](https://healthchecks.io/b/3/31b38cb0-f8bd-42b1-b662-d5905b22cd94.svg) | 🕛 every 1 minute |
+| Installations | ![Installations](https://healthchecks.io/b/3/ca0a08b4-8bd7-4d24-85ef-7b0623d8cb0b.svg) | 🕛 every 1 minute |
+| Issues | ![Issues](https://healthchecks.io/b/3/05666a6b-d35f-4cb8-abc8-25584cc9029b.svg) | 🕛 every 1 minute |
+| Pull Requests | ![Pull Requests](https://healthchecks.io/b/3/05c48393-c700-45b4-880f-59cb7b9b9f25.svg) | 🕛 every 1 minute |
+| Pushes | ![Pushes](https://healthchecks.io/b/3/1e8724fa-8361-47d7-a4f6-901e8d4ff265.svg) | 🕛 every 1 minute |
+| Repositories | ![Repositories](https://healthchecks.io/b/3/4ef0ee6c-38f8-4c79-b9f7-049438bd39a9.svg) | 🕛 every 1 minute |
+| Users | ![Users](https://healthchecks.io/b/3/fb14f4cc-0ee1-4da2-94eb-bd5f3be46e9b.svg) | 🕛 every 1 minute |
 
 ## 🔗 Useful Links
 
