@@ -5,6 +5,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
 
 const COLLAPSE_STATE_KEY = 'pr_groups_collapse_state';
+const FLAT_GROUP_KEY = '__all__';
 
 const STATE_ORDER = ['success', 'failure', 'pending', 'error', 'skipped', ''];
 const MERGEABLE_STATES = {
@@ -88,13 +89,14 @@ function isValidPR(pr) {
 }
 
 /**
- * Groups and sorts pull requests by owner.
+ * Groups and sorts pull requests by owner. When grouping is disabled, every
+ * pull request is placed into a single flat group.
  */
-function groupPRsByOwner(items) {
+function groupPRsByOwner(items, groupingEnabled = true) {
     const grouped = {};
 
     items.forEach(item => {
-        const owner = item?.owner || 'Unknown';
+        const owner = groupingEnabled ? (item?.owner || 'Unknown') : FLAT_GROUP_KEY;
         if (!grouped[owner]) grouped[owner] = [];
         grouped[owner].push(item);
     });
@@ -214,65 +216,70 @@ function createPRListItem(pr) {
 
 /**
  * Builds a complete owner-group card element (header + collapsible PR list).
+ * When `flat` is true, the owner header/collapse chrome is omitted and the PR
+ * list is rendered directly.
  *
  * @param {string}   owner          - Owner display name.
  * @param {Array}    pullRequests   - Sorted PRs for this owner.
  * @param {string}   groupId        - Unique DOM id for the collapse target.
  * @param {boolean}  startCollapsed - Whether the group should begin collapsed.
+ * @param {boolean}  flat           - Whether to render without the owner header.
  * @returns {HTMLElement}
  */
-function createOwnerGroup(owner, pullRequests, groupId, startCollapsed) {
+function createOwnerGroup(owner, pullRequests, groupId, startCollapsed, flat = false) {
     const ownerDiv = document.createElement('div');
     ownerDiv.className = 'mb-4 card';
     ownerDiv.dataset.owner = owner;
     ownerDiv.dataset.prHash = hashItems(pullRequests);
 
-    // Header
-    const header = document.createElement('div');
-    header.className = 'card-header bg-light';
-    ownerDiv.appendChild(header);
+    if (!flat) {
+        // Header
+        const header = document.createElement('div');
+        header.className = 'card-header bg-light';
+        ownerDiv.appendChild(header);
 
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
-    btn.type = 'button';
-    btn.setAttribute('data-bs-toggle', 'collapse');
-    btn.setAttribute('data-bs-target', `#${groupId}`);
-    btn.setAttribute('aria-expanded', String(!startCollapsed));
-    btn.setAttribute('aria-controls', groupId);
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
+        btn.type = 'button';
+        btn.setAttribute('data-bs-toggle', 'collapse');
+        btn.setAttribute('data-bs-target', `#${groupId}`);
+        btn.setAttribute('aria-expanded', String(!startCollapsed));
+        btn.setAttribute('aria-controls', groupId);
 
-    const ownerText = document.createElement('span');
-    ownerText.textContent = escapeHtml(owner);
-    btn.appendChild(ownerText);
+        const ownerText = document.createElement('span');
+        ownerText.textContent = escapeHtml(owner);
+        btn.appendChild(ownerText);
 
-    const badgeAndChevron = document.createElement('div');
-    badgeAndChevron.className = 'd-flex align-items-center';
+        const badgeAndChevron = document.createElement('div');
+        badgeAndChevron.className = 'd-flex align-items-center';
 
-    const totalBadge = document.createElement('span');
-    totalBadge.className = 'badge bg-primary me-1';
-    totalBadge.title = 'Total Pull Requests';
-    totalBadge.textContent = pullRequests.length;
-    badgeAndChevron.appendChild(totalBadge);
+        const totalBadge = document.createElement('span');
+        totalBadge.className = 'badge bg-primary me-1';
+        totalBadge.title = 'Total Pull Requests';
+        totalBadge.textContent = pullRequests.length;
+        badgeAndChevron.appendChild(totalBadge);
 
-    const validCount = pullRequests.filter(isValidPR).length;
-    if (validCount > 0) {
-        const validBadge = document.createElement('span');
-        validBadge.className = 'badge bg-success me-2';
-        validBadge.title = 'Ready to Merge';
-        validBadge.textContent = validCount;
-        badgeAndChevron.appendChild(validBadge);
+        const validCount = pullRequests.filter(isValidPR).length;
+        if (validCount > 0) {
+            const validBadge = document.createElement('span');
+            validBadge.className = 'badge bg-success me-2';
+            validBadge.title = 'Ready to Merge';
+            validBadge.textContent = validCount;
+            badgeAndChevron.appendChild(validBadge);
+        }
+
+        const chevron = document.createElement('i');
+        chevron.className = 'fas fa-chevron-down';
+        if (startCollapsed) chevron.classList.add('chevron-collapsed');
+        badgeAndChevron.appendChild(chevron);
+
+        btn.appendChild(badgeAndChevron);
+        header.appendChild(btn);
     }
 
-    const chevron = document.createElement('i');
-    chevron.className = 'fas fa-chevron-down';
-    if (startCollapsed) chevron.classList.add('chevron-collapsed');
-    badgeAndChevron.appendChild(chevron);
-
-    btn.appendChild(badgeAndChevron);
-    header.appendChild(btn);
-
-    // PR list (collapsible)
+    // PR list (collapsible unless flat)
     const list = document.createElement('ul');
-    list.className = `list-group list-group-flush collapse${startCollapsed ? '' : ' show'}`;
+    list.className = `list-group list-group-flush${flat ? '' : ` collapse${startCollapsed ? '' : ' show'}`}`;
     list.id = groupId;
 
     pullRequests.forEach(pr => list.appendChild(createPRListItem(pr)));
@@ -404,7 +411,8 @@ function populateIssuesGroupedByOwner(items) {
         }
 
         // ── Group & count ──────────────────────────────────────────────────
-        const groupedData = groupPRsByOwner(items);
+        const groupingEnabled = isGroupByOrgEnabled();
+        const groupedData = groupPRsByOwner(items, groupingEnabled);
 
         let validPRCount = 0;
         Object.values(groupedData).forEach(prs => {
@@ -449,7 +457,7 @@ function populateIssuesGroupedByOwner(items) {
             } else {
                 // Create a brand-new card, restoring its persisted collapse state
                 const isCollapsed = collapseState.has(groupId);
-                const card = createOwnerGroup(owner, prs, groupId, isCollapsed);
+                const card = createOwnerGroup(owner, prs, groupId, isCollapsed, !groupingEnabled);
                 groupedContainer.insertBefore(card, groupedContainer.children[index] || null);
                 existingCards.set(owner, card);
             }

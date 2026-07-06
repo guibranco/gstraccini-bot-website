@@ -5,6 +5,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
 
 const COLLAPSE_STATE_KEY = 'issue_groups_collapse_state';
+const FLAT_GROUP_KEY = '__all__';
 
 /** Serialised snapshot of the last successfully rendered payload. */
 let previousDataHash = null;
@@ -87,56 +88,61 @@ function createIssueListItem(issue) {
 
 /**
  * Builds a complete owner-group card element (header + collapsible issue list).
+ * When `flat` is true, the owner header/collapse chrome is omitted and the
+ * issue list is rendered directly.
  *
  * @param {string}   owner          - Owner display name.
  * @param {Array}    issues         - Sorted issues for this owner.
  * @param {string}   groupId        - Unique DOM id for the collapse target.
  * @param {boolean}  startCollapsed - Whether the group should begin collapsed.
+ * @param {boolean}  flat           - Whether to render without the owner header.
  * @returns {HTMLElement}
  */
-function createOwnerGroup(owner, issues, groupId, startCollapsed) {
+function createOwnerGroup(owner, issues, groupId, startCollapsed, flat = false) {
     const ownerDiv = document.createElement('div');
     ownerDiv.className = 'mb-4 card';
     ownerDiv.dataset.owner   = owner;
     ownerDiv.dataset.prHash  = hashItems(issues);
 
-    // Header
-    const header = document.createElement('div');
-    header.className = 'card-header bg-light';
-    ownerDiv.appendChild(header);
+    if (!flat) {
+        // Header
+        const header = document.createElement('div');
+        header.className = 'card-header bg-light';
+        ownerDiv.appendChild(header);
 
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
-    btn.type = 'button';
-    btn.setAttribute('data-bs-toggle', 'collapse');
-    btn.setAttribute('data-bs-target', `#${groupId}`);
-    btn.setAttribute('aria-expanded', String(!startCollapsed));
-    btn.setAttribute('aria-controls', groupId);
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
+        btn.type = 'button';
+        btn.setAttribute('data-bs-toggle', 'collapse');
+        btn.setAttribute('data-bs-target', `#${groupId}`);
+        btn.setAttribute('aria-expanded', String(!startCollapsed));
+        btn.setAttribute('aria-controls', groupId);
 
-    const ownerText = document.createElement('span');
-    ownerText.textContent = escapeHtml(owner);
-    btn.appendChild(ownerText);
+        const ownerText = document.createElement('span');
+        ownerText.textContent = escapeHtml(owner);
+        btn.appendChild(ownerText);
 
-    const badgeAndChevron = document.createElement('div');
-    badgeAndChevron.className = 'd-flex align-items-center';
+        const badgeAndChevron = document.createElement('div');
+        badgeAndChevron.className = 'd-flex align-items-center';
 
-    const countBadge = document.createElement('span');
-    countBadge.className = 'badge bg-primary me-2';
-    countBadge.title = 'Total Issues';
-    countBadge.textContent = issues.length;
-    badgeAndChevron.appendChild(countBadge);
+        const countBadge = document.createElement('span');
+        countBadge.className = 'badge bg-primary me-2';
+        countBadge.title = 'Total Issues';
+        countBadge.textContent = issues.length;
+        badgeAndChevron.appendChild(countBadge);
 
-    const chevron = document.createElement('i');
-    chevron.className = 'fas fa-chevron-down';
-    if (startCollapsed) chevron.classList.add('chevron-collapsed');
-    badgeAndChevron.appendChild(chevron);
+        const chevron = document.createElement('i');
+        chevron.className = 'fas fa-chevron-down';
+        if (startCollapsed) chevron.classList.add('chevron-collapsed');
+        badgeAndChevron.appendChild(chevron);
 
-    btn.appendChild(badgeAndChevron);
-    header.appendChild(btn);
+        btn.appendChild(badgeAndChevron);
+        header.appendChild(btn);
+    }
 
-    // Issue list (collapsible)
+    // Issue list (collapsible unless flat)
     const list = document.createElement('ul');
-    list.className = `list-group list-group-flush collapse${startCollapsed ? '' : ' show'}`;
+    list.className = `list-group list-group-flush${flat ? '' : ` collapse${startCollapsed ? '' : ' show'}`}`;
     list.id = groupId;
 
     issues.forEach(issue => list.appendChild(createIssueListItem(issue)));
@@ -147,12 +153,13 @@ function createOwnerGroup(owner, issues, groupId, startCollapsed) {
 
 /**
  * Groups issues by owner and sorts each group by creation date descending.
+ * When grouping is disabled, every issue is placed into a single flat group.
  */
-function groupIssuesByOwner(items) {
+function groupIssuesByOwner(items, groupingEnabled = true) {
     const grouped = {};
 
     items.forEach(item => {
-        const owner = item?.owner || 'Unknown';
+        const owner = groupingEnabled ? (item?.owner || 'Unknown') : FLAT_GROUP_KEY;
         if (!grouped[owner]) grouped[owner] = [];
         grouped[owner].push(item);
     });
@@ -275,7 +282,8 @@ function populateIssuesGroupedByOwner(items) {
         counterContainer.textContent = items.length;
 
         // ── Group ──────────────────────────────────────────────────────────
-        const groupedData = groupIssuesByOwner(items);
+        const groupingEnabled = isGroupByOrgEnabled();
+        const groupedData = groupIssuesByOwner(items, groupingEnabled);
 
         // ── Read persisted collapse state ──────────────────────────────────
         const collapseState = getCollapseState(COLLAPSE_STATE_KEY);
@@ -312,7 +320,7 @@ function populateIssuesGroupedByOwner(items) {
             } else {
                 // Create a brand-new card, restoring persisted collapse state
                 const isCollapsed = collapseState.has(groupId);
-                const card = createOwnerGroup(owner, issues, groupId, isCollapsed);
+                const card = createOwnerGroup(owner, issues, groupId, isCollapsed, !groupingEnabled);
                 groupedContainer.insertBefore(card, groupedContainer.children[index] || null);
                 existingCards.set(owner, card);
             }

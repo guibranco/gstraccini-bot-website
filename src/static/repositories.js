@@ -6,6 +6,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000;
 
 const COLLAPSE_STATE_KEY = 'repository_groups_collapse_state';
+const FLAT_GROUP_KEY = '__all__';
 
 /** Debounce timer for filterRepositories. */
 let filterTimeout = null;
@@ -48,13 +49,14 @@ function createRepositoryRow(repo) {
 // ─── Organization-group builders ────────────────────────────────────────────
 
 /**
- * Groups repositories by organization and sorts each group by name.
+ * Groups repositories by organization and sorts each group by name. When
+ * grouping is disabled, every repository is placed into a single flat group.
  */
-function groupRepositoriesByOrganization(items) {
+function groupRepositoriesByOrganization(items, groupingEnabled = true) {
     const grouped = {};
 
     items.forEach(item => {
-        const organization = item?.organization || 'Unknown';
+        const organization = groupingEnabled ? (item?.organization || 'Unknown') : FLAT_GROUP_KEY;
         if (!grouped[organization]) grouped[organization] = [];
         grouped[organization].push(item);
     });
@@ -68,56 +70,61 @@ function groupRepositoriesByOrganization(items) {
 
 /**
  * Builds a complete organization-group card element (header + collapsible repository table).
+ * When `flat` is true, the organization header/collapse chrome is omitted and
+ * the repository table is rendered directly.
  *
  * @param {string}   organization   - Organization display name.
  * @param {Array}    repositories   - Sorted repositories for this organization.
  * @param {string}   groupId        - Unique DOM id for the collapse target.
  * @param {boolean}  startCollapsed - Whether the group should begin collapsed.
+ * @param {boolean}  flat           - Whether to render without the organization header.
  * @returns {HTMLElement}
  */
-function createOrganizationGroup(organization, repositories, groupId, startCollapsed) {
+function createOrganizationGroup(organization, repositories, groupId, startCollapsed, flat = false) {
     const orgDiv = document.createElement('div');
     orgDiv.className = 'mb-4 card';
     orgDiv.dataset.organization = organization;
     orgDiv.dataset.groupHash = hashRepositories(repositories);
 
-    // Header
-    const header = document.createElement('div');
-    header.className = 'card-header bg-light';
-    orgDiv.appendChild(header);
+    if (!flat) {
+        // Header
+        const header = document.createElement('div');
+        header.className = 'card-header bg-light';
+        orgDiv.appendChild(header);
 
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
-    btn.type = 'button';
-    btn.setAttribute('data-bs-toggle', 'collapse');
-    btn.setAttribute('data-bs-target', `#${groupId}`);
-    btn.setAttribute('aria-expanded', String(!startCollapsed));
-    btn.setAttribute('aria-controls', groupId);
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center';
+        btn.type = 'button';
+        btn.setAttribute('data-bs-toggle', 'collapse');
+        btn.setAttribute('data-bs-target', `#${groupId}`);
+        btn.setAttribute('aria-expanded', String(!startCollapsed));
+        btn.setAttribute('aria-controls', groupId);
 
-    const orgText = document.createElement('span');
-    orgText.textContent = organization;
-    btn.appendChild(orgText);
+        const orgText = document.createElement('span');
+        orgText.textContent = organization;
+        btn.appendChild(orgText);
 
-    const badgeAndChevron = document.createElement('div');
-    badgeAndChevron.className = 'd-flex align-items-center';
+        const badgeAndChevron = document.createElement('div');
+        badgeAndChevron.className = 'd-flex align-items-center';
 
-    const countBadge = document.createElement('span');
-    countBadge.className = 'badge bg-primary me-2';
-    countBadge.title = 'Total Repositories';
-    countBadge.textContent = repositories.length;
-    badgeAndChevron.appendChild(countBadge);
+        const countBadge = document.createElement('span');
+        countBadge.className = 'badge bg-primary me-2';
+        countBadge.title = 'Total Repositories';
+        countBadge.textContent = repositories.length;
+        badgeAndChevron.appendChild(countBadge);
 
-    const chevron = document.createElement('i');
-    chevron.className = 'fas fa-chevron-down';
-    if (startCollapsed) chevron.classList.add('chevron-collapsed');
-    badgeAndChevron.appendChild(chevron);
+        const chevron = document.createElement('i');
+        chevron.className = 'fas fa-chevron-down';
+        if (startCollapsed) chevron.classList.add('chevron-collapsed');
+        badgeAndChevron.appendChild(chevron);
 
-    btn.appendChild(badgeAndChevron);
-    header.appendChild(btn);
+        btn.appendChild(badgeAndChevron);
+        header.appendChild(btn);
+    }
 
-    // Repository table (collapsible)
+    // Repository table (collapsible unless flat)
     const collapseDiv = document.createElement('div');
-    collapseDiv.className = `collapse${startCollapsed ? '' : ' show'}`;
+    collapseDiv.className = flat ? '' : `collapse${startCollapsed ? '' : ' show'}`;
     collapseDiv.id = groupId;
 
     const table = document.createElement('table');
@@ -265,7 +272,8 @@ function populateRepositoriesGroupedByOrganization(repositories) {
         counterContainer.textContent = repositories.length;
 
         // ── Group ──────────────────────────────────────────────────────────
-        const groupedData = groupRepositoriesByOrganization(repositories);
+        const groupingEnabled = isGroupByOrgEnabled();
+        const groupedData = groupRepositoriesByOrganization(repositories, groupingEnabled);
 
         // ── Read persisted collapse state ──────────────────────────────────
         const collapseState = getCollapseState(COLLAPSE_STATE_KEY);
@@ -302,7 +310,7 @@ function populateRepositoriesGroupedByOrganization(repositories) {
             } else {
                 // Create a brand-new card, restoring persisted collapse state
                 const isCollapsed = collapseState.has(groupId);
-                const card = createOrganizationGroup(organization, repos, groupId, isCollapsed);
+                const card = createOrganizationGroup(organization, repos, groupId, isCollapsed, !groupingEnabled);
                 groupedContainer.insertBefore(card, groupedContainer.children[index] || null);
                 existingCards.set(organization, card);
             }

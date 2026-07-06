@@ -387,7 +387,7 @@ $title = "Account Details";
                                     <h3 class="h5 mb-0"><i class="fas fa-sliders-h"></i> Preferences</h3>
                                 </div>
                                 <div class="card-body">
-                                    <div class="mb-0">
+                                    <div class="mb-3">
                                         <label for="theme" class="form-label">Select Theme:</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-adjust"></i></span>
@@ -397,6 +397,21 @@ $title = "Account Details";
                                                 <option value="system">🖥️ Use System Theme</option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="form-label d-block">Repository &amp; List Grouping</label>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="groupByOrgToggle">
+                                            <label class="form-check-label" for="groupByOrgToggle">
+                                                Group repositories, issues, and pull requests by
+                                                organization/account
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">When disabled, repositories, issues,
+                                            and pull requests are listed together instead of grouped by
+                                            organization/account.</small>
                                     </div>
                                 </div>
                             </div>

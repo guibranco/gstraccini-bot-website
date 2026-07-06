@@ -68,6 +68,16 @@ function isDarkTheme(theme) {
     return theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 }
 
+const GROUP_BY_ORG_STORAGE_KEY = 'groupByOrgAccount';
+
+/**
+ * Whether repositories, issues, and pull requests should be grouped by
+ * organization/account, per the user's account preference. Defaults to enabled.
+ */
+function isGroupByOrgEnabled() {
+    return localStorage.getItem(GROUP_BY_ORG_STORAGE_KEY) !== 'false';
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'system';
     const switcher = document.getElementById('theme');
@@ -86,6 +96,14 @@ window.addEventListener('DOMContentLoaded', () => {
                 switcher.value = nextTheme;
             }
             applyTheme(nextTheme);
+        });
+    }
+
+    const groupByOrgToggle = document.getElementById('groupByOrgToggle');
+    if (groupByOrgToggle) {
+        groupByOrgToggle.checked = isGroupByOrgEnabled();
+        groupByOrgToggle.addEventListener('change', () => {
+            localStorage.setItem(GROUP_BY_ORG_STORAGE_KEY, groupByOrgToggle.checked ? 'true' : 'false');
         });
     }
 });
