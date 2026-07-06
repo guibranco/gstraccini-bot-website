@@ -18,14 +18,15 @@ if (isset($user["first_name"])) {
     $name = $user["name"];
 }
 
-$selectedOrganization = $_GET['organization'] ?? '';
-$filteredRepositories = $data['repositories'];
-if (!empty($selectedOrganization)) {
-    $filteredRepositories = array_filter($filteredRepositories, function ($repo) use ($selectedOrganization) {
-        return $repo['organization'] === $selectedOrganization;
-    });
+$groupedRepositories = [];
+foreach ($data['repositories'] as $repo) {
+    $organization = $repo['organization'] ?? 'Unknown';
+    if (!isset($groupedRepositories[$organization])) {
+        $groupedRepositories[$organization] = [];
+    }
+    $groupedRepositories[$organization][] = $repo;
 }
-$organizations = array_unique(array_column($data['repositories'], 'organization'));
+ksort($groupedRepositories);
 ?>
 
 <!DOCTYPE html>
@@ -47,20 +48,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
 
     <div class="container mt-5">
         <div class="row mt-3">
-            <div class="col-md-4">
-                <label for="organizationFilter" class="form-label">Filter by Organization</label>
-                <select id="organizationFilter" class="form-select">
-                    <option value="">All Organizations</option>
-                    <?php
-                    foreach ($organizations as $organization) {
-                        $selected = $selectedOrganization === $organization ? 'selected' : '';
-                        echo "<option value=\"" . htmlspecialchars($organization) . "\" $selected>" . htmlspecialchars($organization) . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label for="languageFilter" class="form-label">Filter by Language</label>
                 <select id="languageFilter" class="form-select">
                     <option value="">All Languages</option>
@@ -75,8 +63,8 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                     ?>
                 </select>
             </div>
-    
-            <div class="col-md-4">
+
+            <div class="col-md-6">
                 <label for="visibilityFilter" class="form-label">Filter by Visibility</label>
                 <select id="visibilityFilter" class="form-select">
                     <option value="">All</option>
@@ -85,7 +73,7 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                 </select>
             </div>
         </div>
-        
+
         <div class="row mt-3">
             <div class="col-md-3">
                 <div class="form-check form-switch">
@@ -93,21 +81,21 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
                     <label class="form-check-label" for="isForkFilter">Is Fork</label>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="hasForkFilter">
                     <label class="form-check-label" for="hasForkFilter">Has Forks</label>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="hasIssuesFilter">
                     <label class="form-check-label" for="hasIssuesFilter">Has Issues</label>
                 </div>
             </div>
-            
+
             <div class="col-md-3">
                 <button id="resetFilters" class="btn btn-outline-secondary">Reset Filters</button>
             </div>
@@ -118,53 +106,79 @@ $organizations = array_unique(array_column($data['repositories'], 'organization'
         <div class="row mt-5">
             <div class="col-md-12">
                 <h3>Your Repositories <span class="badge text-bg-warning rounded-pill"
-                        id="repositoriesCount"><?php echo count($filteredRepositories); ?></span></h3>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Organization</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Stars</th>
-                            <th scope="col">Fork</th>
-                            <th scope="col">Forks</th>
-                            <th scope="col">Open Issues</th>
-                            <th scope="col">Languages</th>
-                            <th scope="col">Visibility</th>
-                        </tr>
-                    </thead>
-                    <tbody id="repositories">
-                        <?php if (count($filteredRepositories) === 0): ?>
-                            <tr>
-                                <td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading data...
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                        <?php foreach ($filteredRepositories as $repo): ?>
-                            <tr class="repository-row"
-                                data-organization="<?php echo htmlspecialchars($repo['organization']); ?>">
-                                <td><?php echo htmlspecialchars($repo['organization']) ?></td>
-                                <td><a href='<?php echo $repo['url']; ?>'
-                                        target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
-                                <td><i class="fas fa-star status-suspended"></i> <?php echo $repo['stars']; ?></td>
-                                <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-installed"></i> Yes' : '<i class="fas fa-circle-xmark status-uninstalled"></i> No'; ?>
-                                </td>
-                                <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
-                                <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
-                                <td><span
-                                        class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span>
-                                </td>
-                                <td><i
-                                        class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash status-uninstalled' : ' status-installed'; ?>"></i>
-                                    <?php echo $repo['visibility']; ?></td>
-                            </tr>
+                        id="repositoriesCount"><?php echo count($data['repositories']); ?></span></h3>
+                <div id="groupedRepositories">
+                    <?php if (empty($groupedRepositories)): ?>
+                        <p class="text-muted"><i class="fas fa-spinner fa-spin"></i> Loading data...</p>
+                    <?php else: ?>
+                        <?php foreach ($groupedRepositories as $organization => $repositories): ?>
+                            <?php
+                                $sanitizedOrganization = preg_replace('/[^a-z0-9]+/', '-', strtolower($organization));
+                                $sanitizedOrganization = trim($sanitizedOrganization, '-');
+                                $groupId = "group-{$sanitizedOrganization}";
+                            ?>
+                            <div class="mb-4 card" data-organization="<?php echo htmlspecialchars($organization, ENT_QUOTES, 'UTF-8'); ?>">
+                                <div class="card-header bg-light">
+                                    <button class="btn btn-link text-decoration-none p-0 fw-bold text-start w-100 d-flex justify-content-between align-items-center"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#<?php echo $groupId; ?>"
+                                        aria-expanded="true" aria-controls="<?php echo $groupId; ?>">
+                                        <span><?php echo htmlspecialchars($organization, ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-primary me-2"><?php echo count($repositories); ?></span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                    </button>
+                                </div>
+                                <div class="collapse show" id="<?php echo $groupId; ?>">
+                                    <table class="table table-striped mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Stars</th>
+                                                <th scope="col">Fork</th>
+                                                <th scope="col">Forks</th>
+                                                <th scope="col">Open Issues</th>
+                                                <th scope="col">Languages</th>
+                                                <th scope="col">Visibility</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($repositories as $repo): ?>
+                                                <tr class="repository-row"
+                                                    data-organization="<?php echo htmlspecialchars($organization, ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-language="<?php echo htmlspecialchars($repo['language'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-visibility="<?php echo htmlspecialchars($repo['visibility'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                    data-fork="<?php echo $repo['fork'] ? 'true' : 'false'; ?>"
+                                                    data-has-forks="<?php echo $repo['forks'] > 0 ? 'true' : 'false'; ?>"
+                                                    data-has-issues="<?php echo $repo['issues'] > 0 ? 'true' : 'false'; ?>">
+                                                    <td><a href='<?php echo $repo['url']; ?>'
+                                                            target='_blank'><?php echo htmlspecialchars($repo['name']); ?></a></td>
+                                                    <td><i class="fas fa-star status-suspended"></i> <?php echo $repo['stars']; ?></td>
+                                                    <td><?php echo $repo['fork'] ? '<i class="fas fa-circle-check status-installed"></i> Yes' : '<i class="fas fa-circle-xmark status-uninstalled"></i> No'; ?>
+                                                    </td>
+                                                    <td><i class="fas fa-code-branch"></i> <?php echo $repo['forks']; ?></td>
+                                                    <td><i class="fas fa-circle-exclamation"></i> <?php echo $repo['issues']; ?></td>
+                                                    <td><span
+                                                            class="badge bg-primary"><?php echo empty($repo['language']) ? '-' : $repo['language']; ?></span>
+                                                    </td>
+                                                    <td><i
+                                                            class="fas fa-eye<?php echo ($repo['visibility'] === 'private') ? '-slash status-uninstalled' : ' status-installed'; ?>"></i>
+                                                        <?php echo $repo['visibility']; ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
-                    </tbody>
-                </table>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 
     <?php require_once "includes/footer.php"; ?>
+    <script src="static/list-shared.js"></script>
     <script src="static/repositories.js"></script>
 </body>
 
