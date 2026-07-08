@@ -21,11 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
     $firstName = htmlspecialchars($_POST['firstName']);
     $lastName = htmlspecialchars($_POST['lastName']);
+    $currentPassword = $_POST['currentPassword'] ?? '';
     $password = $_POST['password'] ?? '';
     $passwordConfirm = $_POST['passwordConfirm'] ?? '';
 
+    if ($password !== '' && $currentPassword === '') {
+        header("Location: account.php?current_password_required=true");
+        exit();
+    }
+
     if ($password !== '' && $password !== $passwordConfirm) {
-        header("Location: settings.php?password_mismatch=true");
+        header("Location: account.php?password_mismatch=true");
         exit();
     }
 
@@ -198,6 +204,13 @@ $title = "Account Details";
             </div>
         <?php endif; ?>
 
+        <?php if (isset($_GET['current_password_required'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Please enter your current password to change it.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <div class="row">
             <div class="col-md-3 mb-4">
                 <div class="list-group account-nav" id="accountTabs" role="tablist">
@@ -298,11 +311,22 @@ $title = "Account Details";
                                         </div>
                                         <div class="collapse mt-3" id="passwordFields">
                                             <div class="mb-3">
+                                                <label for="currentPassword" class="form-label">Current
+                                                    Password</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                    <input type="password" class="form-control" id="currentPassword"
+                                                        name="currentPassword" autocomplete="current-password">
+                                                    <div class="invalid-feedback">Please enter your current password.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
                                                 <label for="password" class="form-label">New Password</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                                     <input type="password" class="form-control" id="password"
-                                                        name="password" minlength="6">
+                                                        name="password" minlength="6" autocomplete="new-password">
                                                     <div class="invalid-feedback">Password must be at least 6
                                                         characters long.</div>
                                                 </div>
@@ -313,7 +337,7 @@ $title = "Account Details";
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                                     <input type="password" class="form-control" id="passwordConfirm"
-                                                        name="passwordConfirm">
+                                                        name="passwordConfirm" autocomplete="new-password">
                                                     <div class="invalid-feedback">Passwords must match.</div>
                                                 </div>
                                             </div>
@@ -573,8 +597,15 @@ $title = "Account Details";
                 event.preventDefault();
                 event.stopPropagation();
 
+                const currentPassword = document.getElementById('currentPassword').value;
                 const password = document.getElementById('password').value;
                 const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+                if (password !== '' && currentPassword === '') {
+                    document.getElementById('currentPassword').setCustomValidity('Please enter your current password.');
+                } else {
+                    document.getElementById('currentPassword').setCustomValidity('');
+                }
 
                 if (password !== passwordConfirm) {
                     document.getElementById('passwordConfirm').setCustomValidity("Passwords don't match");
