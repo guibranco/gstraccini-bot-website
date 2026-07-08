@@ -63,6 +63,10 @@ function renderStateBadge($state)
             background-color: #f8f9fa;
         }
 
+        [data-theme="dark"] .assigned-list .list-group-item:hover {
+            background-color: #242424;
+        }
+
         .assigned-list .list-group-item:first-child {
             border-top: 0;
         }

@@ -11,3 +11,5 @@
     </ul>
   </nav>
 </footer>
+
+<script src="/static/main.js"></script>

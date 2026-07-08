@@ -21,6 +21,117 @@ body.dark-theme {
   color: #ffffff;
 }
 
+[data-theme="dark"] .menu {
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .menu ul li a {
+  color: #66b2ff;
+}
+
+[data-theme="dark"] .menu ul li a:hover {
+  color: #99ccff;
+}
+
+[data-theme="dark"] .features {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] .feature {
+  border-color: #2a2a2a;
+}
+
+[data-theme="dark"] .feature:hover {
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .feature h3 {
+  color: #f1f1f1;
+}
+
+[data-theme="dark"] .feature p {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .commands {
+  background: #1a1a1a;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .commands h2 {
+  color: #66b2ff;
+}
+
+[data-theme="dark"] #commands-search {
+  background-color: #242424;
+  border-color: #3a3a3a;
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .commands-count {
+  color: #999;
+}
+
+[data-theme="dark"] .command-card {
+  background: #202020;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .command-card:hover {
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .command-desc {
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] .command-desc code {
+  background: #2c2c2c;
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .param-list {
+  border-top-color: #333;
+}
+
+[data-theme="dark"] .param-list li {
+  color: #b0b0b0;
+}
+
+[data-theme="dark"] .param-name {
+  background: #2c2c2c;
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .commands-loading,
+[data-theme="dark"] .commands-error,
+[data-theme="dark"] .commands-no-results {
+  color: #999;
+}
+
+[data-theme="dark"] section.content {
+  background: #1a1a1a;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] section.content h2 {
+  color: #66b2ff;
+}
+
+[data-theme="dark"] section.content p,
+[data-theme="dark"] section.content ul {
+  color: #c0c0c0;
+}
+
+[data-theme="dark"] footer {
+  background-color: #1a1a1a;
+}
+
+[data-theme="dark"] footer p {
+  color: #999;
+}
+
 header {
   background-color: #007bff;
   color: white;

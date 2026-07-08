@@ -169,6 +169,20 @@ $title = "Account Details";
             border-radius: 4px;
             padding: 6px;
         }
+
+        [data-theme="dark"] .qr-placeholder {
+            background: #242424;
+            color: #6c757d;
+        }
+
+        [data-theme="dark"] .recovery-codes-grid span {
+            background: #242424;
+            color: #e0e0e0;
+        }
+
+        [data-theme="dark"] .security-item:not(:last-child) {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 

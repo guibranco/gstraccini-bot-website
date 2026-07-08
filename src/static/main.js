@@ -41,31 +41,28 @@ function showErrorAlert(message, isRetriable = false) {
     }, 5000);
 }
 
+function isDarkTheme(theme) {
+    return theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
 function applyTheme(theme) {
     const themeIcon = document.getElementById('theme-icon');
     const iconEl = themeIcon ? (themeIcon.querySelector('i') || themeIcon) : null;
+    const effectiveDark = isDarkTheme(theme);
 
-    if (theme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.body.classList.remove('dark-theme');
-        if (iconEl) iconEl.className = 'fas fa-sun';
-    } else if (theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        document.body.classList.add('dark-theme');
-        if (iconEl) iconEl.className = 'fas fa-moon';
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        document.body.classList.remove('dark-theme');
-        if (iconEl) iconEl.className = 'fas fa-adjust';
+    // Drives this site's own CSS variables (main.css/user.css) as well as
+    // Bootstrap 5.3's built-in dark mode for cards, modals, tables, forms, etc.
+    document.documentElement.setAttribute('data-theme', effectiveDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-bs-theme', effectiveDark ? 'dark' : 'light');
+    document.body.classList.toggle('dark-theme', effectiveDark);
 
-        if (iconEl && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            iconEl.className = 'fas fa-moon';
+    if (iconEl) {
+        if (theme === 'system') {
+            iconEl.className = effectiveDark ? 'fas fa-moon' : 'fas fa-adjust';
+        } else {
+            iconEl.className = effectiveDark ? 'fas fa-moon' : 'fas fa-sun';
         }
     }
-}
-
-function isDarkTheme(theme) {
-    return theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 }
 
 const GROUP_BY_ORG_STORAGE_KEY = 'groupByOrgAccount';

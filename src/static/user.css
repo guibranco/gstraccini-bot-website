@@ -21,8 +21,64 @@ body.dark-theme {
   color: #ffffff;
 }
 
+[data-theme="dark"] .dropdown-toggle {
+  background-color: #242424;
+  color: #e0e0e0;
+  border-color: #3a3a3a;
+}
+
+[data-theme="dark"] .dropdown-toggle:hover {
+  background-color: #2e2e2e;
+  border-color: #4a4a4a;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: #2e2e2e;
+}
+
+[data-theme="dark"] .account-nav .list-group-item.active {
+  background-color: #17324d;
+  color: #66b2ff;
+  border-left-color: #66b2ff;
+}
+
+[data-theme="dark"] .add-installation-note {
+  background-color: #1e1e1e;
+  border-color: #333;
+  color: #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .add-installation-note strong {
+  color: #cfcfcf;
+}
+
+[data-theme="dark"] .installations th {
+  background-color: #1e1e1e;
+}
+
+[data-theme="dark"] .installations th,
+[data-theme="dark"] .installations td {
+  border-color: #333;
+}
+
+[data-theme="dark"] .tag-chip {
+  background-color: #2c2c2c;
+  border-color: #666;
+  color: #e0e0e0;
+}
+
 .theme-switcher {
   cursor: pointer;
+}
+
+.tag-chip {
+  background-color: #f0f0f0;
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 5px;
+  display: inline-block;
+  font-size: 9px;
 }
 
 .container {
