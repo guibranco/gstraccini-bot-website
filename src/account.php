@@ -807,9 +807,19 @@ $title = "Account Details";
                 removeBtn.className = 'btn btn-link btn-sm text-danger p-0 ms-2';
                 removeBtn.textContent = 'Remove';
                 removeBtn.addEventListener('click', function () {
-                    const remaining = loadFidoKeys().filter((_, i) => i !== index);
-                    localStorage.setItem('demo_fido_keys', JSON.stringify(remaining));
-                    renderFidoKeys();
+                    const removeKey = () => {
+                        const remaining = loadFidoKeys().filter((_, i) => i !== index);
+                        localStorage.setItem('demo_fido_keys', JSON.stringify(remaining));
+                        renderFidoKeys();
+                    };
+
+                    const twoFaEnabled = localStorage.getItem('demo_2fa_enabled') === 'true';
+                    if (twoFaEnabled) {
+                        requestTwoFaVerification(removeKey,
+                            'Enter the 6-digit code from your authenticator app to remove this security key.');
+                    } else {
+                        removeKey();
+                    }
                 });
 
                 li.appendChild(label);
