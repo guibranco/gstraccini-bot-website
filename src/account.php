@@ -575,14 +575,14 @@ $title = "Account Details";
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Two-factor authentication is enabled on your account. Enter the 6-digit code from your
-                        authenticator app to confirm this password change.</p>
+                    <p id="twoFaVerifyMessage">Two-factor authentication is enabled on your account. Enter the
+                        6-digit code from your authenticator app to confirm this action.</p>
                     <div class="digit-inputs mb-2" id="twoFaVerifyInputs"></div>
                     <div id="twoFaVerifyError" class="text-danger mt-2"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmTwoFaVerifyBtn">Verify &amp; Save</button>
+                    <button type="button" class="btn btn-primary" id="confirmTwoFaVerifyBtn">Verify &amp; Continue</button>
                 </div>
             </div>
         </div>
@@ -641,7 +641,7 @@ $title = "Account Details";
 
                     const twoFaEnabled = localStorage.getItem('demo_2fa_enabled') === 'true';
                     if (password !== '' && twoFaEnabled) {
-                        bootstrap.Modal.getOrCreateInstance(document.getElementById('twoFaVerifyModal')).show();
+                        requestTwoFaVerification(() => form.submit());
                     } else {
                         form.submit();
                     }
@@ -732,17 +732,34 @@ $title = "Account Details";
 
         twoFaActionBtn.addEventListener('click', function () {
             const enabled = localStorage.getItem('demo_2fa_enabled') === 'true';
-            if (enabled && confirm('Disable Two-Factor Authentication?')) {
-                localStorage.removeItem('demo_2fa_enabled');
-                refreshTwoFaUi();
+            if (enabled) {
+                requestTwoFaVerification(() => {
+                    localStorage.removeItem('demo_2fa_enabled');
+                    refreshTwoFaUi();
+                }, 'Enter the 6-digit code from your authenticator app to disable two-factor authentication.');
             }
         });
 
         refreshTwoFaUi();
 
-        // --- 2FA verification gate for password changes (client-side demo, no backend yet) ---
+        // --- 2FA verification gate for security-sensitive actions (client-side demo, no backend yet) ---
         const twoFaVerifyModalEl = document.getElementById('twoFaVerifyModal');
         const twoFaVerifyInputs = document.getElementById('twoFaVerifyInputs');
+        const twoFaVerifyMessage = document.getElementById('twoFaVerifyMessage');
+        let twoFaVerifyCallback = null;
+
+        /**
+         * Opens the 2FA verification modal and runs `onVerified` once a
+         * 6-digit code has been entered. Used to gate any security-sensitive
+         * action (saving a password change, disabling 2FA) behind 2FA when
+         * it's enabled.
+         */
+        function requestTwoFaVerification(onVerified, message) {
+            twoFaVerifyCallback = onVerified;
+            twoFaVerifyMessage.textContent = message ||
+                'Two-factor authentication is enabled on your account. Enter the 6-digit code from your authenticator app to confirm this action.';
+            bootstrap.Modal.getOrCreateInstance(twoFaVerifyModalEl).show();
+        }
 
         twoFaVerifyModalEl.addEventListener('show.bs.modal', function () {
             buildDigitInputs(twoFaVerifyInputs, 6);
@@ -756,7 +773,9 @@ $title = "Account Details";
                 return;
             }
             bootstrap.Modal.getInstance(twoFaVerifyModalEl).hide();
-            document.getElementById('settingsForm').submit();
+            const callback = twoFaVerifyCallback;
+            twoFaVerifyCallback = null;
+            if (callback) callback();
         });
 
         // --- Security keys / FIDO (client-side demo, no backend yet) ---
