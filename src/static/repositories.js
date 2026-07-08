@@ -391,17 +391,23 @@ function filterRepositories() {
 
         updateURLParameters(language, visibility, isFork, hasForks, hasIssues);
 
+        console.log('DEBUG filterRepositories CALLED', Date.now(), JSON.stringify({ language, visibility, isFork, hasForks, hasIssues }));
         let counter = 0;
-        document.querySelectorAll('#groupedRepositories [data-organization]').forEach(group => {
+        const groupsFound = document.querySelectorAll('#groupedRepositories [data-organization]');
+        console.log('DEBUG groupsFound', groupsFound.length);
+        groupsFound.forEach(group => {
             let visibleInGroup = 0;
+            const rowsFound = group.querySelectorAll('.repository-row');
+            console.log('DEBUG rowsFound for group', group.dataset.organization, rowsFound.length);
 
-            group.querySelectorAll('.repository-row').forEach(row => {
+            rowsFound.forEach(row => {
                 const matches =
                     (!language     || row.dataset.language     === language)     &&
                     (!visibility   || row.dataset.visibility   === visibility)   &&
                     (!isFork       || row.dataset.fork         === 'true')       &&
                     (!hasForks     || row.dataset.hasForks     === 'true')       &&
                     (!hasIssues    || row.dataset.hasIssues    === 'true');
+                console.log('DEBUG row matches?', matches, row.dataset.repoUrl);
 
                 row.style.display = matches ? '' : 'none';
                 if (matches) {
