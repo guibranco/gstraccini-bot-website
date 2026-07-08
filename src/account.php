@@ -601,6 +601,9 @@ $title = "Account Details";
                     <div class="recovery-codes-grid" id="recoveryCodesGrid"></div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" id="printRecoveryBtn">
+                        <i class="fas fa-print"></i> Print codes
+                    </button>
                     <button type="button" class="btn btn-outline-secondary" id="regenerateRecoveryBtn">
                         <i class="fas fa-sync"></i> Regenerate codes
                     </button>
@@ -872,6 +875,74 @@ $title = "Account Details";
             if (confirm('Regenerating will invalidate your existing recovery codes. Continue?')) {
                 renderRecoveryCodes(generateRecoveryCodes());
             }
+        });
+
+        /**
+         * Opens a new window with the recovery codes and usage instructions,
+         * formatted for printing, and triggers the browser's print dialog.
+         */
+        function printRecoveryCodes(codes) {
+            const printWindow = window.open('', '_blank', 'width=650,height=750');
+            if (!printWindow) {
+                showErrorAlert('Please allow pop-ups to print your recovery codes.');
+                return;
+            }
+
+            const codesHtml = codes.map((code) => `<li>${escapeHtml(code)}</li>`).join('');
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>GStraccini Bot - Recovery Codes</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 32px; color: #212529; }
+                        h1 { font-size: 1.4rem; margin-bottom: 4px; }
+                        h2 { font-size: 1.1rem; margin-top: 32px; }
+                        p { color: #495057; }
+                        ul.codes {
+                            list-style: none; padding: 0; margin: 24px 0;
+                            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+                        }
+                        ul.codes li {
+                            font-family: 'Courier New', Courier, monospace; text-align: center;
+                            background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;
+                            padding: 8px; font-size: 1.1rem;
+                        }
+                        ol { color: #495057; line-height: 1.6; }
+                        #printBtn { margin-top: 24px; }
+                        @media print {
+                            #printBtn { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>GStraccini Bot - Recovery Codes</h1>
+                    <p>Generated on ${escapeHtml(new Date().toLocaleString())}</p>
+                    <ul class="codes">${codesHtml}</ul>
+                    <h2>How to use your recovery codes</h2>
+                    <ol>
+                        <li>Store these codes somewhere safe, such as a password manager or a printed copy kept in
+                            a secure location.</li>
+                        <li>Each code can only be used once to sign in if you lose access to your other sign-in
+                            methods (password, authenticator app, or security key).</li>
+                        <li>If you run out of codes, generate a new set from Account &gt; Security. Generating new
+                            codes invalidates the old ones.</li>
+                        <li>Never share these codes with anyone. GStraccini Bot staff will never ask you for
+                            them.</li>
+                    </ol>
+                    <button id="printBtn" onclick="window.print()">Print</button>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        }
+
+        document.getElementById('printRecoveryBtn').addEventListener('click', function () {
+            printRecoveryCodes(loadRecoveryCodes() || generateRecoveryCodes());
         });
 
         const existingRecoveryCodes = loadRecoveryCodes();
