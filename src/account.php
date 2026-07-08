@@ -566,6 +566,28 @@ $title = "Account Details";
         </div>
     </div>
 
+    <div class="modal fade" id="twoFaVerifyModal" tabindex="-1" aria-labelledby="twoFaVerifyModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="twoFaVerifyModalLabel">Verify Two-Factor Authentication</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Two-factor authentication is enabled on your account. Enter the 6-digit code from your
+                        authenticator app to confirm this password change.</p>
+                    <div class="digit-inputs mb-2" id="twoFaVerifyInputs"></div>
+                    <div id="twoFaVerifyError" class="text-danger mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmTwoFaVerifyBtn">Verify &amp; Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="recoveryModal" tabindex="-1" aria-labelledby="recoveryModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -616,7 +638,13 @@ $title = "Account Details";
                     form.classList.add('was-validated');
                 } else {
                     form.classList.remove('was-validated');
-                    form.submit();
+
+                    const twoFaEnabled = localStorage.getItem('demo_2fa_enabled') === 'true';
+                    if (password !== '' && twoFaEnabled) {
+                        bootstrap.Modal.getOrCreateInstance(document.getElementById('twoFaVerifyModal')).show();
+                    } else {
+                        form.submit();
+                    }
                 }
             });
         });
@@ -711,6 +739,25 @@ $title = "Account Details";
         });
 
         refreshTwoFaUi();
+
+        // --- 2FA verification gate for password changes (client-side demo, no backend yet) ---
+        const twoFaVerifyModalEl = document.getElementById('twoFaVerifyModal');
+        const twoFaVerifyInputs = document.getElementById('twoFaVerifyInputs');
+
+        twoFaVerifyModalEl.addEventListener('show.bs.modal', function () {
+            buildDigitInputs(twoFaVerifyInputs, 6);
+            document.getElementById('twoFaVerifyError').textContent = '';
+        });
+
+        document.getElementById('confirmTwoFaVerifyBtn').addEventListener('click', function () {
+            const code = digitCode(twoFaVerifyInputs);
+            if (code.length !== 6) {
+                document.getElementById('twoFaVerifyError').textContent = 'Please enter the 6-digit code.';
+                return;
+            }
+            bootstrap.Modal.getInstance(twoFaVerifyModalEl).hide();
+            document.getElementById('settingsForm').submit();
+        });
 
         // --- Security keys / FIDO (client-side demo, no backend yet) ---
         const fidoKeyList = document.getElementById('fidoKeyList');
