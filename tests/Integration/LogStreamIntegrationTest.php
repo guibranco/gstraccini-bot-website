@@ -14,7 +14,7 @@ class LogStreamIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->secretsFile = __DIR__ . '/../../src/logstream.secrets.php';
+        $this->secretsFile = sys_get_temp_dir() . '/logstream-test-' . bin2hex(random_bytes(8)) . '.secrets.php';
     }
 
     protected function tearDown(): void
@@ -28,7 +28,7 @@ class LogStreamIntegrationTest extends TestCase
     public function testGetLogStreamIsNullWhenSecretsFileIsMissing(): void
     {
         $this->assertFileDoesNotExist($this->secretsFile);
-        $this->assertNull(getLogStream());
+        $this->assertNull(getLogStream($this->secretsFile));
     }
 
     #[RunInSeparateProcess]
@@ -36,7 +36,7 @@ class LogStreamIntegrationTest extends TestCase
     {
         file_put_contents($this->secretsFile, "<?php\n\$logStreamUrl = '';\n\$logStreamToken = '';\n");
 
-        $this->assertNull(getLogStream());
+        $this->assertNull(getLogStream($this->secretsFile));
     }
 
     #[RunInSeparateProcess]
@@ -47,6 +47,6 @@ class LogStreamIntegrationTest extends TestCase
             "<?php\n\$logStreamUrl = 'https://logstream.example.com/';\n\$logStreamToken = 'test-token';\n"
         );
 
-        $this->assertInstanceOf(LogStream::class, getLogStream());
+        $this->assertInstanceOf(LogStream::class, getLogStream($this->secretsFile));
     }
 }
