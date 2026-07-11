@@ -61,6 +61,13 @@ jobs:
           cd src
           echo ${{ env.fullSemVer }} > version.txt
 
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: "8.3"
+          extensions: sockets
+          coverage: pcov
+
       - name: 💾 Cache Composer dependencies
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
@@ -68,6 +75,21 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
       - name: 📦 Install PHP Dependencies
+        uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
+        with:
+          php_extensions: sockets
+          dev: yes
+          progress: yes
+
+      - name: 🧪 Run PHPUnit tests
+        run: src/vendor/bin/phpunit -c tests/phpunit.xml --coverage-clover=tests/coverage.xml
+
+      - name: 📊 SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: 🧹 Prune dev dependencies
         uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
         with:
           php_extensions: sockets

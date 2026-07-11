@@ -19,5 +19,8 @@
 		<include>
 			<directory suffix=".php">../src</directory>
 		</include>
+		<exclude>
+			<directory>../src/vendor</directory>
+		</exclude>
 	</source>
 </phpunit>

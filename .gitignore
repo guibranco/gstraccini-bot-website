@@ -1,3 +1,6 @@
 ﻿src/secrets/**.php
 src/*.secrets.php
 **/vendor/**
+.phpunit.result.cache
+tests/coverage.xml
+/coverage/

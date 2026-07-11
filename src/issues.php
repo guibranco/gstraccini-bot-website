@@ -1,5 +1,6 @@
 <?php
 require_once "includes/session.php";
+require_once "includes/color-utils.php";
 
 if ($isAuthenticated === false) {
     header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
@@ -27,17 +28,6 @@ foreach ($data["openIssues"] as $issue) {
     $groupedIssues[$owner][] = $issue;
 }
 
-function luminance($color)
-{
-    if (!preg_match('/^[0-9A-Fa-f]{6}$/', $color)) {
-        throw new InvalidArgumentException('Invalid color format. Expected 6-digit hex color.');
-    }
-    $red = hexdec(substr($color, 0, 2));
-    $green = hexdec(substr($color, 2, 2));
-    $blue = hexdec(substr($color, 4, 2));
-    $yiq = (($red * 299) + ($green * 587) + ($blue * 114)) / 1000;
-    return ($yiq >= 128) ? '#000' : '#fff';
-}
 ?>
 
 <!DOCTYPE html>
