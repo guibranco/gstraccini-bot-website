@@ -14,7 +14,7 @@
 function luminance($color)
 {
     if (!preg_match('/^[0-9A-Fa-f]{6}$/', $color)) {
-        throw new InvalidArgumentException('Invalid color format. Expected 6-digit hex color.');
+        throw new InvalidArgumentException("Invalid color format '{$color}'. Expected 6-digit hex color.");
     }
     $red = hexdec(substr($color, 0, 2));
     $green = hexdec(substr($color, 2, 2));
