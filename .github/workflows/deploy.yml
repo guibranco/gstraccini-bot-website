@@ -85,7 +85,7 @@ jobs:
         run: src/vendor/bin/phpunit -c tests/phpunit.xml --coverage-clover=tests/coverage.xml
 
       - name: 📊 SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v6
+        uses: sonarsource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
