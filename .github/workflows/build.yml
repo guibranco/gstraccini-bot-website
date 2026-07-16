@@ -21,6 +21,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: "8.4"
+          extensions: sockets
+          coverage: pcov
+
       - name: 💾 Cache Composer dependencies
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
@@ -31,5 +38,14 @@ jobs:
         uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
         with:
           php_extensions: sockets
-          dev: no
+          dev: yes
           progress: yes
+
+      - name: 🧪 Run PHPUnit tests
+        run: src/vendor/bin/phpunit -c tests/phpunit.xml --coverage-clover=tests/coverage.xml
+
+      - name: 📊 SonarCloud Scan
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: sonarsource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
