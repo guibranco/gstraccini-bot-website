@@ -1,5 +1,6 @@
 <?php
 require_once "includes/session.php";
+require_once "includes/color-utils.php";
 
 if ($isAuthenticated === false) {
     header('Location: signin.php?redirectUrl=' . urlencode($_SERVER['REQUEST_URI'] ?? '/'));
@@ -44,15 +45,6 @@ foreach ($groupedPullRequests as &$prs) {
     });
 }
 unset($prs);
-
-function luminance($color)
-{
-    $r = hexdec(substr($color, 0, 2));
-    $g = hexdec(substr($color, 2, 2));
-    $b = hexdec(substr($color, 4, 2));
-    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-    return ($yiq >= 128) ? '#000' : '#fff';
-}
 
 function getMergeableBadge($mergeable, $mergeable_state) {
     if ($mergeable === null) {
