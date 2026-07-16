@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8323e3c48b398f1a611f0114f201d601",
+    "content-hash": "b4611d584e37cd75f52314d93a5ee789",
     "packages": [
         {
             "name": "guibranco/pancake",
-            "version": "v1.9.2",
+            "version": "v1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guibranco/pancake.git",
-                "reference": "9969a8c1fcb8b7d28928751b1f5b372020fb59e1"
+                "reference": "ce864ac33c1a163d63331f67864c1123d20d0e09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guibranco/pancake/zipball/9969a8c1fcb8b7d28928751b1f5b372020fb59e1",
-                "reference": "9969a8c1fcb8b7d28928751b1f5b372020fb59e1",
+                "url": "https://api.github.com/repos/guibranco/pancake/zipball/ce864ac33c1a163d63331f67864c1123d20d0e09",
+                "reference": "ce864ac33c1a163d63331f67864c1123d20d0e09",
                 "shasum": ""
             },
             "require": {
@@ -46,9 +46,9 @@
             "description": "The Pancake project, a toolkit for PHP projects",
             "support": {
                 "issues": "https://github.com/guibranco/pancake/issues",
-                "source": "https://github.com/guibranco/pancake/tree/v1.9.2"
+                "source": "https://github.com/guibranco/pancake/tree/v1.9.3"
             },
-            "time": "2026-07-10T19:50:41+00:00"
+            "time": "2026-07-15T01:54:03+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
