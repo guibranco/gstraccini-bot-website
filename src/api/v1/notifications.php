@@ -1,13 +1,14 @@
 <?php
 /**
- * API endpoint for the signed-in user's notifications, scoped to their
- * GitHub user id and GitHub App installation ids.
+ * API endpoint for the signed-in user's unread notifications, scoped to
+ * their GitHub user id.
  */
 
-if (!file_exists("../../webhook.secrets.php")) {
+if (file_exists("../../webhook.secrets.php") === false) {
     http_response_code(500);
     die(json_encode(['error' => 'Configuration file not found']));
 }
+
 require_once "../../webhook.secrets.php";
 require_once "../../includes/constants.php";
 require_once "../../includes/log-stream.php";
@@ -23,7 +24,6 @@ if ($isAuthenticated === false) {
 
 header('Content-Type: application/json');
 
-$filter = $_GET['filter'] ?? null;
-$url = appendUserScopeParams($gstracciniApiUrl . "v1/notifications/", ['filter' => $filter]);
+$url = appendUserIdParam($gstracciniApiUrl."v1/notifications/", getCurrentUserId());
 
-proxyJsonFromUpstream($url, 'notifications');
+proxyJsonFromUpstream($url, 'notifications', ["X-Api-Key: $gstracciniApiKey"]);

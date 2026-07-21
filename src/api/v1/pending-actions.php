@@ -1,13 +1,14 @@
 <?php
 /**
- * API endpoint for the signed-in user's pending actions, scoped to their
- * GitHub user id and GitHub App installation ids.
+ * API endpoint for the signed-in user's unread pending actions, scoped to
+ * their GitHub user id.
  */
 
-if (!file_exists("../../webhook.secrets.php")) {
+if (file_exists("../../webhook.secrets.php") === false) {
     http_response_code(500);
     die(json_encode(['error' => 'Configuration file not found']));
 }
+
 require_once "../../webhook.secrets.php";
 require_once "../../includes/constants.php";
 require_once "../../includes/log-stream.php";
@@ -23,6 +24,6 @@ if ($isAuthenticated === false) {
 
 header('Content-Type: application/json');
 
-$url = appendUserScopeParams($gstracciniApiUrl . "v1/pending-actions/");
+$url = appendUserIdParam($gstracciniApiUrl."v1/pending-actions/", getCurrentUserId());
 
-proxyJsonFromUpstream($url, 'pending actions');
+proxyJsonFromUpstream($url, 'pending actions', ["X-Api-Key: $gstracciniApiKey"]);

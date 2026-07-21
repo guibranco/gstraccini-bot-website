@@ -1,12 +1,10 @@
 <?php
 /**
  * Helpers for scoping upstream GStraccini API calls to the signed-in user's
- * GitHub id and GitHub App installation ids.
- *
- * NOTE: the upstream API does not accept these params yet; the query string
- * shape here (userId / repeated installationIds) will be revisited once the
- * gstraccini-bot-service OpenAPI spec is available.
+ * GitHub id, per the gstraccini-bot-service OpenAPI spec (userId is the only
+ * scoping param the upstream API accepts; it resolves installations itself).
  */
+
 
 /**
  * Reads the signed-in user's GitHub id from the session.
@@ -15,43 +13,22 @@
  */
 function getCurrentUserId(): ?int
 {
-    return isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : null;
-}
-
-/**
- * Reads the signed-in user's GitHub App installation ids from the session.
- *
- * @return int[] List of installation ids.
- */
-function getCurrentInstallationIds(): array
-{
-    $installations = $_SESSION['installations']['installations'] ?? [];
-
-    return array_map('intval', array_column($installations, 'id'));
-}
-
-/**
- * Appends the current user's id and installation ids (plus any extra params)
- * to an upstream URL as a query string.
- *
- * @param string $url          The base upstream URL (no query string).
- * @param array  $extraParams  Additional query params to include, e.g. ['filter' => 'unread'].
- * @return string               The URL with the scoped query string appended.
- */
-function appendUserScopeParams(string $url, array $extraParams = []): string
-{
-    $params = array_filter(
-        array_merge(['userId' => getCurrentUserId()], $extraParams),
-        static fn ($value) => $value !== null && $value !== ''
-    );
-
-    $queryParts = [];
-    if ($params !== []) {
-        $queryParts[] = http_build_query($params);
-    }
-    foreach (getCurrentInstallationIds() as $installationId) {
-        $queryParts[] = 'installationIds=' . urlencode((string) $installationId);
+    if (isset($_SESSION['user']['id']) === true) {
+        return (int) $_SESSION['user']['id'];
     }
 
-    return $url . '?' . implode('&', $queryParts);
-}
+    return null;
+}//end getCurrentUserId()
+
+
+/**
+ * Appends the current user's id to an upstream URL as a query string.
+ *
+ * @param string   $url    The base upstream URL (no query string).
+ * @param int|null $userId The GitHub user id to scope the request to.
+ * @return string The URL with the userId query string appended.
+ */
+function appendUserIdParam(string $url, ?int $userId): string
+{
+    return $url.'?'.http_build_query(['userId' => $userId]);
+}//end appendUserIdParam()

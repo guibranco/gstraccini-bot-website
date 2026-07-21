@@ -32,14 +32,8 @@ $title = "Notifications";
         <h2>Notifications</h2>
 
         <div class="mb-3">
-            <button class="btn btn-secondary" id="unread-btn">
-                <i class="fas fa-envelope"></i> Unread
-            </button>
-            <button class="btn btn-success" id="read-btn">
-                <i class="fas fa-envelope-open"></i> Read
-            </button>
-            <button class="btn btn-primary" id="view-all-btn">
-                <i class="fas fa-list"></i> View All
+            <button class="btn btn-primary" id="refresh-notifications-btn">
+                <i class="fas fa-rotate"></i> Refresh
             </button>
         </div>
 
@@ -50,17 +44,15 @@ $title = "Notifications";
 
     <?php require_once "includes/footer.php"; ?>
     <script>
-        function fetchNotifications(filter) {
-            const params = new URLSearchParams(filter && filter !== 'all' ? { filter } : {});
-
-            fetch(`/api/v1/notifications?${params}`)
+        function fetchNotifications() {
+            fetch('/api/v1/notifications')
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
                         showErrorMessage('#notifications-list', data.error);
                         return;
                     }
-                    updateNotificationList(data.notifications ?? data);
+                    renderListItems('#notifications-list', data, 'fa-envelope', 'No unread notifications.');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -76,7 +68,7 @@ $title = "Notifications";
                         showErrorMessage('#pending-actions-list', data.error);
                         return;
                     }
-                    updatePendingActionsList(data.pendingActions ?? data);
+                    renderListItems('#pending-actions-list', data, 'fa-exclamation-circle', 'No pending actions.');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -98,43 +90,22 @@ $title = "Notifications";
             }
 
             items.forEach(item => {
-                const text = item.text ?? item.title ?? '';
+                const repo = `${item.repositoryOwner}/${item.repositoryName}`;
                 const url = item.url ? encodeURI(item.url) : '#';
                 $list.append(`
-                <a href="${url}" class="list-group-item list-group-item-action">
-                    <i class="fas ${icon(item)}"></i> ${escapeHtml(text)}
+                <a href="${url}" target="_blank" class="list-group-item list-group-item-action">
+                    <i class="fas ${icon}"></i> ${escapeHtml(item.title)} - ${escapeHtml(repo)}
                 </a>
             `);
             });
         }
 
-        function updateNotificationList(notifications) {
-            renderListItems(
-                '#notifications-list',
-                notifications,
-                notification => (notification.read === false || notification.type === 'unread') ? 'fa-envelope' : 'fa-envelope-open',
-                'No notifications.'
-            );
-        }
-
-        function updatePendingActionsList(pendingActions) {
-            renderListItems('#pending-actions-list', pendingActions, () => 'fa-exclamation-circle', 'No pending actions.');
-        }
-
-        $('#view-all-btn').on('click', function () {
-            fetchNotifications('all');
-        });
-
-        $('#unread-btn').on('click', function () {
-            fetchNotifications('unread');
-        });
-
-        $('#read-btn').on('click', function () {
-            fetchNotifications('read');
+        $('#refresh-notifications-btn').on('click', function () {
+            fetchNotifications();
         });
 
         $(document).ready(function () {
-            fetchNotifications('all');
+            fetchNotifications();
             fetchPendingActions();
         });
     </script>
