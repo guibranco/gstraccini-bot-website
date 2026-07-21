@@ -1,6 +1,6 @@
 <?php
 /**
- * API endpoint for the signed-in user's notifications, scoped to their
+ * API endpoint for the signed-in user's pending actions, scoped to their
  * GitHub user id and GitHub App installation ids.
  */
 
@@ -23,7 +23,6 @@ if ($isAuthenticated === false) {
 
 header('Content-Type: application/json');
 
-$filter = $_GET['filter'] ?? null;
-$url = appendUserScopeParams($gstracciniApiUrl . "v1/notifications/", ['filter' => $filter]);
+$url = appendUserScopeParams($gstracciniApiUrl . "v1/pending-actions/");
 
-proxyJsonFromUpstream($url, 'notifications');
+proxyJsonFromUpstream($url, 'pending actions');

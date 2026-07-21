@@ -56,11 +56,6 @@ jobs:
           echo "\$logStreamUrl   = \"${{ secrets.LOGSTREAM_URL }}\";" >> logstream.secrets.php
           echo "\$logStreamToken = \"${{ secrets.LOGSTREAM_TOKEN }}\";" >> logstream.secrets.php
 
-      - name: 📝 Create Version File for API
-        run: |
-          cd src
-          echo ${{ env.fullSemVer }} > version.txt
-
       - name: 🐘 Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
@@ -88,6 +83,11 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8.2.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: 📝 Create Version File for API
+        run: |
+          cd src
+          echo ${{ env.fullSemVer }} > version.txt
 
       - name: 🧹 Prune dev dependencies
         uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
