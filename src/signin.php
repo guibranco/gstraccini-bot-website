@@ -142,6 +142,7 @@ if ($isAuthenticated === true) {
                             <input type="password" class="form-control" id="password"
                                 placeholder="Enter your password" required>
                         </div>
+                        <div id="passwordError" class="text-danger mb-2"></div>
                         <div class="mb-3 text-end">
                             <a href="#" id="forgotPasswordLink" data-bs-toggle="modal"
                                 data-bs-target="#forgotPasswordModal">Forgot password?</a>
@@ -183,17 +184,31 @@ if ($isAuthenticated === true) {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="forgotPasswordModalLabel">Verify Email</h5>
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>A 6-digit code has been sent to your email. Please enter it below to reset your password.</p>
-                    <div class="digit-inputs digits-6" data-length="6" id="resetPasswordInputs"></div>
+                    <div id="resetRequestStep">
+                        <p>We'll generate a password reset token for <strong id="resetEmailDisplay"></strong>.</p>
+                        <div id="devResetTokenNotice" class="alert alert-warning d-none"></div>
+                    </div>
+                    <div id="resetCompleteStep" class="d-none">
+                        <div class="mb-3">
+                            <label for="resetToken" class="form-label">Reset token</label>
+                            <input type="text" class="form-control" id="resetToken" placeholder="Paste the reset token">
+                        </div>
+                        <div class="mb-3">
+                            <label for="resetNewPassword" class="form-label">New password</label>
+                            <input type="password" class="form-control" id="resetNewPassword" minlength="6"
+                                placeholder="At least 6 characters">
+                        </div>
+                    </div>
                     <div id="forgotPasswordError" class="text-danger mt-2"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="verifyCodeBtn" class="btn btn-primary">Verify Code</button>
+                    <button type="button" id="requestResetBtn" class="btn btn-primary">Send reset token</button>
+                    <button type="button" id="verifyCodeBtn" class="btn btn-primary d-none">Reset password</button>
                 </div>
             </div>
         </div>
@@ -252,6 +267,7 @@ if ($isAuthenticated === true) {
         }
 
         let currentEmail = '';
+        let currentLoginUserId = null;
 
         $('#emailForm').submit(function (event) {
             event.preventDefault();
@@ -274,27 +290,68 @@ if ($isAuthenticated === true) {
         });
 
         $('#fidoRetryBtn').click(function () {
-            alert('Requesting security key verification for ' + currentEmail + '…');
+            alert('Security key sign-in is not available yet.');
         });
 
         $('#choosePassword').click(function () {
+            $('#passwordError').text('');
             showStep('step-password');
         });
 
+        /**
+         * Redirects to the dashboard on a fully-verified login. Note: this
+         * login path is not backed by a GitHub OAuth token (unlike "Continue
+         * with GitHub"), so pages that call the GitHub API directly on the
+         * user's behalf will not work for it yet.
+         */
+        function completeLogin() {
+            window.location.href = 'dashboard.php';
+        }
+
         $('#passwordForm').submit(function (event) {
             event.preventDefault();
-            buildDigitInputs($('#twoFaInputs'));
-            $('#twoFaError').text('');
-            showStep('step-2fa');
+            $('#passwordError').text('');
+
+            const password = $('#password').val();
+
+            $.ajax({
+                url: '/api/v1/auth/login',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ email: currentEmail, password: password }),
+            }).done(function (data) {
+                currentLoginUserId = data.userId;
+                if (data.status === 'totp_required') {
+                    buildDigitInputs($('#twoFaInputs'));
+                    $('#twoFaError').text('');
+                    showStep('step-2fa');
+                } else {
+                    completeLogin();
+                }
+            }).fail(function (xhr) {
+                const message = (xhr.responseJSON && xhr.responseJSON.error) || 'Invalid email or password.';
+                $('#passwordError').text(message);
+            });
         });
 
         $('#verify2faBtn').click(function () {
             const code = digitCode($('#twoFaInputs'));
-            if (code.length === 6) {
-                alert('Authenticating ' + currentEmail + ' with 2FA code: ' + code);
-            } else {
+            if (code.length !== 6) {
                 $('#twoFaError').text('Please enter the 6-digit code.');
+                return;
             }
+
+            $.ajax({
+                url: '/api/v1/auth/login/verify-totp',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ userId: currentLoginUserId, code: code }),
+            }).done(function () {
+                completeLogin();
+            }).fail(function (xhr) {
+                const message = (xhr.responseJSON && xhr.responseJSON.error) || 'Invalid code.';
+                $('#twoFaError').text(message);
+            });
         });
 
         $('#useRecoveryInstead').click(function (event) {
@@ -312,26 +369,83 @@ if ($isAuthenticated === true) {
 
         $('#verifyRecoveryBtn').click(function () {
             const code = digitCode($('#recoveryInputs'));
-            if (code.length === 10) {
-                alert('Authenticating ' + currentEmail + ' with recovery code: ' + code);
-            } else {
+            if (code.length !== 10) {
                 $('#recoveryError').text('Please enter the full 10-digit recovery code.');
+                return;
             }
+
+            $.ajax({
+                url: '/api/v1/auth/login/verify-recovery',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ userId: currentLoginUserId, code: code }),
+            }).done(function () {
+                completeLogin();
+            }).fail(function (xhr) {
+                const message = (xhr.responseJSON && xhr.responseJSON.error) || 'Invalid or already-used recovery code.';
+                $('#recoveryError').text(message);
+            });
         });
 
         $('#forgotPasswordModal').on('show.bs.modal', function () {
-            buildDigitInputs($('#resetPasswordInputs'));
+            $('#resetEmailDisplay').text(currentEmail);
+            $('#resetRequestStep').removeClass('d-none');
+            $('#resetCompleteStep').addClass('d-none');
+            $('#devResetTokenNotice').addClass('d-none').text('');
+            $('#requestResetBtn').removeClass('d-none');
+            $('#verifyCodeBtn').addClass('d-none');
+            $('#resetToken').val('');
+            $('#resetNewPassword').val('');
             $('#forgotPasswordError').text('');
         });
 
+        $('#requestResetBtn').click(function () {
+            $('#forgotPasswordError').text('');
+
+            $.ajax({
+                url: '/api/v1/auth/password-reset/request',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ email: currentEmail }),
+            }).done(function (data) {
+                if (data.devResetToken) {
+                    $('#devResetTokenNotice').removeClass('d-none').html(
+                        '<strong>Dev mode:</strong> email delivery is not wired up yet, so here is the token directly: ' +
+                        '<code>' + $('<div>').text(data.devResetToken).html() + '</code>'
+                    );
+                    $('#resetToken').val(data.devResetToken);
+                }
+                $('#resetCompleteStep').removeClass('d-none');
+                $('#requestResetBtn').addClass('d-none');
+                $('#verifyCodeBtn').removeClass('d-none');
+            }).fail(function () {
+                $('#forgotPasswordError').text('Failed to request a password reset. Please try again.');
+            });
+        });
+
         $('#verifyCodeBtn').click(function () {
-            const code = digitCode($('#resetPasswordInputs'));
-            if (code.length === 6) {
-                alert('Code verified successfully');
-                $('#forgotPasswordModal').modal('hide');
-            } else {
-                $('#forgotPasswordError').text('Invalid code. Please check the digits.');
+            const token = $('#resetToken').val().trim();
+            const newPassword = $('#resetNewPassword').val();
+
+            if (token === '' || newPassword.length < 6) {
+                $('#forgotPasswordError').text('Please provide the reset token and a password of at least 6 characters.');
+                return;
             }
+
+            $.ajax({
+                url: '/api/v1/auth/password-reset/verify',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ token: token, newPassword: newPassword }),
+            }).done(function () {
+                $('#forgotPasswordModal').modal('hide');
+                showStep('step-password');
+                $('#passwordError').removeClass('text-danger').addClass('text-success')
+                    .text('Password updated — sign in with your new password.');
+            }).fail(function (xhr) {
+                const message = (xhr.responseJSON && xhr.responseJSON.error) || 'Invalid or expired token.';
+                $('#forgotPasswordError').text(message);
+            });
         });
     </script>
 </body>

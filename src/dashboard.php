@@ -187,12 +187,10 @@ function renderStateBadge($state)
                     <div class="card-header">
                         <h3 class="h5 mb-0"><i class="fas fa-history"></i> Recent Activities</h3>
                     </div>
-                    <ul class="list-group list-group-flush assigned-list">
-                        <li class="list-group-item">Created PR #45 in repo1</li>
-                        <li class="list-group-item">Merged PR #44 in repo2</li>
-                        <li class="list-group-item">Closed issue #10 in repo1</li>
-                        <li class="list-group-item">Analyzed commits in repo3</li>
-                        <li class="list-group-item">Opened PR #12 in repo2</li>
+                    <ul class="list-group list-group-flush assigned-list" id="recentActivities">
+                        <li class="list-group-item border-0 py-3">
+                            <i class="fas fa-spinner fa-spin"></i> Loading data...
+                        </li>
                     </ul>
                 </div>
             </div>

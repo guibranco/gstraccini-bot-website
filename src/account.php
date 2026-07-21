@@ -6,40 +6,28 @@ if ($isAuthenticated === false) {
     exit();
 }
 
+require_once "webhook.secrets.php";
+require_once "includes/constants.php";
+require_once "includes/log-stream.php";
+require_once "includes/remote-json-proxy.php";
+require_once "includes/user-scope.php";
+
+// Profile, preferences, password, TOTP, and recovery codes are all saved
+// through /api/v1/* (see static/user.js) - this page only renders the
+// initial values server-side. GitHub-sourced installations data below is
+// unrelated and still comes straight from the session.
+
 $user = $_SESSION['user'];
-if (isset($user['first_name']) === false) {
-    $user['first_name'] = '';
-}
-if (isset($user['last_name']) === false) {
-    $user['last_name'] = '';
-}
-if (isset($user['email']) === false) {
-    $user['email'] = '';
-}
+$user['first_name'] = '';
+$user['last_name'] = '';
+$user['email'] = $user['email'] ?? '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $firstName = htmlspecialchars($_POST['firstName']);
-    $lastName = htmlspecialchars($_POST['lastName']);
-    $currentPassword = $_POST['currentPassword'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $passwordConfirm = $_POST['passwordConfirm'] ?? '';
-
-    if ($password !== '' && $currentPassword === '') {
-        header("Location: account.php?current_password_required=true");
-        exit();
-    }
-
-    if ($password !== '' && $password !== $passwordConfirm) {
-        header("Location: account.php?password_mismatch=true");
-        exit();
-    }
-
-    $_SESSION['user']['first_name'] = $firstName;
-    $_SESSION['user']['last_name'] = $lastName;
-
-    header("Location: account.php?updated=true");
-    exit();
+$profileUrl = appendUserIdParam($gstracciniApiUrl."v1/profile/", getCurrentUserId());
+$profileResult = sendJsonToUpstream($profileUrl, 'GET', null, ["X-Api-Key: $gstracciniApiKey"]);
+if ($profileResult['httpCode'] === 200 && is_array($profileResult['decoded'])) {
+    $user['first_name'] = $profileResult['decoded']['firstName'] ?? '';
+    $user['last_name'] = $profileResult['decoded']['lastName'] ?? '';
+    $user['email'] = $profileResult['decoded']['email'] ?: $user['email'];
 }
 
 $installations = $_SESSION['installations']['installations'] ?? [];
@@ -629,8 +617,40 @@ $title = "Account Details";
 
     <?php require_once "includes/footer.php"; ?>
     <script>
+        const currentUserId = <?php echo (int) getCurrentUserId(); ?>;
+        let twoFaEnabledState = false;
+
+        /**
+         * Shows a dismissible error alert at the top of the page. Local to
+         * this page since dashboard.js (which has showErrorAlert) isn't loaded here.
+         */
+        function showAccountError(message) {
+            const container = document.querySelector('.container.mt-5.mb-5');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `${escapeHtml(message)}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+            container.insertBefore(alertDiv, container.firstChild);
+        }
+
+        function escapeHtml(unsafe) {
+            const div = document.createElement('div');
+            div.textContent = String(unsafe ?? '');
+            return div.innerHTML;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('settingsForm');
+
+            fetch('/api/v1/preferences')
+                .then((r) => r.json())
+                .then((prefs) => {
+                    if (!prefs) return;
+                    document.getElementById('theme').value = prefs.theme || 'system';
+                    document.getElementById('groupByOrgToggle').checked = Boolean(prefs.groupByOrganization);
+                })
+                .catch((error) => console.error('Failed to load preferences:', error));
 
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
@@ -653,18 +673,59 @@ $title = "Account Details";
                 }
                 if (form.checkValidity() === false) {
                     form.classList.add('was-validated');
-                } else {
-                    form.classList.remove('was-validated');
+                    return;
+                }
 
-                    const twoFaEnabled = localStorage.getItem('demo_2fa_enabled') === 'true';
-                    if (password !== '' && twoFaEnabled) {
-                        requestTwoFaVerification(() => form.submit());
-                    } else {
-                        form.submit();
-                    }
+                form.classList.remove('was-validated');
+
+                const doSave = () => saveAllChanges(password, currentPassword);
+                if (password !== '' && twoFaEnabledState) {
+                    requestTwoFaVerification(doSave);
+                } else {
+                    doSave();
                 }
             });
         });
+
+        /**
+         * Persists profile, preferences, and (if provided) a new password via
+         * the real API endpoints, then redirects like the old form POST did.
+         */
+        function saveAllChanges(newPassword, currentPassword) {
+            const profilePayload = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+            };
+            const preferencesPayload = {
+                theme: document.getElementById('theme').value,
+                groupByOrganization: document.getElementById('groupByOrgToggle').checked,
+            };
+
+            const requests = [
+                fetch('/api/v1/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profilePayload) }),
+                fetch('/api/v1/preferences', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(preferencesPayload) }),
+            ];
+
+            if (newPassword !== '') {
+                requests.push(fetch('/api/v1/auth/password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword }),
+                }));
+            }
+
+            Promise.all(requests)
+                .then(async (responses) => {
+                    const failed = responses.find((r) => !r.ok);
+                    if (failed) {
+                        const data = await failed.json().catch(() => ({}));
+                        throw new Error(data.error || 'Failed to save changes.');
+                    }
+                    window.location.href = 'account.php?updated=true';
+                })
+                .catch((error) => showAccountError(error.message || 'Failed to save changes.'));
+        }
 
         function changeTheme() {
             const theme = document.getElementById('theme').value;
@@ -689,15 +750,6 @@ $title = "Account Details";
             return Array.from(container.querySelectorAll('input')).map((i) => i.value).join('');
         }
 
-        function randomBase32(length) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-            let out = '';
-            for (let i = 0; i < length; i++) {
-                out += chars[Math.floor(Math.random() * chars.length)];
-            }
-            return out;
-        }
-
         document.addEventListener('input', function (event) {
             if (!event.target.matches('.digit-inputs input')) {
                 return;
@@ -710,30 +762,47 @@ $title = "Account Details";
             }
         });
 
-        // --- Two-Factor Authentication (client-side demo, no backend yet) ---
+        // --- Two-Factor Authentication ---
         const twoFaStatus = document.getElementById('twoFaStatus');
         const twoFaActionBtn = document.getElementById('twoFaActionBtn');
         const twoFaModalEl = document.getElementById('twoFaModal');
         const twoFaSetupInputs = document.getElementById('twoFaSetupInputs');
 
         function refreshTwoFaUi() {
-            const enabled = localStorage.getItem('demo_2fa_enabled') === 'true';
-            twoFaStatus.textContent = enabled ? 'Enabled' : 'Disabled';
-            twoFaStatus.className = 'badge d-block mb-2 ' + (enabled ? 'text-bg-success' : 'text-bg-secondary');
-            twoFaActionBtn.textContent = enabled ? 'Disable' : 'Enable';
-            if (enabled) {
-                twoFaActionBtn.removeAttribute('data-bs-toggle');
-                twoFaActionBtn.removeAttribute('data-bs-target');
-            } else {
-                twoFaActionBtn.setAttribute('data-bs-toggle', 'modal');
-                twoFaActionBtn.setAttribute('data-bs-target', '#twoFaModal');
-            }
+            return fetch('/api/v1/auth/totp/status')
+                .then((r) => r.json())
+                .then((data) => {
+                    const enabled = Boolean(data && data.enabled);
+                    twoFaEnabledState = enabled;
+                    twoFaStatus.textContent = enabled ? 'Enabled' : 'Disabled';
+                    twoFaStatus.className = 'badge d-block mb-2 ' + (enabled ? 'text-bg-success' : 'text-bg-secondary');
+                    twoFaActionBtn.textContent = enabled ? 'Disable' : 'Enable';
+                    if (enabled) {
+                        twoFaActionBtn.removeAttribute('data-bs-toggle');
+                        twoFaActionBtn.removeAttribute('data-bs-target');
+                    } else {
+                        twoFaActionBtn.setAttribute('data-bs-toggle', 'modal');
+                        twoFaActionBtn.setAttribute('data-bs-target', '#twoFaModal');
+                    }
+                })
+                .catch((error) => console.error('Failed to load 2FA status:', error));
         }
 
         twoFaModalEl.addEventListener('show.bs.modal', function () {
-            document.getElementById('twoFaSecret').textContent = randomBase32(16).match(/.{1,4}/g).join(' ');
+            document.getElementById('twoFaSecret').textContent = '';
             buildDigitInputs(twoFaSetupInputs, 6);
             document.getElementById('twoFaSetupError').textContent = '';
+
+            fetch('/api/v1/auth/totp/setup', { method: 'POST' })
+                .then((r) => r.json())
+                .then((data) => {
+                    document.getElementById('twoFaSecret').textContent =
+                        (data.secret || '').match(/.{1,4}/g)?.join(' ') || data.secret || '';
+                })
+                .catch((error) => {
+                    document.getElementById('twoFaSetupError').textContent = 'Failed to start 2FA setup. Please try again.';
+                    console.error(error);
+                });
         });
 
         document.getElementById('confirmTwoFaBtn').addEventListener('click', function () {
@@ -742,34 +811,58 @@ $title = "Account Details";
                 document.getElementById('twoFaSetupError').textContent = 'Please enter the 6-digit code.';
                 return;
             }
-            localStorage.setItem('demo_2fa_enabled', 'true');
-            refreshTwoFaUi();
-            bootstrap.Modal.getInstance(twoFaModalEl).hide();
+
+            fetch('/api/v1/auth/totp/enable', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            })
+                .then(async (r) => {
+                    if (!r.ok) {
+                        const data = await r.json().catch(() => ({}));
+                        throw new Error(data.error || 'Invalid code.');
+                    }
+                    return refreshTwoFaUi();
+                })
+                .then(() => bootstrap.Modal.getInstance(twoFaModalEl).hide())
+                .catch((error) => {
+                    document.getElementById('twoFaSetupError').textContent = error.message;
+                });
         });
 
         twoFaActionBtn.addEventListener('click', function () {
-            const enabled = localStorage.getItem('demo_2fa_enabled') === 'true';
-            if (enabled) {
-                requestTwoFaVerification(() => {
-                    localStorage.removeItem('demo_2fa_enabled');
-                    refreshTwoFaUi();
+            if (twoFaEnabledState) {
+                requestTwoFaVerification((code) => {
+                    fetch('/api/v1/auth/totp/disable', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code }),
+                    })
+                        .then(async (r) => {
+                            if (!r.ok) {
+                                const data = await r.json().catch(() => ({}));
+                                throw new Error(data.error || 'Invalid code.');
+                            }
+                            return refreshTwoFaUi();
+                        })
+                        .catch((error) => showAccountError(error.message));
                 }, 'Enter the 6-digit code from your authenticator app to disable two-factor authentication.');
             }
         });
 
         refreshTwoFaUi();
 
-        // --- 2FA verification gate for security-sensitive actions (client-side demo, no backend yet) ---
+        // --- 2FA verification gate for security-sensitive actions ---
         const twoFaVerifyModalEl = document.getElementById('twoFaVerifyModal');
         const twoFaVerifyInputs = document.getElementById('twoFaVerifyInputs');
         const twoFaVerifyMessage = document.getElementById('twoFaVerifyMessage');
         let twoFaVerifyCallback = null;
 
         /**
-         * Opens the 2FA verification modal and runs `onVerified` once a
-         * 6-digit code has been entered. Used to gate any security-sensitive
-         * action (saving a password change, disabling 2FA) behind 2FA when
-         * it's enabled.
+         * Opens the 2FA verification modal and runs `onVerified(code)` once a
+         * 6-digit code has been entered and confirmed valid against the
+         * user's TOTP secret. Used to gate any security-sensitive action
+         * (saving a password change, disabling 2FA) behind 2FA when it's enabled.
          */
         function requestTwoFaVerification(onVerified, message) {
             twoFaVerifyCallback = onVerified;
@@ -789,10 +882,25 @@ $title = "Account Details";
                 document.getElementById('twoFaVerifyError').textContent = 'Please enter the 6-digit code.';
                 return;
             }
-            bootstrap.Modal.getInstance(twoFaVerifyModalEl).hide();
-            const callback = twoFaVerifyCallback;
-            twoFaVerifyCallback = null;
-            if (callback) callback();
+
+            fetch('/api/v1/auth/login/verify-totp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUserId, code }),
+            })
+                .then(async (r) => {
+                    if (!r.ok) {
+                        const data = await r.json().catch(() => ({}));
+                        throw new Error(data.error || 'Invalid code.');
+                    }
+                    bootstrap.Modal.getInstance(twoFaVerifyModalEl).hide();
+                    const callback = twoFaVerifyCallback;
+                    twoFaVerifyCallback = null;
+                    if (callback) callback(code);
+                })
+                .catch((error) => {
+                    document.getElementById('twoFaVerifyError').textContent = error.message;
+                });
         });
 
         // --- Security keys / FIDO (client-side demo, no backend yet) ---
@@ -858,37 +966,46 @@ $title = "Account Details";
 
         renderFidoKeys();
 
-        // --- Recovery codes (client-side demo, no backend yet) ---
+        // --- Recovery codes ---
+        // Codes are only ever returned once, at generation time (the server
+        // stores hashes only), so there is no "load existing codes" - opening
+        // the modal shows whatever was generated earlier *this page load*, or
+        // prompts to generate a fresh set.
         const recoveryCodesGrid = document.getElementById('recoveryCodesGrid');
         const recoveryStatus = document.getElementById('recoveryStatus');
-
-        function loadRecoveryCodes() {
-            const stored = localStorage.getItem('demo_recovery_codes');
-            return stored ? JSON.parse(stored) : null;
-        }
+        let currentRecoveryCodes = null;
 
         function generateRecoveryCodes() {
-            const codes = [];
-            for (let i = 0; i < 10; i++) {
-                codes.push(randomBase32(10).match(/.{1,5}/g).join('-'));
-            }
-            localStorage.setItem('demo_recovery_codes', JSON.stringify(codes));
-            return codes;
+            return fetch('/api/v1/auth/recovery-codes/generate', { method: 'POST' })
+                .then((r) => r.json())
+                .then((data) => {
+                    currentRecoveryCodes = data.codes || [];
+                    return currentRecoveryCodes;
+                });
         }
 
         function renderRecoveryCodes(codes) {
-            recoveryCodesGrid.innerHTML = codes.map((code) => `<span>${code}</span>`).join('');
-            recoveryStatus.textContent = codes.length + ' recovery codes generated.';
+            recoveryCodesGrid.innerHTML = codes.map((code) => `<span>${escapeHtml(code)}</span>`).join('');
+            recoveryStatus.textContent = codes.length + ' recovery codes generated. Save them now — they will not be shown again.';
         }
 
         document.getElementById('recoveryModal').addEventListener('show.bs.modal', function () {
-            renderRecoveryCodes(loadRecoveryCodes() || generateRecoveryCodes());
+            if (currentRecoveryCodes) {
+                renderRecoveryCodes(currentRecoveryCodes);
+                return;
+            }
+            recoveryCodesGrid.innerHTML = '';
+            recoveryStatus.textContent = 'Generate recovery codes to get a fresh set. Existing codes (if any) are hashed and cannot be displayed again.';
         });
 
         document.getElementById('regenerateRecoveryBtn').addEventListener('click', function () {
-            if (confirm('Regenerating will invalidate your existing recovery codes. Continue?')) {
-                renderRecoveryCodes(generateRecoveryCodes());
-            }
+            const proceed = currentRecoveryCodes === null ||
+                confirm('Regenerating will invalidate your existing recovery codes. Continue?');
+            if (!proceed) return;
+
+            generateRecoveryCodes()
+                .then(renderRecoveryCodes)
+                .catch((error) => showAccountError('Failed to generate recovery codes: ' + error.message));
         });
 
         /**
@@ -956,13 +1073,12 @@ $title = "Account Details";
         }
 
         document.getElementById('printRecoveryBtn').addEventListener('click', function () {
-            printRecoveryCodes(loadRecoveryCodes() || generateRecoveryCodes());
+            if (!currentRecoveryCodes) {
+                showAccountError('Generate recovery codes first, then print them.');
+                return;
+            }
+            printRecoveryCodes(currentRecoveryCodes);
         });
-
-        const existingRecoveryCodes = loadRecoveryCodes();
-        if (existingRecoveryCodes) {
-            recoveryStatus.textContent = existingRecoveryCodes.length + ' recovery codes generated.';
-        }
     </script>
 </body>
 

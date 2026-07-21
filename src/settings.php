@@ -6,6 +6,15 @@ if ($isAuthenticated === false) {
     exit();
 }
 
+require_once "webhook.secrets.php";
+require_once "includes/constants.php";
+require_once "includes/log-stream.php";
+require_once "includes/remote-json-proxy.php";
+require_once "includes/user-scope.php";
+
+// Saved through /api/v1/user-settings (see the inline script below) - this
+// page only renders the initial values server-side.
+
 $user = $_SESSION['user'];
 $userData = [
     'create_labels' => 1,
@@ -20,37 +29,22 @@ $userData = [
     'notify_pull_requests' => 1
 ];
 
-if (isset($_SESSION['user_data'])) {
-    $userData = $_SESSION['user_data'];
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $create_labels = isset($_POST['create_labels']) ? 1 : 0;
-    $notify_issues = isset($_POST['notify_issues']) ? 1 : 0;
-    $require_acceptance_criteria_checklist = isset($_POST['require_acceptance_criteria_checklist']) ? 1 : 0;
-    $reminder_issues = isset($_POST['reminder_issues']) ? 1 : 0;
-    $reminder_issues_days = isset($_POST['reminder_issues_days']) ? intval($_POST['reminder_issues_days']) : null;
-    $pr_template_description = isset($_POST['pr_template_description']) ? 1 : 0;
-    $auto_review_pr = isset($_POST['auto_review_pr']) ? 1 : 0;
-    $auto_merge_pr = isset($_POST['auto_merge_pr']) ? 1 : 0;
-    $create_issue = isset($_POST['create_issue']) ? 1 : 0;
-    $notify_pull_requests = isset($_POST['notify_pull_requests']) ? 1 : 0;
-
-    $_SESSION['user_data'] = [
-        'create_labels' => $create_labels,
-        'notify_issues' => $notify_issues,
-        'require_acceptance_criteria_checklist' => $require_acceptance_criteria_checklist,
-        'reminder_issues' => $reminder_issues,
-        'reminder_issues_days' => $reminder_issues_days,
-        'pr_template_description' => $pr_template_description,
-        'auto_review_pr' => $auto_review_pr,
-        'auto_merge_pr' => $auto_merge_pr,
-        'create_issue' => $create_issue,
-        'notify_pull_requests' => $notify_pull_requests
+$settingsUrl = appendUserIdParam($gstracciniApiUrl."v1/user-settings/", getCurrentUserId());
+$settingsResult = sendJsonToUpstream($settingsUrl, 'GET', null, ["X-Api-Key: $gstracciniApiKey"]);
+if ($settingsResult['httpCode'] === 200 && is_array($settingsResult['decoded'])) {
+    $remote = $settingsResult['decoded'];
+    $userData = [
+        'create_labels' => !empty($remote['createLabels']) ? 1 : 0,
+        'notify_issues' => !empty($remote['notifyIssues']) ? 1 : 0,
+        'require_acceptance_criteria_checklist' => !empty($remote['requireAcceptanceCriteriaChecklist']) ? 1 : 0,
+        'reminder_issues' => !empty($remote['reminderIssues']) ? 1 : 0,
+        'reminder_issues_days' => $remote['reminderIssuesDays'] ?? 10,
+        'pr_template_description' => !empty($remote['prTemplateDescription']) ? 1 : 0,
+        'auto_review_pr' => !empty($remote['autoReviewPr']) ? 1 : 0,
+        'auto_merge_pr' => !empty($remote['autoMergePr']) ? 1 : 0,
+        'create_issue' => !empty($remote['createIssue']) ? 1 : 0,
+        'notify_pull_requests' => !empty($remote['notifyPullRequests']) ? 1 : 0,
     ];
-
-    header("Location: settings.php?updated=true");
-    exit();
 }
 
 $title = "Settings";
@@ -323,10 +317,41 @@ $title = "Settings";
 
                 if (form.checkValidity() === false) {
                     form.classList.add('was-validated');
-                } else {
-                    form.classList.remove('was-validated');
-                    form.submit();
+                    return;
                 }
+
+                form.classList.remove('was-validated');
+
+                const payload = {
+                    createLabels: document.getElementById('create_labels').checked,
+                    notifyIssues: document.getElementById('notify_issues').checked,
+                    requireAcceptanceCriteriaChecklist: document.getElementById('require_acceptance_criteria_checklist').checked,
+                    reminderIssues: document.getElementById('reminder_issues').checked,
+                    reminderIssuesDays: document.getElementById('reminder_issues_days').value
+                        ? parseInt(document.getElementById('reminder_issues_days').value, 10)
+                        : null,
+                    prTemplateDescription: document.getElementById('pr_template_description').checked,
+                    autoReviewPr: document.getElementById('auto_review_pr').checked,
+                    autoMergePr: document.getElementById('auto_merge_pr').checked,
+                    createIssue: document.getElementById('create_issue').checked,
+                    notifyPullRequests: document.getElementById('notify_pull_requests').checked,
+                };
+
+                fetch('/api/v1/user-settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                })
+                    .then(async (response) => {
+                        if (!response.ok) {
+                            const data = await response.json().catch(() => ({}));
+                            throw new Error(data.error || 'Failed to save settings.');
+                        }
+                        window.location.href = 'settings.php?updated=true';
+                    })
+                    .catch((error) => {
+                        alert(error.message || 'Failed to save settings.');
+                    });
             });
 
             const reminder_issues = document.getElementById('reminder_issues');

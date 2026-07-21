@@ -629,6 +629,86 @@ function loadStats() {
 }
 
 /**
+ * Maps a recent-activity actionType to a FontAwesome icon class and label.
+ */
+function getActivityIcon(actionType) {
+    const icons = {
+        opened_pr: { icon: 'fa-code-branch', label: 'Opened PR' },
+        merged_pr: { icon: 'fa-code-merge', label: 'Merged PR' },
+        closed_issue: { icon: 'fa-check-double', label: 'Closed issue' },
+        commented: { icon: 'fa-comment', label: 'Commented' },
+        pushed_commits: { icon: 'fa-upload', label: 'Pushed commits' },
+    };
+
+    return icons[actionType] || { icon: 'fa-circle-dot', label: 'Activity' };
+}
+
+/**
+ * Fetches the signed-in user's recent activity feed and renders it into the
+ * Recent Activities box.
+ */
+function loadRecentActivities() {
+    const list = document.getElementById('recentActivities');
+    if (!list) return;
+
+    fetch('/api/v1/recent-activities')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(activities => {
+            if (!Array.isArray(activities)) {
+                throw new Error('Invalid response format');
+            }
+
+            list.innerHTML = '';
+
+            if (activities.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.className = 'list-group-item list-group-item-light text-center py-4';
+                emptyItem.innerHTML = `
+                    <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                    <h6 class="text-muted mb-1">No recent activity</h6>
+                `;
+                list.appendChild(emptyItem);
+                return;
+            }
+
+            activities.forEach(activity => {
+                const { icon, label } = getActivityIcon(activity.actionType);
+
+                const li = document.createElement('li');
+                li.className = 'list-group-item border-0 py-3';
+
+                const link = activity.url
+                    ? `<a href="${escapeHtml(activity.url)}" target="_blank" rel="noopener noreferrer" class="text-decoration-none fw-bold text-dark">${escapeHtml(activity.title)}</a>`
+                    : escapeHtml(activity.title);
+
+                li.innerHTML = `
+                    <div class="mb-1"><i class="fas ${icon} me-2 text-primary"></i>${label}: ${link}</div>
+                    <div class="text-muted small">
+                        <i class="fab fa-github me-1"></i>${escapeHtml(activity.repositoryOwner)}/${escapeHtml(activity.repositoryName)}
+                        <span class="mx-1">&middot;</span>
+                        <i class="fas fa-clock me-1"></i>${formatDate(activity.createdAt)}
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading recent activities:', error);
+            list.innerHTML = `
+                <li class="list-group-item list-group-item-danger text-center py-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Failed to load recent activities</strong>
+                </li>
+            `;
+        });
+}
+
+/**
  * Adds a click event listener to the refresh button that updates the dashboard.
  */
 function addRefreshButton() {
@@ -698,6 +778,8 @@ function initialize() {
     initializeCounterAnimations();
 
     loadStats();
+
+    loadRecentActivities();
 
     loadData();
     

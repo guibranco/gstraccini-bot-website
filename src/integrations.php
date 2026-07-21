@@ -6,8 +6,15 @@ if ($isAuthenticated === false) {
     exit();
 }
 
+require_once "webhook.secrets.php";
+require_once "includes/constants.php";
+require_once "includes/log-stream.php";
+require_once "includes/remote-json-proxy.php";
+require_once "includes/user-scope.php";
+
 $user = $_SESSION['user'];
-$integrations = $_SESSION['integrations'] ?? [];
+$userId = getCurrentUserId();
+$apiHeaders = ["X-Api-Key: $gstracciniApiKey"];
 
 $title = "Integration Details";
 $providers = [
@@ -32,23 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($provider) && !empty($apiKey)) {
         if (!array_key_exists($provider, $providers)) {
             $error = "Unknown provider selected.";
+        } elseif (strlen($apiKey) < 10) {
+            $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
         } else {
-            $isValid = strlen($apiKey) >= 10;
-            if ($isValid) {
-                if (!isset($integrations[$provider])) {
-                    $integrations[$provider] = [
-                        'apiKey' => $apiKey,
-                        'status' => 'Validated',
-                        'lastUsage' => 'N/A',
-                        'lastError' => 'N/A',
-                    ];
-                    $_SESSION['integrations'] = $integrations;
-                    $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
-                } else {
-                    $error = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> already exists.";
-                }
+            $saveUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/", $userId);
+            $saveResult = sendJsonToUpstream($saveUrl, 'POST', ['provider' => $provider, 'apiKey' => $apiKey], $apiHeaders);
+            if ($saveResult['httpCode'] === 200) {
+                $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
             } else {
-                $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
+                $error = $saveResult['decoded']['error'] ?? "Failed to save integration for <strong>" . htmlspecialchars($provider) . "</strong>.";
             }
         }
     } else {
@@ -58,9 +57,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
-    unset($integrations[$providerToRemove]);
-    $_SESSION['integrations'] = $integrations;
-    $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
+    $deleteUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/".rawurlencode($providerToRemove)."/", $userId);
+    $deleteResult = sendJsonToUpstream($deleteUrl, 'DELETE', null, $apiHeaders);
+    if ($deleteResult['httpCode'] === 200) {
+        $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
+    } else {
+        $error = $deleteResult['decoded']['error'] ?? "Failed to remove integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong>.";
+    }
+}
+
+$integrations = [];
+$listUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/", $userId);
+$listResult = sendJsonToUpstream($listUrl, 'GET', null, $apiHeaders);
+if ($listResult['httpCode'] === 200 && is_array($listResult['decoded'])) {
+    foreach ($listResult['decoded'] as $integration) {
+        $integrations[$integration['provider']] = [
+            'maskedApiKey' => $integration['maskedApiKey'],
+            'status' => $integration['status'],
+            'lastUsage' => $integration['lastUsedAt'] ?? 'N/A',
+            'lastError' => $integration['lastError'] ?? 'N/A',
+        ];
+    }
 }
 
 ksort($integrations);
@@ -69,13 +86,6 @@ $usedIntegrations = array_keys($integrations);
 $availableProviders = array_filter($providers, function ($provider) use ($usedIntegrations) {
     return !in_array($provider, $usedIntegrations);
 }, ARRAY_FILTER_USE_KEY);
-
-function maskApiKey($apiKey)
-{
-    $visibleLength = 4;
-    $maskedLength = strlen($apiKey) - ($visibleLength * 2);
-    return substr($apiKey, 0, $visibleLength) . str_repeat('*', $maskedLength) . substr($apiKey, -$visibleLength);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -224,7 +234,7 @@ function maskApiKey($apiKey)
                                                             alt="<?php echo htmlspecialchars($provider); ?>" class="provider-logo">
                                                         <?php echo htmlspecialchars($provider); ?>
                                                     </td>
-                                                    <td><code><?php echo htmlspecialchars(maskApiKey($details['apiKey'])); ?></code>
+                                                    <td><code><?php echo htmlspecialchars($details['maskedApiKey'] ?? ''); ?></code>
                                                     </td>
                                                     <td>
                                                         <span
