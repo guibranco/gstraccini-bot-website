@@ -11,8 +11,9 @@
  *
  * @param string $url          The upstream URL to fetch.
  * @param string $resourceName Human-readable resource name used in the fetch-failure error message (e.g. "commands", "stats").
+ * @param array  $extraHeaders Additional request headers, e.g. ['X-Api-Key: secret'].
  */
-function proxyJsonFromUpstream(string $url, string $resourceName): void
+function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHeaders = []): void
 {
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -23,7 +24,7 @@ function proxyJsonFromUpstream(string $url, string $resourceName): void
         CURLOPT_TIMEOUT => 10,
         CURLOPT_CONNECTTIMEOUT => 5,
         CURLOPT_USERAGENT => getUserAgent(),
-        CURLOPT_HTTPHEADER => ['Accept: application/json'],
+        CURLOPT_HTTPHEADER => array_merge(['Accept: application/json'], $extraHeaders),
     ]);
 
     $response = curl_exec($curl);

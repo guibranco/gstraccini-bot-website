@@ -27,111 +27,86 @@ $title = "Notifications";
 
     <div class="container mt-5">
         <h2>Pending Actions</h2>
-        <div class="list-group mb-5" id="pending-actions-list">
-            <a href="#" class="list-group-item list-group-item-action">
-                <i class="fas fa-exclamation-circle"></i> Complete Profile Setup
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <i class="fas fa-tasks"></i> Approve New User Requests
-            </a>
-        </div>
+        <div class="list-group mb-5" id="pending-actions-list"></div>
 
         <h2>Notifications</h2>
 
         <div class="mb-3">
-            <button class="btn btn-secondary" id="unread-btn">
-                <i class="fas fa-envelope"></i> Unread
-            </button>
-            <button class="btn btn-success" id="read-btn">
-                <i class="fas fa-envelope-open"></i> Read
-            </button>
-            <button class="btn btn-primary" id="view-all-btn">
-                <i class="fas fa-list"></i> View All
+            <button class="btn btn-primary" id="refresh-notifications-btn">
+                <i class="fas fa-rotate"></i> Refresh
             </button>
         </div>
 
-        <div class="list-group" id="notifications-list">
-            <a href="#" class="list-group-item list-group-item-action">
-                <i class="fas fa-envelope"></i> You have a new message from John.
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <i class="fas fa-envelope-open"></i> System maintenance scheduled for tonight.
-            </a>
-        </div>
+        <div class="list-group" id="notifications-list"></div>
 
     </div>
 
 
     <?php require_once "includes/footer.php"; ?>
     <script>
-        function fetchNotifications(filter) {
-            console.log('Fetching notifications:', filter);
-
-            let notifications = [];
-            if (filter === 'all') {
-                notifications = [
-                    { id: 1, type: 'unread', text: 'You have a new message from John.' },
-                    { id: 2, type: 'read', text: 'System maintenance scheduled for tonight.' },
-                    { id: 3, type: 'unread', text: 'New updates are available.' },
-                ];
-            } else if (filter === 'unread') {
-                notifications = [
-                    { id: 1, type: 'unread', text: 'You have a new message from John.' },
-                    { id: 3, type: 'unread', text: 'New updates are available.' },
-                ];
-            } else if (filter === 'read') {
-                notifications = [
-                    { id: 2, type: 'read', text: 'System maintenance scheduled for tonight.' },
-                ];
-            }
-
-            updateNotificationList(notifications);
-
-            // const params = new URLSearchParams({ filter, page: 1, limit: 10 });
-            // fetch(`/api/notifications?${params}`)
-            //     .then(response => {
-            //         if (!response.ok) throw new Error('Failed to fetch notifications');
-            //         return response.json();
-            //     })
-            //     .then(data => {
-            //         updateNotificationList(data.notifications);
-            //         updatePagination(data.pagination);
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         showErrorMessage('Failed to load notifications');
-            //     });
+        function fetchNotifications() {
+            fetch('/api/v1/notifications')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showErrorMessage('#notifications-list', data.error);
+                        return;
+                    }
+                    renderListItems('#notifications-list', data, 'fa-envelope', 'No unread notifications.');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('#notifications-list', 'Failed to load notifications.');
+                });
         }
 
-        function updateNotificationList(notifications) {
-            const $notificationsList = $('#notifications-list');
-            $notificationsList.empty();
+        function fetchPendingActions() {
+            fetch('/api/v1/pending-actions')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showErrorMessage('#pending-actions-list', data.error);
+                        return;
+                    }
+                    renderListItems('#pending-actions-list', data, 'fa-exclamation-circle', 'No pending actions.');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('#pending-actions-list', 'Failed to load pending actions.');
+                });
+        }
 
-            notifications.forEach(notification => {
-                const icon = notification.type === 'unread' ? 'fa-envelope' : 'fa-envelope-open';
-                const notificationItem = `
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="fas ${icon}"></i> ${notification.text}
+        function showErrorMessage(listSelector, message) {
+            $(listSelector).html(`<div class="list-group-item text-bg-danger">${escapeHtml(message)}</div>`);
+        }
+
+        function renderListItems(listSelector, items, icon, emptyText) {
+            const $list = $(listSelector);
+            $list.empty();
+
+            if (!items || items.length === 0) {
+                $list.html(`<div class="list-group-item">${escapeHtml(emptyText)}</div>`);
+                return;
+            }
+
+            items.forEach(item => {
+                const repo = `${item.repositoryOwner}/${item.repositoryName}`;
+                const url = item.url ? encodeURI(item.url) : '#';
+                $list.append(`
+                <a href="${url}" target="_blank" class="list-group-item list-group-item-action">
+                    <i class="fas ${icon}"></i> ${escapeHtml(item.title)} - ${escapeHtml(repo)}
                 </a>
-            `;
-                $notificationsList.append(notificationItem);
+            `);
             });
         }
 
-        $('#view-all-btn').on('click', function () {
-            fetchNotifications('all');
-        });
-
-        $('#unread-btn').on('click', function () {
-            fetchNotifications('unread');
-        });
-
-        $('#read-btn').on('click', function () {
-            fetchNotifications('read');
+        $('#refresh-notifications-btn').on('click', function () {
+            fetchNotifications();
         });
 
         $(document).ready(function () {
-            fetchNotifications('all');
+            fetchNotifications();
+            fetchPendingActions();
         });
     </script>
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * API endpoint for the signed-in user's unread notifications, scoped to
+ * API endpoint for the signed-in user's unread pending actions, scoped to
  * their GitHub user id.
  */
 
@@ -24,6 +24,6 @@ if ($isAuthenticated === false) {
 
 header('Content-Type: application/json');
 
-$url = appendUserIdParam($gstracciniApiUrl."v1/notifications/", getCurrentUserId());
+$url = appendUserIdParam($gstracciniApiUrl."v1/pending-actions/", getCurrentUserId());
 
-proxyJsonFromUpstream($url, 'notifications', ["X-Api-Key: $gstracciniApiKey"]);
+proxyJsonFromUpstream($url, 'pending actions', ["X-Api-Key: $gstracciniApiKey"]);
