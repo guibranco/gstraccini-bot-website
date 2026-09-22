@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76d8723dda5f0b2f66d32b2b71e86b12",
+    "content-hash": "18d89b0563f780813df8bba899d7f23f",
     "packages": [
         {
             "name": "guibranco/pancake",
-            "version": "v1.9.14",
+            "version": "v1.9.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guibranco/pancake.git",
-                "reference": "85d2a9d427f18ed5e4ed491bc285f15a419c6ab9"
+                "reference": "8905f3be75a71a7097697cef787864d370d07c9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guibranco/pancake/zipball/85d2a9d427f18ed5e4ed491bc285f15a419c6ab9",
-                "reference": "85d2a9d427f18ed5e4ed491bc285f15a419c6ab9",
+                "url": "https://api.github.com/repos/guibranco/pancake/zipball/8905f3be75a71a7097697cef787864d370d07c9d",
+                "reference": "8905f3be75a71a7097697cef787864d370d07c9d",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
                 "psr/container": "^1.1 || ^2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "13.3.3"
+                "phpunit/phpunit": "13.3.4"
             },
             "type": "library",
             "autoload": {
@@ -46,9 +46,9 @@
             "description": "The Pancake project, a toolkit for PHP projects",
             "support": {
                 "issues": "https://github.com/guibranco/pancake/issues",
-                "source": "https://github.com/guibranco/pancake/tree/v1.9.14"
+                "source": "https://github.com/guibranco/pancake/tree/v1.9.17"
             },
-            "time": "2026-09-14T03:46:06+00:00"
+            "time": "2026-09-21T03:51:25+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
