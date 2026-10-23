@@ -1,4 +1,4 @@
-FROM php:8.6-rc-apache
+FROM php:8.6.0RC4-apache
 
 RUN a2enmod rewrite \
     && apt-get clean \
