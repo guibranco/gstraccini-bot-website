@@ -29,16 +29,17 @@ function getLogStream(?string $secretsFile = null): ?LogStream
 
     require $secretsFile;
 
-    if (empty($logStreamUrl) || empty($logStreamToken)) {
+    if (empty($logStreamServer) || empty($logStreamApiKey) || empty($logStreamApiToken)) {
         return null;
     }
 
     $instance = new LogStream(
-        baseUrl: $logStreamUrl,
-        appKey: 'gstraccini-bot-website',
+        baseUrl: $logStreamServer,
+        appKey: $logStreamApiKey,
         appId: getAppVersion(),
-        authMode: LogStream::AUTH_BEARER,
-        apiSecret: $logStreamToken,
+        authMode: LogStream::AUTH_API_KEY,
+        apiKey: $logStreamApiKey,
+        apiToken: $logStreamApiToken,
         userAgent: getUserAgent(),
     );
 

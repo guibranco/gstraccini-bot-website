@@ -34,7 +34,7 @@ class LogStreamIntegrationTest extends TestCase
     #[RunInSeparateProcess]
     public function testGetLogStreamIsNullWhenSecretsAreIncomplete(): void
     {
-        file_put_contents($this->secretsFile, "<?php\n\$logStreamUrl = '';\n\$logStreamToken = '';\n");
+        file_put_contents($this->secretsFile, "<?php\n\$logStreamServer = 'https://logstream.example.com/';\n\$logStreamApiKey = 'test-key';\n\$logStreamApiToken = '';\n");
 
         $this->assertNull(getLogStream($this->secretsFile));
     }
@@ -44,7 +44,7 @@ class LogStreamIntegrationTest extends TestCase
     {
         file_put_contents(
             $this->secretsFile,
-            "<?php\n\$logStreamUrl = 'https://logstream.example.com/';\n\$logStreamToken = 'test-token';\n"
+            "<?php\n\$logStreamServer = 'https://logstream.example.com/';\n\$logStreamApiKey = 'test-key';\n\$logStreamApiToken = 'test-token';\n"
         );
 
         $this->assertInstanceOf(LogStream::class, getLogStream($this->secretsFile));

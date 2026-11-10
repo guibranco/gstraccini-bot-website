@@ -51,11 +51,22 @@ jobs:
           echo "\$webhooksServiceUrl    = \"${{ secrets.WEBHOOK_SERVICE_HEALTHCHECK_URL }}\";" >> webhook.secrets.php
 
       - name: 🔑 Generate LogStream Configuration
+        env:
+          LOGSTREAM_SERVER: ${{ secrets.LOGSTREAM_SERVER }}
+          LOGSTREAM_API_KEY: ${{ secrets.LOGSTREAM_API_KEY }}
+          LOGSTREAM_API_TOKEN: ${{ secrets.LOGSTREAM_API_TOKEN }}
         run: |
           cd src
-          echo "<?php" >> logstream.secrets.php
-          echo "\$logStreamUrl   = \"${{ secrets.LOGSTREAM_URL }}\";" >> logstream.secrets.php
-          echo "\$logStreamToken = \"${{ secrets.LOGSTREAM_TOKEN }}\";" >> logstream.secrets.php
+          php_literal() {
+            local value="${1//\\/\\\\}"
+            printf "'%s'" "${value//\'/\\\'}"
+          }
+          {
+            echo "<?php"
+            echo "\$logStreamServer   = $(php_literal "$LOGSTREAM_SERVER");"
+            echo "\$logStreamApiKey   = $(php_literal "$LOGSTREAM_API_KEY");"
+            echo "\$logStreamApiToken = $(php_literal "$LOGSTREAM_API_TOKEN");"
+          } > logstream.secrets.php
 
       - name: 🐘 Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
@@ -88,7 +99,7 @@ jobs:
       - name: 📝 Create Version File for API
         run: |
           cd src
-          echo ${{ env.fullSemVer }} > version.txt
+          echo "${{ steps.gitversion.outputs.fullSemVer }}" > version.txt
 
       - name: 🧹 Prune dev dependencies
         uses: "php-actions/composer@8a65f0d3c6a1d17ca4800491a40b5756a4c164f3" # v6
