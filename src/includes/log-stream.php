@@ -33,7 +33,7 @@ function getLogStream(?string $secretsFile = null): ?LogStream
 
     require $secretsFile;
 
-    if (empty($logStreamServer) || empty($logStreamApiKey) || empty($logStreamApiToken)) {
+    if (empty($logStreamServer) === true || empty($logStreamApiKey) === true || empty($logStreamApiToken) === true) {
         return null;
     }
 
