@@ -39,21 +39,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!array_key_exists($provider, $providers)) {
             logWarning(
                 "User {userId} tried to add unknown integration {provider}",
-                ['userId' => $userId, 'provider' => $provider],
+                [
+                    'userId' => $userId,
+                    'provider' => $provider,
+                ],
                 'integrations'
             );
             $error = "Unknown provider selected.";
         } elseif (strlen($apiKey) < 10) {
             logNotice(
                 "User {userId} submitted an invalid API key for integration {provider}",
-                ['userId' => $userId, 'provider' => $provider],
+                [
+                    'userId' => $userId,
+                    'provider' => $provider,
+                ],
                 'integrations'
             );
             $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
         } else {
             $saveUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/", $userId);
             $saveResult = sendJsonToUpstream($saveUrl, 'POST', ['provider' => $provider, 'apiKey' => $apiKey], $apiHeaders);
-            logIntegrationChange('added', $userId, $provider, $saveResult['httpCode']);
+            logIntegrationChange('add', $userId, $provider, $saveResult['httpCode']);
             if ($saveResult['httpCode'] === 200) {
                 $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
             } else {
@@ -69,7 +75,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     $deleteUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/".rawurlencode($providerToRemove)."/", $userId);
     $deleteResult = sendJsonToUpstream($deleteUrl, 'DELETE', null, $apiHeaders);
-    logIntegrationChange('removed', $userId, $providerToRemove, $deleteResult['httpCode']);
+    logIntegrationChange('remove', $userId, $providerToRemove, $deleteResult['httpCode']);
     if ($deleteResult['httpCode'] === 200) {
         $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
     } else {
@@ -83,7 +89,10 @@ $listResult = sendJsonToUpstream($listUrl, 'GET', null, $apiHeaders);
 if ($listResult['httpCode'] !== 200 || !is_array($listResult['decoded'])) {
     logWarning(
         "Could not list integrations for user {userId}: HTTP {httpCode}",
-        ['userId' => $userId, 'httpCode' => $listResult['httpCode']],
+        [
+            'userId' => $userId,
+            'httpCode' => $listResult['httpCode'],
+        ],
         'integrations'
     );
 } else {

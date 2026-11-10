@@ -28,7 +28,10 @@ function ensureConfigurationFileExists(string $path, string $endpoint): void
 
     logCritical(
         "Configuration file {file} not found",
-        ['file' => basename($path), 'endpoint' => $endpoint],
+        [
+            'file' => basename($path),
+            'endpoint' => $endpoint,
+        ],
         'configuration'
     );
     http_response_code(500);
@@ -71,9 +74,10 @@ function describeUpdatedFields(mixed $body): string
 }
 
 /**
- * Logs an integration being added or removed by the signed-in user.
+ * Logs a request by the signed-in user to add or remove an integration.
+ * The level follows the upstream status, so failed attempts are not logged as changes.
  *
- * @param string      $action   "added" or "removed".
+ * @param string      $action   "add" or "remove".
  * @param int|null    $userId   The GitHub user id.
  * @param string|null $provider The integration provider.
  * @param int         $httpCode The upstream HTTP status code.
@@ -83,8 +87,13 @@ function logIntegrationChange(string $action, ?int $userId, ?string $provider, i
 {
     logEvent(
         getLogLevelForHttpStatus($httpCode),
-        "User {userId} {action} integration {provider}: HTTP {httpCode}",
-        ['userId' => $userId, 'action' => $action, 'provider' => $provider, 'httpCode' => $httpCode],
+        "User {userId} requested to {action} integration {provider}: HTTP {httpCode}",
+        [
+            'userId' => $userId,
+            'action' => $action,
+            'provider' => $provider,
+            'httpCode' => $httpCode,
+        ],
         'integrations'
     );
 }

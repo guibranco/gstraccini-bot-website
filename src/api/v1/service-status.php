@@ -59,7 +59,11 @@ function checkServiceHealth(string $url): array
 
     $status = ($httpCode === 200 && strtolower(trim($body)) === 'healthy') ? 'Operational' : 'Failure';
 
-    $properties = ['url' => $url, 'httpCode' => $httpCode, 'status' => $status];
+    $properties = [
+        'url' => $url,
+        'httpCode' => $httpCode,
+        'status' => $status,
+    ];
     if ($status === 'Failure') {
         logWarning("Health check of {url} reported {status} (HTTP {httpCode})", $properties, 'health-checks');
     } else {
@@ -86,7 +90,11 @@ function checkServiceHealthSafely(string $serviceName, string $url): array
     } catch (Exception $e) {
         logError(
             "Health check of {service} at {url} failed: {error}",
-            ['service' => $serviceName, 'url' => $url, 'error' => $e->getMessage()],
+            [
+                'service' => $serviceName,
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ],
             'health-checks'
         );
 

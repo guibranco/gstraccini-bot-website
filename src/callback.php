@@ -65,8 +65,8 @@ class GitHubOAuthHandler
             logError(
                 "GitHub did not return an access token: {githubError}",
                 [
-                    'githubError' => $tokenData['error'] ?? 'unknown',
-                    'githubErrorDescription' => $tokenData['error_description'] ?? null,
+                    'githubError' => ($tokenData['error'] ?? 'unknown'),
+                    'githubErrorDescription' => ($tokenData['error_description'] ?? null),
                 ],
                 'auth'
             );
@@ -75,7 +75,7 @@ class GitHubOAuthHandler
 
         logDebug(
             "Exchanged OAuth code for an access token with scope {scope}",
-            ['scope' => $tokenData['scope'] ?? null],
+            ['scope' => ($tokenData['scope'] ?? null)],
             'auth'
         );
         
@@ -135,7 +135,10 @@ class GitHubOAuthHandler
             // Installations might not be available for all users
             logWarning(
                 "Could not fetch installations for {username}: {error}",
-                ['username' => $userLogin, 'error' => $e->getMessage()],
+                [
+                    'username' => $userLogin,
+                    'error' => $e->getMessage(),
+                ],
                 'auth'
             );
             $installations = [];
@@ -148,7 +151,10 @@ class GitHubOAuthHandler
             // Organizations might be private or unavailable
             logWarning(
                 "Could not fetch organizations for {username}: {error}",
-                ['username' => $userLogin, 'error' => $e->getMessage()],
+                [
+                    'username' => $userLogin,
+                    'error' => $e->getMessage(),
+                ],
                 'auth'
             );
             $organizations = [];
@@ -240,7 +246,12 @@ class GitHubOAuthHandler
         if ($response === false) {
             logError(
                 "Remote {method} {url} failed after {durationMs} ms: {error}",
-                ['method' => $method, 'url' => $url, 'durationMs' => $durationMs, 'error' => $error],
+                [
+                    'method' => $method,
+                    'url' => $url,
+                    'durationMs' => $durationMs,
+                    'error' => $error,
+                ],
                 'remote-calls'
             );
             throw new Exception("cURL Error: {$error}");
@@ -249,7 +260,12 @@ class GitHubOAuthHandler
         if ($httpCode >= 400) {
             logWarning(
                 "Remote {method} {url} returned HTTP {httpCode} in {durationMs} ms",
-                ['method' => $method, 'url' => $url, 'httpCode' => $httpCode, 'durationMs' => $durationMs],
+                [
+                    'method' => $method,
+                    'url' => $url,
+                    'httpCode' => $httpCode,
+                    'durationMs' => $durationMs,
+                ],
                 'remote-calls'
             );
             throw new Exception("HTTP Error {$httpCode}: Request failed");
@@ -257,7 +273,12 @@ class GitHubOAuthHandler
 
         logInfo(
             "Remote {method} {url} returned HTTP {httpCode} in {durationMs} ms",
-            ['method' => $method, 'url' => $url, 'httpCode' => $httpCode, 'durationMs' => $durationMs],
+            [
+                'method' => $method,
+                'url' => $url,
+                'httpCode' => $httpCode,
+                'durationMs' => $durationMs,
+            ],
             'remote-calls'
         );
 
@@ -289,8 +310,8 @@ class GitHubOAuthHandler
         logInfo(
             "User {username} logged in with {installations} installation(s) and {organizations} organization(s)",
             [
-                'username' => $userData['login'] ?? 'unknown',
-                'userId' => $userData['id'] ?? null,
+                'username' => ($userData['login'] ?? 'unknown'),
+                'userId' => ($userData['id'] ?? null),
                 'installations' => count($installations),
                 'organizations' => count($organizations),
             ],
@@ -301,7 +322,10 @@ class GitHubOAuthHandler
         unset($_SESSION['redirectUrl']);
         logDebug(
             "Redirecting {username} to {redirectUrl} after login",
-            ['username' => $userData['login'] ?? 'unknown', 'redirectUrl' => $redirectUrl],
+            [
+                'username' => ($userData['login'] ?? 'unknown'),
+                'redirectUrl' => sanitizeUrlForLog($redirectUrl),
+            ],
             'auth'
         );
 
@@ -352,7 +376,10 @@ try {
         // Log webhook error but don't fail the login process
         logError(
             "Token sync webhook for {username} failed: {error}",
-            ['username' => $userData['user']['login'] ?? 'unknown', 'error' => $e->getMessage()],
+            [
+                'username' => ($userData['user']['login'] ?? 'unknown'),
+                'error' => $e->getMessage(),
+            ],
             'auth'
         );
     }

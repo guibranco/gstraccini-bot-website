@@ -44,7 +44,11 @@ function loadData($url, $token)
         $curlError = curl_error($curl);
         logError(
             "GitHub API call to {url} failed after {durationMs} ms: {error}",
-            ['url' => $url, 'durationMs' => $durationMs, 'error' => $curlError],
+            [
+                'url' => $url,
+                'durationMs' => $durationMs,
+                'error' => $curlError,
+            ],
             'remote-calls'
         );
         curl_close($curl);
@@ -81,7 +85,11 @@ function loadData($url, $token)
     if (json_last_error() !== JSON_ERROR_NONE) {
         logError(
             "GitHub API call to {url} returned invalid JSON: {error}",
-            ['url' => $url, 'httpCode' => $httpCode, 'error' => json_last_error_msg()],
+            [
+                'url' => $url,
+                'httpCode' => $httpCode,
+                'error' => json_last_error_msg(),
+            ],
             'remote-calls'
         );
         return null;
@@ -113,7 +121,7 @@ function getResponseHeaderValue(string $rawHeaders, string $name): ?string
     foreach (explode("\r\n", $rawHeaders) as $line) {
         $separator = strpos($line, ':');
         if ($separator !== false && strcasecmp(trim(substr($line, 0, $separator)), $name) === 0) {
-            return trim(substr($line, $separator + 1));
+            return trim(substr($line, ($separator + 1)));
         }
     }
 
@@ -158,7 +166,11 @@ function fetchAllGitHubPages($url, $token, $maxPages = 3)
         if ($result === null || !isset($result["body"]) || $result["body"] === null) {
             logWarning(
                 "Stopped paginating {url} after {pagesFetched} page(s) because a page failed to load",
-                ['url' => $url, 'pagesFetched' => $pagesFetched, 'itemsFetched' => count($results)],
+                [
+                    'url' => $url,
+                    'pagesFetched' => $pagesFetched,
+                    'itemsFetched' => count($results),
+                ],
                 'remote-calls'
             );
             return $anySuccess ? $results : false;
@@ -174,7 +186,11 @@ function fetchAllGitHubPages($url, $token, $maxPages = 3)
     if ($url) {
         logNotice(
             "Pagination cap of {maxPages} page(s) reached; {itemsFetched} item(s) returned, more are available",
-            ['maxPages' => $maxPages, 'itemsFetched' => count($results), 'nextUrl' => $url],
+            [
+                'maxPages' => $maxPages,
+                'itemsFetched' => count($results),
+                'nextUrl' => $url,
+            ],
             'remote-calls'
         );
     }
@@ -223,7 +239,7 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     if (!isset($pullRequest["body"]["head"]) || $pullRequest["body"]["head"] === null) {
         logWarning(
             "Pull request {url} has no head information; skipping CI status lookup",
-            ['url' => $issueData['url'] ?? 'unknown'],
+            ['url' => ($issueData['url'] ?? 'unknown')],
             'github'
         );
         return $issueData;
@@ -237,7 +253,10 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     if ($state === null || !isset($state["body"]["state"])) {
         logWarning(
             "Could not load CI status for pull request {url}",
-            ['url' => $issueData['url'] ?? 'unknown', 'sha' => $sha],
+            [
+                'url' => ($issueData['url'] ?? 'unknown'),
+                'sha' => $sha,
+            ],
             'github'
         );
         return $issueData;
@@ -248,7 +267,7 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     $issueData["is_valid_pr"] = (
         $state["body"]["state"] === "success" &&
         ($issueData["mergeable"] ?? false) === true &&
-        in_array($issueData["mergeable_state"] ?? '', ["clean", "unstable"], true)
+        in_array(($issueData["mergeable_state"] ?? ''), ["clean", "unstable"], true)
     );
 
     return $issueData;
@@ -307,7 +326,7 @@ function checkAuth()
     if ($isAuthenticated === false) {
         logNotice(
             "Rejected unauthenticated API request to {path}",
-            ['path' => $_SERVER['REQUEST_URI'] ?? null],
+            ['path' => sanitizeUrlForLog(($_SERVER['REQUEST_URI'] ?? ''))],
             'auth'
         );
         http_response_code(401);
@@ -337,7 +356,11 @@ function getCache($cacheKey = 'data', $ttl = 300)
     ) {
         logDebug(
             "Cache hit for {cacheKey} (age {ageSeconds} s, TTL {ttl} s)",
-            ['cacheKey' => $cacheKey, 'ageSeconds' => time() - $_SESSION[$cacheKey]['last_api_call'], 'ttl' => $ttl],
+            [
+                'cacheKey' => $cacheKey,
+                'ageSeconds' => (time() - $_SESSION[$cacheKey]['last_api_call']),
+                'ttl' => $ttl,
+            ],
             'cache'
         );
         sendJsonResponse(

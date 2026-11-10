@@ -6,7 +6,11 @@ $redirectUrl = (substr($redirectUrl, 0, 1) === '/') ? $redirectUrl : '/' . $redi
 $baseUrl = 'https://bot.straccini.com';
 $parsedUrl = parse_url($redirectUrl);
 if (isset($parsedUrl['host']) && $parsedUrl['host'] !== parse_url($baseUrl, PHP_URL_HOST)) {
-    logWarning("Rejected off-site redirect URL {redirectUrl}", ['redirectUrl' => $redirectUrl], 'auth');
+    logWarning(
+        "Rejected off-site redirect URL {redirectUrl}",
+        ['redirectUrl' => sanitizeUrlForLog($redirectUrl)],
+        'auth'
+    );
     $redirectUrl = 'dashboard.php';
 }
 $_SESSION['redirectUrl'] = $redirectUrl;

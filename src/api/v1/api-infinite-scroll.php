@@ -6,7 +6,11 @@
 $token = checkAuth();
 
 if (!isset($_GET['page']) || !is_numeric($_GET['page']) || $_GET['page'] < 1) {
-    logNotice("Rejected infinite scroll request with invalid page {page}", ['page' => $_GET['page'] ?? null], 'api');
+    logNotice(
+        "Rejected infinite scroll request with invalid page {page}",
+        ['page' => sanitizeInputForLog(($_GET['page'] ?? null))],
+        'api'
+    );
     http_response_code(400);
     echo json_encode(['error' => 'Invalid page parameter']);
     exit();

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = json_decode(file_get_contents('php://input'), true) ?? [];
     $url = appendUserIdParam($gstracciniApiUrl."v1/integrations/", $userId);
     $result = sendJsonToUpstream($url, 'POST', $body, ["X-Api-Key: $gstracciniApiKey"]);
-    logIntegrationChange('added', $userId, $body['provider'] ?? null, $result['httpCode']);
+    logIntegrationChange('add', $userId, sanitizeInputForLog(($body['provider'] ?? null)), $result['httpCode']);
     http_response_code($result['httpCode'] > 0 ? $result['httpCode'] : 502);
     echo json_encode($result['decoded']);
     exit();
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $url = appendUserIdParam($gstracciniApiUrl."v1/integrations/".rawurlencode($providerSegment)."/", $userId);
     $result = sendJsonToUpstream($url, 'DELETE', null, ["X-Api-Key: $gstracciniApiKey"]);
-    logIntegrationChange('removed', $userId, $providerSegment, $result['httpCode']);
+    logIntegrationChange('remove', $userId, $providerSegment, $result['httpCode']);
     http_response_code($result['httpCode'] > 0 ? $result['httpCode'] : 502);
     echo json_encode($result['decoded']);
     exit();

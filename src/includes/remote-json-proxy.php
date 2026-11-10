@@ -36,7 +36,12 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
     if ($response === false || $curlError) {
         logError(
             "Upstream GET {url} for {resource} failed after {durationMs} ms: {error}",
-            ['url' => $url, 'resource' => $resourceName, 'durationMs' => $durationMs, 'error' => $curlError],
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'durationMs' => $durationMs,
+                'error' => $curlError,
+            ],
             'remote-calls'
         );
         http_response_code(502);
@@ -47,7 +52,12 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
     if ($httpCode !== 200) {
         logWarning(
             "Upstream GET {url} for {resource} returned HTTP {httpCode} in {durationMs} ms",
-            ['url' => $url, 'resource' => $resourceName, 'httpCode' => $httpCode, 'durationMs' => $durationMs],
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'httpCode' => $httpCode,
+                'durationMs' => $durationMs,
+            ],
             'remote-calls'
         );
         http_response_code(502);
@@ -74,7 +84,12 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
 
     logInfo(
         "Upstream GET {url} for {resource} returned HTTP {httpCode} in {durationMs} ms",
-        ['url' => $url, 'resource' => $resourceName, 'httpCode' => $httpCode, 'durationMs' => $durationMs],
+        [
+            'url' => $url,
+            'resource' => $resourceName,
+            'httpCode' => $httpCode,
+            'durationMs' => $durationMs,
+        ],
         'remote-calls'
     );
 
@@ -128,14 +143,24 @@ function sendJsonToUpstream(string $url, string $method, ?array $body, array $ex
     if ($response === false || $curlError) {
         logError(
             "Upstream {method} {url} failed after {durationMs} ms: {error}",
-            ['method' => $method, 'url' => $url, 'durationMs' => $durationMs, 'error' => $curlError],
+            [
+                'method' => $method,
+                'url' => $url,
+                'durationMs' => $durationMs,
+                'error' => $curlError,
+            ],
             'remote-calls'
         );
         return ['httpCode' => 502, 'decoded' => ['error' => "Upstream call failed: {$curlError}"], 'error' => $curlError];
     }
 
     $decoded = json_decode($response, true);
-    $properties = ['method' => $method, 'url' => $url, 'httpCode' => $httpCode, 'durationMs' => $durationMs];
+    $properties = [
+        'method' => $method,
+        'url' => $url,
+        'httpCode' => $httpCode,
+        'durationMs' => $durationMs,
+    ];
 
     // 4xx is relayed as-is (e.g. a wrong password), so only 5xx is worth a warning here.
     logEvent(

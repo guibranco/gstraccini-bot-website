@@ -19,7 +19,10 @@ class MessageTemplateTest extends TestCase
     {
         $message = renderMessageTemplate(
             'Remote call to {url} returned HTTP {httpCode}',
-            ['url' => 'https://api.github.com/user', 'httpCode' => 200]
+            [
+                'url' => 'https://api.github.com/user',
+                'httpCode' => 200,
+            ]
         );
 
         $this->assertSame('Remote call to https://api.github.com/user returned HTTP 200', $message);
@@ -48,7 +51,16 @@ class MessageTemplateTest extends TestCase
     {
         $message = renderMessageTemplate(
             '{none} {yes} {no} {list} {map}',
-            ['none' => null, 'yes' => true, 'no' => false, 'list' => [1, 2], 'map' => ['a' => 'b/c']]
+            [
+                'none' => null,
+                'yes' => true,
+                'no' => false,
+                'list' => [
+                    1,
+                    2,
+                ],
+                'map' => ['a' => 'b/c'],
+            ]
         );
 
         $this->assertSame('null true false [1,2] {"a":"b/c"}', $message);
@@ -83,11 +95,26 @@ class MessageTemplateTest extends TestCase
     public static function httpStatusProvider(): array
     {
         return [
-            'ok' => [200, 'info'],
-            'redirect' => [302, 'info'],
-            'client error' => [401, 'warning'],
-            'server error' => [502, 'error'],
-            'no response' => [0, 'error'],
+            'ok' => [
+                200,
+                'info',
+            ],
+            'redirect' => [
+                302,
+                'info',
+            ],
+            'client error' => [
+                401,
+                'warning',
+            ],
+            'server error' => [
+                502,
+                'error',
+            ],
+            'no response' => [
+                0,
+                'error',
+            ],
         ];
     }
 
@@ -101,6 +128,27 @@ class MessageTemplateTest extends TestCase
     public function testLogLevelForHttpStatus(int $httpCode, string $expected): void
     {
         $this->assertSame($expected, getLogLevelForHttpStatus($httpCode));
+    }
+
+    /**
+     * Query strings and fragments are dropped from logged URLs.
+     */
+    public function testSanitizeUrlDropsQueryString(): void
+    {
+        $this->assertSame('/dashboard.php', sanitizeUrlForLog('/dashboard.php?code=secret#top'));
+        $this->assertSame('evil.example.com/path', sanitizeUrlForLog('https://evil.example.com/path?token=1'));
+        $this->assertSame('/', sanitizeUrlForLog(''));
+    }
+
+    /**
+     * Untrusted input is truncated, and non-strings are replaced by their type.
+     */
+    public function testSanitizeInputBoundsValues(): void
+    {
+        $this->assertNull(sanitizeInputForLog(null));
+        $this->assertSame('abc', sanitizeInputForLog('abc'));
+        $this->assertSame(str_repeat('x', 10) . '…', sanitizeInputForLog(str_repeat('x', 20), 10));
+        $this->assertSame('array', sanitizeInputForLog(['a']));
     }
 
     /**
@@ -119,12 +167,18 @@ class MessageTemplateTest extends TestCase
             logInfo('Cache miss for {cacheKey}', ['cacheKey' => 'dashboard'], 'cache');
             logWarning(
                 'Remote call to {url} returned HTTP {httpCode}',
-                ['url' => 'https://example.com', 'httpCode' => 503],
+                [
+                    'url' => 'https://example.com',
+                    'httpCode' => 503,
+                ],
                 'remote-calls'
             );
 
+            logError('Unknown provider {provider}', ['provider' => "fake\n[critical] forged"], 'integrations');
+
             $contents = file_exists($errorLog) ? file_get_contents($errorLog) : '';
             $this->assertStringNotContainsString('Cache miss', $contents);
+            $this->assertStringContainsString('Unknown provider fake [critical] forged', $contents);
             $this->assertStringContainsString(
                 '[warning] [remote-calls] Remote call to https://example.com returned HTTP 503',
                 $contents

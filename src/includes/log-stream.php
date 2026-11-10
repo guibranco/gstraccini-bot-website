@@ -8,7 +8,11 @@ use GuiBranco\Pancake\LogStream;
  * Log levels that are also mirrored to the PHP error log, so problems stay
  * visible in the web server logs even when LogStream is unavailable.
  */
-const LOG_LEVELS_MIRRORED_TO_ERROR_LOG = ['warning', 'error', 'critical'];
+const LOG_LEVELS_MIRRORED_TO_ERROR_LOG = [
+    'warning',
+    'error',
+    'critical',
+];
 
 /**
  * Builds (and caches) the LogStream client used to ship real-time logs.
@@ -95,7 +99,7 @@ function formatMessageTemplateValue(mixed $value): string
         return (string) $value;
     }
 
-    $json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $json = json_encode($value, (JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
     return $json === false ? get_debug_type($value) : $json;
 }
@@ -122,6 +126,42 @@ function renderMessageTemplate(string $template, array $properties): string
         },
         $template
     );
+}
+
+/**
+ * Reduces a URL to its host and path, dropping the query string and fragment,
+ * so tokens or one-time codes passed in a URL never reach the logs.
+ *
+ * @param string $url The URL (absolute or relative).
+ * @return string The host and path, or "/" when there is no path.
+ */
+function sanitizeUrlForLog(string $url): string
+{
+    $host = parse_url($url, PHP_URL_HOST);
+    $path = parse_url($url, PHP_URL_PATH);
+    $path = is_string($path) && $path !== '' ? $path : '/';
+
+    return is_string($host) ? $host . $path : $path;
+}
+
+/**
+ * Bounds an untrusted input value before it is logged.
+ *
+ * @param mixed $value     The raw input value.
+ * @param int   $maxLength The maximum length kept for strings.
+ * @return string|null The value, truncated, or its type when it is not a string.
+ */
+function sanitizeInputForLog(mixed $value, int $maxLength = 50): ?string
+{
+    if ($value === null) {
+        return null;
+    }
+
+    if (is_string($value) === false) {
+        return get_debug_type($value);
+    }
+
+    return strlen($value) > $maxLength ? substr($value, 0, $maxLength) . '…' : $value;
 }
 
 /**
@@ -160,7 +200,9 @@ function logEvent(string $level, string $template, array $properties = [], strin
     $message = renderMessageTemplate($template, $properties);
 
     if (in_array($level, LOG_LEVELS_MIRRORED_TO_ERROR_LOG, true)) {
-        error_log("[{$level}] [{$category}] {$message}");
+        // Control characters are replaced so user input cannot forge extra log lines.
+        $safeMessage = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $message);
+        error_log("[{$level}] [{$category}] {$safeMessage}");
     }
 
     $logStream = getLogStream();
@@ -168,7 +210,7 @@ function logEvent(string $level, string $template, array $properties = [], strin
         return;
     }
 
-    $context = ['messageTemplate' => $template] + $properties;
+    $context = array_merge(['messageTemplate' => $template], $properties);
 
     try {
         $logStream->log($logStream->makeEntry($message, $level, $category, $context, getLogTraceId()));
