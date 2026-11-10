@@ -1,12 +1,9 @@
 <?php
 
-if (!file_exists("../../webhook.secrets.php")) {
-    http_response_code(500);
-    die(json_encode(['error' => 'Configuration file not found']));
-}
+require_once "../../includes/api-guards.php";
+
+ensureConfigurationFileExists("../../webhook.secrets.php", basename(__FILE__));
 require_once "../../webhook.secrets.php";
-require_once "../../includes/constants.php";
-require_once "../../includes/log-stream.php";
 
 /**
  * Performs an HTTP GET request and checks the response.
@@ -34,7 +31,9 @@ function checkServiceHealth(string $url): array
     $response = curl_exec($curl);
 
     if ($response === false) {
-        throw new Exception('cURL error: ' . curl_error($curl));
+        $error = curl_error($curl);
+        curl_close($curl);
+        throw new Exception('cURL error: ' . $error);
     }
 
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
@@ -60,10 +59,15 @@ function checkServiceHealth(string $url): array
 
     $status = ($httpCode === 200 && strtolower(trim($body)) === 'healthy') ? 'Operational' : 'Failure';
 
+    $properties = [
+        'url' => $url,
+        'httpCode' => $httpCode,
+        'status' => $status,
+    ];
     if ($status === 'Failure') {
-        getLogStream()?->warning("Remote call unhealthy: $url", ['httpCode' => $httpCode], 'remote-calls');
+        logWarning("Health check of {url} reported {status} (HTTP {httpCode})", $properties, 'health-checks');
     } else {
-        getLogStream()?->debug("Remote call succeeded: $url", ['httpCode' => $httpCode], 'remote-calls');
+        logDebug("Health check of {url} reported {status} (HTTP {httpCode})", $properties, 'health-checks');
     }
 
     return [
@@ -72,49 +76,39 @@ function checkServiceHealth(string $url): array
     ];
 }
 
-try {
-    $resultApi = checkServiceHealth($gstracciniApiUrl."v1/health");
-} catch (Exception $e) {
-    error_log("Health check handler failed: " . $e->getMessage());
-    getLogStream()?->error("Remote call failed: {$gstracciniApiUrl}v1/health", ['error' => $e->getMessage()], 'remote-calls');
-    $resultApi = [
-        'status' => 'Failure',
-        'lastUpdated' => gmdate('Y-m-d h:i A T')
-    ];
+/**
+ * Runs a health check, logging and reporting a failure when the request itself fails.
+ *
+ * @param string $serviceName Human-readable service name, used in the logs.
+ * @param string $url         The health-check URL.
+ * @return array The checkServiceHealth() result, or a failure result.
+ */
+function checkServiceHealthSafely(string $serviceName, string $url): array
+{
+    try {
+        return checkServiceHealth($url);
+    } catch (Exception $e) {
+        logError(
+            "Health check of {service} at {url} failed: {error}",
+            [
+                'service' => $serviceName,
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ],
+            'health-checks'
+        );
+
+        return [
+            'status' => 'Failure',
+            'lastUpdated' => gmdate('Y-m-d h:i A T')
+        ];
+    }
 }
 
-try {
-    $resultService = checkServiceHealth($webhooksServiceUrl);
-} catch (Exception $e) {
-    error_log("Health check handler failed: " . $e->getMessage());
-    getLogStream()?->error("Remote call failed: {$webhooksServiceUrl}", ['error' => $e->getMessage()], 'remote-calls');
-    $resultService = [
-        'status' => 'Failure',
-        'lastUpdated' => gmdate('Y-m-d h:i A T')
-    ];
-}
-
-try {
-    $resultProcessing = checkServiceHealth($webhooksProcessingUrl);
-} catch (Exception $e) {
-    error_log("Health check processor failed: " . $e->getMessage());
-    getLogStream()?->error("Remote call failed: {$webhooksProcessingUrl}", ['error' => $e->getMessage()], 'remote-calls');
-    $resultProcessing = [
-        'status' => 'Failure',
-        'lastUpdated' => gmdate('Y-m-d h:i A T')
-    ];
-}
-
-try {
-    $resultDocs = checkServiceHealth("https://docs.bot.straccini.com/docs/intro");
-} catch (Exception $e) {
-    error_log("Health check processor failed: " . $e->getMessage());
-    getLogStream()?->error("Remote call failed: https://docs.bot.straccini.com/docs/intro", ['error' => $e->getMessage()], 'remote-calls');
-    $resultDocs = [
-        'status' => 'Failure',
-        'lastUpdated' => gmdate('Y-m-d h:i A T')
-    ];
-}
+$resultApi = checkServiceHealthSafely('API', $gstracciniApiUrl . "v1/health");
+$resultService = checkServiceHealthSafely('GitHub Integration (Service)', $webhooksServiceUrl);
+$resultProcessing = checkServiceHealthSafely('Webhook Processing', $webhooksProcessingUrl);
+$resultDocs = checkServiceHealthSafely('Documentation', "https://docs.bot.straccini.com/docs/intro");
 
 $date = new DateTime('now', new DateTimeZone('GMT'));
 $services = [

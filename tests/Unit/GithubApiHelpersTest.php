@@ -14,6 +14,18 @@ class GithubApiHelpersTest extends TestCase
         $_GET = [];
     }
 
+    /**
+     * Response headers are matched case-insensitively.
+     */
+    public function testHeaderValueIsCaseInsensitive(): void
+    {
+        $headers = "HTTP/2 200\r\nContent-Type: application/json\r\n"
+            . "X-RateLimit-Remaining: 4999\r\n\r\n";
+
+        $this->assertSame('4999', getResponseHeaderValue($headers, 'x-ratelimit-remaining'));
+        $this->assertNull(getResponseHeaderValue($headers, 'x-missing'));
+    }
+
     public function testGetNextPageUrlExtractsNextLink(): void
     {
         $linkHeader = '<https://api.github.com/issues?page=2>; rel="next", <https://api.github.com/issues?page=5>; rel="last"';

@@ -29,18 +29,37 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
 
     $response = curl_exec($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $durationMs = (int) round(curl_getinfo($curl, CURLINFO_TOTAL_TIME) * 1000);
     $curlError = curl_error($curl);
     curl_close($curl);
 
     if ($response === false || $curlError) {
-        getLogStream()?->error("Remote call failed: $url", ['error' => $curlError], 'remote-calls');
+        logError(
+            "Upstream GET {url} for {resource} failed after {durationMs} ms: {error}",
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'durationMs' => $durationMs,
+                'error' => $curlError,
+            ],
+            'remote-calls'
+        );
         http_response_code(502);
         echo json_encode(['error' => "Failed to fetch $resourceName: " . $curlError]);
         exit();
     }
 
     if ($httpCode !== 200) {
-        getLogStream()?->warning("Remote call returned HTTP $httpCode: $url", ['httpCode' => $httpCode], 'remote-calls');
+        logWarning(
+            "Upstream GET {url} for {resource} returned HTTP {httpCode} in {durationMs} ms",
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'httpCode' => $httpCode,
+                'durationMs' => $durationMs,
+            ],
+            'remote-calls'
+        );
         http_response_code(502);
         echo json_encode(['error' => "Upstream returned HTTP $httpCode"]);
         exit();
@@ -48,12 +67,31 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
 
     $decoded = json_decode($response);
     if ($decoded === null) {
+        logError(
+            "Upstream GET {url} for {resource} returned invalid JSON: {error}",
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'error' => json_last_error_msg(),
+                'responseLength' => strlen($response),
+            ],
+            'remote-calls'
+        );
         http_response_code(502);
         echo json_encode(['error' => 'Invalid JSON from upstream']);
         exit();
     }
 
-    getLogStream()?->info("Remote call succeeded: $url", ['httpCode' => $httpCode], 'remote-calls');
+    logInfo(
+        "Upstream GET {url} for {resource} returned HTTP {httpCode} in {durationMs} ms",
+        [
+            'url' => $url,
+            'resource' => $resourceName,
+            'httpCode' => $httpCode,
+            'durationMs' => $durationMs,
+        ],
+        'remote-calls'
+    );
 
     echo json_encode($decoded);
 }
@@ -97,16 +135,40 @@ function sendJsonToUpstream(string $url, string $method, ?array $body, array $ex
 
     $response = curl_exec($curl);
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $durationMs = (int) round(curl_getinfo($curl, CURLINFO_TOTAL_TIME) * 1000);
     $curlError = curl_error($curl);
     curl_close($curl);
 
+    // Request bodies are intentionally never logged: they may carry passwords, codes or API keys.
     if ($response === false || $curlError) {
-        getLogStream()?->error("Remote call failed: $url", ['error' => $curlError], 'remote-calls');
+        logError(
+            "Upstream {method} {url} failed after {durationMs} ms: {error}",
+            [
+                'method' => $method,
+                'url' => $url,
+                'durationMs' => $durationMs,
+                'error' => $curlError,
+            ],
+            'remote-calls'
+        );
         return ['httpCode' => 502, 'decoded' => ['error' => "Upstream call failed: {$curlError}"], 'error' => $curlError];
     }
 
     $decoded = json_decode($response, true);
-    getLogStream()?->info("Remote call completed: $url", ['httpCode' => $httpCode], 'remote-calls');
+    $properties = [
+        'method' => $method,
+        'url' => $url,
+        'httpCode' => $httpCode,
+        'durationMs' => $durationMs,
+    ];
+
+    // 4xx is relayed as-is (e.g. a wrong password), so only 5xx is worth a warning here.
+    logEvent(
+        $httpCode >= 500 ? 'warning' : 'info',
+        "Upstream {method} {url} returned HTTP {httpCode} in {durationMs} ms",
+        $properties,
+        'remote-calls'
+    );
 
     return ['httpCode' => $httpCode, 'decoded' => $decoded, 'error' => null];
 }

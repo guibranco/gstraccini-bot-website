@@ -4,12 +4,9 @@
  */
 require_once "../../includes/session.php";
 require_once "../../includes/github-api.php";
+require_once "../../includes/api-guards.php";
 
-if ($isAuthenticated === false) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit();
-}
+ensureAuthenticated($isAuthenticated, basename(__FILE__), 'Unauthorized');
 
 if (isset($_GET['repositories'])) {
     require_once "api-repositories.php";

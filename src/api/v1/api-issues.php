@@ -14,6 +14,7 @@ if ($cache !== false) {
 $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token);
 
 if ($issues === false || !is_array($issues)) {
+    logError("Failed to fetch issues from the GitHub API", [], 'github');
     http_response_code(500);
     echo json_encode(['error' => 'Failed to fetch issues from GitHub API']);
     exit();

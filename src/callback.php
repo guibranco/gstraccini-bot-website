@@ -62,8 +62,22 @@ class GitHubOAuthHandler
         $tokenData = json_decode($response, true);
         
         if (!isset($tokenData['access_token']) || empty($tokenData['access_token'])) {
+            logError(
+                "GitHub did not return an access token: {githubError}",
+                [
+                    'githubError' => ($tokenData['error'] ?? 'unknown'),
+                    'githubErrorDescription' => ($tokenData['error_description'] ?? null),
+                ],
+                'auth'
+            );
             throw new Exception('Failed to retrieve access token from GitHub');
         }
+
+        logDebug(
+            "Exchanged OAuth code for an access token with scope {scope}",
+            ['scope' => ($tokenData['scope'] ?? null)],
+            'auth'
+        );
         
         return $tokenData;
     }
@@ -119,6 +133,14 @@ class GitHubOAuthHandler
             $installations = $installationsResponse['body'];
         } catch (Exception $e) {
             // Installations might not be available for all users
+            logWarning(
+                "Could not fetch installations for {username}: {error}",
+                [
+                    'username' => $userLogin,
+                    'error' => $e->getMessage(),
+                ],
+                'auth'
+            );
             $installations = [];
         }
         
@@ -127,6 +149,14 @@ class GitHubOAuthHandler
             $organizations = $organizationsResponse['body'];
         } catch (Exception $e) {
             // Organizations might be private or unavailable
+            logWarning(
+                "Could not fetch organizations for {username}: {error}",
+                [
+                    'username' => $userLogin,
+                    'error' => $e->getMessage(),
+                ],
+                'auth'
+            );
             $organizations = [];
         }
         
@@ -207,21 +237,50 @@ class GitHubOAuthHandler
         
         $response = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $durationMs = (int) round(curl_getinfo($curl, CURLINFO_TOTAL_TIME) * 1000);
         $error = curl_error($curl);
+        $method = $postData !== null ? 'POST' : 'GET';
 
         curl_close($curl);
 
         if ($response === false) {
-            getLogStream()?->error("Remote call failed: {$url}", ['error' => $error], 'remote-calls');
+            logError(
+                "Remote {method} {url} failed after {durationMs} ms: {error}",
+                [
+                    'method' => $method,
+                    'url' => $url,
+                    'durationMs' => $durationMs,
+                    'error' => $error,
+                ],
+                'remote-calls'
+            );
             throw new Exception("cURL Error: {$error}");
         }
 
         if ($httpCode >= 400) {
-            getLogStream()?->warning("Remote call returned HTTP {$httpCode}: {$url}", ['httpCode' => $httpCode], 'remote-calls');
+            logWarning(
+                "Remote {method} {url} returned HTTP {httpCode} in {durationMs} ms",
+                [
+                    'method' => $method,
+                    'url' => $url,
+                    'httpCode' => $httpCode,
+                    'durationMs' => $durationMs,
+                ],
+                'remote-calls'
+            );
             throw new Exception("HTTP Error {$httpCode}: Request failed");
         }
 
-        getLogStream()?->info("Remote call succeeded: {$url}", ['httpCode' => $httpCode], 'remote-calls');
+        logInfo(
+            "Remote {method} {url} returned HTTP {httpCode} in {durationMs} ms",
+            [
+                'method' => $method,
+                'url' => $url,
+                'httpCode' => $httpCode,
+                'durationMs' => $durationMs,
+            ],
+            'remote-calls'
+        );
 
         return $response;
     }
@@ -231,7 +290,7 @@ class GitHubOAuthHandler
      */
     public function redirectWithError(string $message): void
     {
-        getLogStream()?->warning("Login failed: {$message}", [], 'auth');
+        logWarning("Login failed: {reason}", ['reason' => $message], 'auth');
 
         $encodedMessage = urlencode($message);
         header("Location: signin.php?error={$encodedMessage}");
@@ -248,14 +307,27 @@ class GitHubOAuthHandler
         $_SESSION['installations'] = $installations;
         $_SESSION['organizations'] = $organizations;
 
-        getLogStream()?->info(
-            "User logged in: " . ($userData['login'] ?? 'unknown'),
-            ['username' => $userData['login'] ?? null, 'installations' => count($installations)],
+        logInfo(
+            "User {username} logged in with {installations} installation(s) and {organizations} organization(s)",
+            [
+                'username' => ($userData['login'] ?? 'unknown'),
+                'userId' => ($userData['id'] ?? null),
+                'installations' => count($installations),
+                'organizations' => count($organizations),
+            ],
             'auth'
         );
 
         $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
         unset($_SESSION['redirectUrl']);
+        logDebug(
+            "Redirecting {username} to {redirectUrl} after login",
+            [
+                'username' => ($userData['login'] ?? 'unknown'),
+                'redirectUrl' => sanitizeUrlForLog($redirectUrl),
+            ],
+            'auth'
+        );
 
         session_regenerate_id(true); // More secure - delete old session
 
@@ -302,7 +374,14 @@ try {
         );
     } catch (Exception $e) {
         // Log webhook error but don't fail the login process
-        error_log("Webhook update failed: " . $e->getMessage());
+        logError(
+            "Token sync webhook for {username} failed: {error}",
+            [
+                'username' => ($userData['user']['login'] ?? 'unknown'),
+                'error' => $e->getMessage(),
+            ],
+            'auth'
+        );
     }
     
     // Complete login process
@@ -314,7 +393,7 @@ try {
     );
     
 } catch (Exception $e) {
-    error_log("OAuth callback error: " . $e->getMessage());
+    logError("OAuth callback failed: {error}", ['error' => $e->getMessage(), 'exception' => get_class($e)], 'auth');
     
     if (isset($oauthHandler)) {
         $oauthHandler->redirectWithError($e->getMessage());
