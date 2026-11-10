@@ -4,26 +4,14 @@
  * GitHub user id.
  */
 
-require_once "../../includes/constants.php";
-require_once "../../includes/log-stream.php";
+require_once "../../includes/api-guards.php";
 
-if (file_exists("../../webhook.secrets.php") === false) {
-    logCritical("Configuration file {file} not found", ['file' => 'webhook.secrets.php', 'endpoint' => basename(__FILE__)], 'configuration');
-    http_response_code(500);
-    die(json_encode(['error' => 'Configuration file not found']));
-}
+ensureConfigurationFileExists("../../webhook.secrets.php", basename(__FILE__));
 
 require_once "../../webhook.secrets.php";
-require_once "../../includes/remote-json-proxy.php";
 require_once "../../includes/session.php";
-require_once "../../includes/user-scope.php";
 
-if ($isAuthenticated === false) {
-    logNotice("Rejected unauthenticated request to {endpoint}", ['endpoint' => basename(__FILE__)], 'auth');
-    http_response_code(401);
-    echo json_encode(['error' => 'User not authenticated.']);
-    exit();
-}
+ensureAuthenticated($isAuthenticated, basename(__FILE__));
 
 header('Content-Type: application/json');
 header('Cache-Control: private, max-age=300');

@@ -7,19 +7,12 @@
  * user's session and are scoped to their GitHub user id.
  */
 
-require_once "../../includes/constants.php";
-require_once "../../includes/log-stream.php";
+require_once "../../includes/api-guards.php";
 
-if (file_exists("../../webhook.secrets.php") === false) {
-    logCritical("Configuration file {file} not found", ['file' => 'webhook.secrets.php', 'endpoint' => basename(__FILE__)], 'configuration');
-    http_response_code(500);
-    die(json_encode(['error' => 'Configuration file not found']));
-}
+ensureConfigurationFileExists("../../webhook.secrets.php", basename(__FILE__));
 
 require_once "../../webhook.secrets.php";
-require_once "../../includes/remote-json-proxy.php";
 require_once "../../includes/session.php";
-require_once "../../includes/user-scope.php";
 
 header('Content-Type: application/json');
 
@@ -65,12 +58,11 @@ $authProperties = [
     'httpCode' => $result['httpCode'],
     'userId' => getCurrentUserId(),
 ];
-if ($result['httpCode'] >= 200 && $result['httpCode'] < 300) {
-    logInfo("Auth {method} {route} succeeded: HTTP {httpCode}", $authProperties, 'auth');
-} elseif ($result['httpCode'] >= 400 && $result['httpCode'] < 500) {
-    logWarning("Auth {method} {route} rejected: HTTP {httpCode}", $authProperties, 'auth');
-} else {
-    logError("Auth {method} {route} failed: HTTP {httpCode}", $authProperties, 'auth');
-}
+logEvent(
+    getLogLevelForHttpStatus($result['httpCode']),
+    "Auth {method} {route} completed: HTTP {httpCode}",
+    $authProperties,
+    'auth'
+);
 http_response_code($result['httpCode'] > 0 ? $result['httpCode'] : 502);
 echo json_encode($result['decoded']);

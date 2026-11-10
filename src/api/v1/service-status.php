@@ -1,13 +1,8 @@
 <?php
 
-require_once "../../includes/constants.php";
-require_once "../../includes/log-stream.php";
+require_once "../../includes/api-guards.php";
 
-if (!file_exists("../../webhook.secrets.php")) {
-    logCritical("Configuration file {file} not found", ['file' => 'webhook.secrets.php', 'endpoint' => basename(__FILE__)], 'configuration');
-    http_response_code(500);
-    die(json_encode(['error' => 'Configuration file not found']));
-}
+ensureConfigurationFileExists("../../webhook.secrets.php", basename(__FILE__));
 require_once "../../webhook.secrets.php";
 
 /**

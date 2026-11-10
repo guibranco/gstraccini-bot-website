@@ -58,6 +58,7 @@ function loadData($url, $token)
         $errorBody = trim(substr($response, $headerSize));
         $decoded   = json_decode($errorBody, true);
         $reason    = $decoded['message'] ?? $errorBody;
+        $rawHeader = substr($response, 0, $headerSize);
         logWarning(
             "GitHub API call to {url} returned HTTP {httpCode} in {durationMs} ms: {reason}",
             [
@@ -65,7 +66,7 @@ function loadData($url, $token)
                 'httpCode'           => $httpCode,
                 'durationMs'         => $durationMs,
                 'reason'             => $reason,
-                'rateLimitRemaining' => getResponseHeaderValue(substr($response, 0, $headerSize), 'x-ratelimit-remaining'),
+                'rateLimitRemaining' => getResponseHeaderValue($rawHeader, 'x-ratelimit-remaining'),
             ],
             'remote-calls'
         );
@@ -233,21 +234,22 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
 
     $state = loadData($repoUrl . "/commits/" . urlencode($sha) . "/status", $token);
 
-    if ($state !== null && isset($state["body"]["state"])) {
-        $issueData["state"] = $state["body"]["state"];
-
-        $issueData["is_valid_pr"] = (
-            $state["body"]["state"] === "success" &&
-            ($issueData["mergeable"] ?? false) === true &&
-            in_array($issueData["mergeable_state"] ?? '', ["clean", "unstable"], true)
-        );
-    } else {
+    if ($state === null || !isset($state["body"]["state"])) {
         logWarning(
             "Could not load CI status for pull request {url}",
             ['url' => $issueData['url'] ?? 'unknown', 'sha' => $sha],
             'github'
         );
+        return $issueData;
     }
+
+    $issueData["state"] = $state["body"]["state"];
+
+    $issueData["is_valid_pr"] = (
+        $state["body"]["state"] === "success" &&
+        ($issueData["mergeable"] ?? false) === true &&
+        in_array($issueData["mergeable_state"] ?? '', ["clean", "unstable"], true)
+    );
 
     return $issueData;
 }

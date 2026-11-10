@@ -9,8 +9,7 @@ if ($isAuthenticated === false) {
 require_once "webhook.secrets.php";
 require_once "includes/constants.php";
 require_once "includes/log-stream.php";
-require_once "includes/remote-json-proxy.php";
-require_once "includes/user-scope.php";
+require_once "includes/api-guards.php";
 
 $user = $_SESSION['user'];
 $userId = getCurrentUserId();
@@ -38,19 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $apiKey = $_POST['apiKey'] ?? "";
     if (!empty($provider) && !empty($apiKey)) {
         if (!array_key_exists($provider, $providers)) {
-            logWarning("User {userId} tried to add unknown integration {provider}", ['userId' => $userId, 'provider' => $provider], 'integrations');
+            logWarning(
+                "User {userId} tried to add unknown integration {provider}",
+                ['userId' => $userId, 'provider' => $provider],
+                'integrations'
+            );
             $error = "Unknown provider selected.";
         } elseif (strlen($apiKey) < 10) {
-            logNotice("User {userId} submitted an invalid API key for integration {provider}", ['userId' => $userId, 'provider' => $provider], 'integrations');
+            logNotice(
+                "User {userId} submitted an invalid API key for integration {provider}",
+                ['userId' => $userId, 'provider' => $provider],
+                'integrations'
+            );
             $error = "Invalid API key for <strong>" . htmlspecialchars($provider) . "</strong>.";
         } else {
             $saveUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/", $userId);
             $saveResult = sendJsonToUpstream($saveUrl, 'POST', ['provider' => $provider, 'apiKey' => $apiKey], $apiHeaders);
-            logInfo(
-                "User {userId} added integration {provider}: HTTP {httpCode}",
-                ['userId' => $userId, 'provider' => $provider, 'httpCode' => $saveResult['httpCode']],
-                'integrations'
-            );
+            logIntegrationChange('added', $userId, $provider, $saveResult['httpCode']);
             if ($saveResult['httpCode'] === 200) {
                 $message = "Integration for <strong>" . htmlspecialchars($provider) . "</strong> added successfully!";
             } else {
@@ -66,11 +69,7 @@ if (isset($_GET['remove'])) {
     $providerToRemove = $_GET['remove'];
     $deleteUrl = appendUserIdParam($gstracciniApiUrl."v1/integrations/".rawurlencode($providerToRemove)."/", $userId);
     $deleteResult = sendJsonToUpstream($deleteUrl, 'DELETE', null, $apiHeaders);
-    logInfo(
-        "User {userId} removed integration {provider}: HTTP {httpCode}",
-        ['userId' => $userId, 'provider' => $providerToRemove, 'httpCode' => $deleteResult['httpCode']],
-        'integrations'
-    );
+    logIntegrationChange('removed', $userId, $providerToRemove, $deleteResult['httpCode']);
     if ($deleteResult['httpCode'] === 200) {
         $message = "Integration for <strong>" . htmlspecialchars($providerToRemove) . "</strong> removed successfully!";
     } else {

@@ -59,7 +59,12 @@ function proxyJsonFromUpstream(string $url, string $resourceName, array $extraHe
     if ($decoded === null) {
         logError(
             "Upstream GET {url} for {resource} returned invalid JSON: {error}",
-            ['url' => $url, 'resource' => $resourceName, 'error' => json_last_error_msg(), 'responseLength' => strlen($response)],
+            [
+                'url' => $url,
+                'resource' => $resourceName,
+                'error' => json_last_error_msg(),
+                'responseLength' => strlen($response),
+            ],
             'remote-calls'
         );
         http_response_code(502);
@@ -132,11 +137,13 @@ function sendJsonToUpstream(string $url, string $method, ?array $body, array $ex
     $decoded = json_decode($response, true);
     $properties = ['method' => $method, 'url' => $url, 'httpCode' => $httpCode, 'durationMs' => $durationMs];
 
-    if ($httpCode >= 500) {
-        logWarning("Upstream {method} {url} returned HTTP {httpCode} in {durationMs} ms", $properties, 'remote-calls');
-    } else {
-        logInfo("Upstream {method} {url} returned HTTP {httpCode} in {durationMs} ms", $properties, 'remote-calls');
-    }
+    // 4xx is relayed as-is (e.g. a wrong password), so only 5xx is worth a warning here.
+    logEvent(
+        $httpCode >= 500 ? 'warning' : 'info',
+        "Upstream {method} {url} returned HTTP {httpCode} in {durationMs} ms",
+        $properties,
+        'remote-calls'
+    );
 
     return ['httpCode' => $httpCode, 'decoded' => $decoded, 'error' => null];
 }

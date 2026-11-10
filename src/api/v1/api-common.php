@@ -84,7 +84,8 @@ function processIssuesAndPullRequests(array $issues, string $token, int $maxVali
     }
 
     logDebug(
-        "Processed {total} assigned item(s): {pullRequests} pull request(s), {issues} issue(s), {validPullRequests} valid pull request(s), {reposProcessed} repository(ies) enriched",
+        "Processed {total} assigned item(s): {pullRequests} pull request(s) "
+            . "({validPullRequests} valid, {reposProcessed} repository(ies) enriched) and {issues} issue(s)",
         [
             'total'             => count($issues),
             'pullRequests'      => count($openPullRequests),

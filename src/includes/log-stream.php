@@ -125,6 +125,22 @@ function renderMessageTemplate(string $template, array $properties): string
 }
 
 /**
+ * Picks the log level for the outcome of an HTTP call: success and redirects
+ * are informational, client errors are warnings, everything else is an error.
+ *
+ * @param int $httpCode The HTTP status code (0 when no response was received).
+ * @return string The log level.
+ */
+function getLogLevelForHttpStatus(int $httpCode): string
+{
+    if ($httpCode >= 200 && $httpCode < 400) {
+        return 'info';
+    }
+
+    return $httpCode >= 400 && $httpCode < 500 ? 'warning' : 'error';
+}
+
+/**
  * Writes a structured log entry using a message template.
  *
  * The template itself is kept constant (no string interpolation at the call
@@ -161,37 +177,79 @@ function logEvent(string $level, string $template, array $properties = [], strin
     }
 }
 
-/** Writes a DEBUG-level structured log entry. See logEvent(). */
+/**
+ * Writes a DEBUG-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logDebug(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('debug', $template, $properties, $category);
 }
 
-/** Writes an INFO-level structured log entry. See logEvent(). */
+/**
+ * Writes an INFO-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logInfo(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('info', $template, $properties, $category);
 }
 
-/** Writes a NOTICE-level structured log entry. See logEvent(). */
+/**
+ * Writes a NOTICE-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logNotice(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('notice', $template, $properties, $category);
 }
 
-/** Writes a WARNING-level structured log entry. See logEvent(). */
+/**
+ * Writes a WARNING-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logWarning(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('warning', $template, $properties, $category);
 }
 
-/** Writes an ERROR-level structured log entry. See logEvent(). */
+/**
+ * Writes an ERROR-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logError(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('error', $template, $properties, $category);
 }
 
-/** Writes a CRITICAL-level structured log entry. See logEvent(). */
+/**
+ * Writes a CRITICAL-level structured log entry. See logEvent().
+ *
+ * @param string $template   The message template.
+ * @param array  $properties Values for the template placeholders plus any extra context.
+ * @param string $category   Short grouping tag.
+ * @return void
+ */
 function logCritical(string $template, array $properties = [], string $category = 'general'): void
 {
     logEvent('critical', $template, $properties, $category);

@@ -64,13 +64,20 @@ class GitHubOAuthHandler
         if (!isset($tokenData['access_token']) || empty($tokenData['access_token'])) {
             logError(
                 "GitHub did not return an access token: {githubError}",
-                ['githubError' => $tokenData['error'] ?? 'unknown', 'githubErrorDescription' => $tokenData['error_description'] ?? null],
+                [
+                    'githubError' => $tokenData['error'] ?? 'unknown',
+                    'githubErrorDescription' => $tokenData['error_description'] ?? null,
+                ],
                 'auth'
             );
             throw new Exception('Failed to retrieve access token from GitHub');
         }
 
-        logDebug("Exchanged OAuth code for an access token with scope {scope}", ['scope' => $tokenData['scope'] ?? null], 'auth');
+        logDebug(
+            "Exchanged OAuth code for an access token with scope {scope}",
+            ['scope' => $tokenData['scope'] ?? null],
+            'auth'
+        );
         
         return $tokenData;
     }
@@ -292,7 +299,11 @@ class GitHubOAuthHandler
 
         $redirectUrl = $_SESSION['redirectUrl'] ?? 'dashboard.php';
         unset($_SESSION['redirectUrl']);
-        logDebug("Redirecting {username} to {redirectUrl} after login", ['username' => $userData['login'] ?? 'unknown', 'redirectUrl' => $redirectUrl], 'auth');
+        logDebug(
+            "Redirecting {username} to {redirectUrl} after login",
+            ['username' => $userData['login'] ?? 'unknown', 'redirectUrl' => $redirectUrl],
+            'auth'
+        );
 
         session_regenerate_id(true); // More secure - delete old session
 
