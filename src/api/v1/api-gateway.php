@@ -6,6 +6,7 @@ require_once "../../includes/session.php";
 require_once "../../includes/github-api.php";
 
 if ($isAuthenticated === false) {
+    logNotice("Rejected unauthenticated request to {endpoint}", ['endpoint' => basename(__FILE__)], 'auth');
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit();

@@ -15,6 +15,7 @@ function fetchAssignedIssues(string $token): array
     $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token, 1);
 
     if ($issues === false || !is_array($issues)) {
+        logError("Failed to fetch assigned issues from the GitHub API", [], 'github');
         http_response_code(500);
         echo json_encode(['error' => 'Failed to fetch issues from GitHub API']);
         exit();
@@ -81,6 +82,18 @@ function processIssuesAndPullRequests(array $issues, string $token, int $maxVali
 
         $openPullRequests[] = $issueData;
     }
+
+    logDebug(
+        "Processed {total} assigned item(s): {pullRequests} pull request(s), {issues} issue(s), {validPullRequests} valid pull request(s), {reposProcessed} repository(ies) enriched",
+        [
+            'total'             => count($issues),
+            'pullRequests'      => count($openPullRequests),
+            'issues'            => count($openIssues),
+            'validPullRequests' => $validPRCount,
+            'reposProcessed'    => count($processedRepos),
+        ],
+        'github'
+    );
 
     return [
         'pullRequests' => $openPullRequests,

@@ -6,6 +6,7 @@
 $token = checkAuth();
 
 if (!isset($_GET['page']) || !is_numeric($_GET['page']) || $_GET['page'] < 1) {
+    logNotice("Rejected infinite scroll request with invalid page {page}", ['page' => $_GET['page'] ?? null], 'api');
     http_response_code(400);
     echo json_encode(['error' => 'Invalid page parameter']);
     exit();
@@ -14,6 +15,9 @@ if (!isset($_GET['page']) || !is_numeric($_GET['page']) || $_GET['page'] < 1) {
 $page = intval($_GET['page']);
 
 $response = loadData('https://api.github.com/issues?per_page=50&page=' . $page, $token);
+if ($response === null) {
+    logWarning("Failed to load infinite scroll page {page} from the GitHub API", ['page' => $page], 'github');
+}
 $issues = $response["body"] ?? [];
 
 $openPullRequests = [];

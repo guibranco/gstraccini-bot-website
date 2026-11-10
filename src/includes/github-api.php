@@ -38,10 +38,15 @@ function loadData($url, $token)
 
     $response = curl_exec($curl);
 
+    $durationMs = (int) round(curl_getinfo($curl, CURLINFO_TOTAL_TIME) * 1000);
+
     if (curl_errno($curl)) {
         $curlError = curl_error($curl);
-        error_log("cURL error for $url: " . $curlError);
-        getLogStream()?->error("Remote call failed: $url", ['error' => $curlError], 'remote-calls');
+        logError(
+            "GitHub API call to {url} failed after {durationMs} ms: {error}",
+            ['url' => $url, 'durationMs' => $durationMs, 'error' => $curlError],
+            'remote-calls'
+        );
         curl_close($curl);
         return null;
     }
@@ -53,8 +58,17 @@ function loadData($url, $token)
         $errorBody = trim(substr($response, $headerSize));
         $decoded   = json_decode($errorBody, true);
         $reason    = $decoded['message'] ?? $errorBody;
-        error_log("GitHub API error: HTTP $httpCode for URL $url | Reason: $reason");
-        getLogStream()?->warning("Remote call returned HTTP $httpCode: $url", ['reason' => $reason], 'remote-calls');
+        logWarning(
+            "GitHub API call to {url} returned HTTP {httpCode} in {durationMs} ms: {reason}",
+            [
+                'url'                => $url,
+                'httpCode'           => $httpCode,
+                'durationMs'         => $durationMs,
+                'reason'             => $reason,
+                'rateLimitRemaining' => getResponseHeaderValue(substr($response, 0, $headerSize), 'x-ratelimit-remaining'),
+            ],
+            'remote-calls'
+        );
         curl_close($curl);
         return null;
     }
@@ -64,13 +78,45 @@ function loadData($url, $token)
     curl_close($curl);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("JSON decode error for $url: " . json_last_error_msg());
+        logError(
+            "GitHub API call to {url} returned invalid JSON: {error}",
+            ['url' => $url, 'httpCode' => $httpCode, 'error' => json_last_error_msg()],
+            'remote-calls'
+        );
         return null;
     }
 
-    getLogStream()?->info("Remote call succeeded: $url", ['httpCode' => $httpCode], 'remote-calls');
+    logInfo(
+        "GitHub API call to {url} returned HTTP {httpCode} in {durationMs} ms",
+        [
+            'url'                => $url,
+            'httpCode'           => $httpCode,
+            'durationMs'         => $durationMs,
+            'rateLimitRemaining' => getResponseHeaderValue($header, 'x-ratelimit-remaining'),
+        ],
+        'remote-calls'
+    );
 
     return ["headers" => $header, "body" => $body];
+}
+
+/**
+ * Reads a single header value from a raw HTTP response header block.
+ *
+ * @param string $rawHeaders The raw response headers.
+ * @param string $name       The header name (case-insensitive).
+ * @return string|null The header value, or null when absent.
+ */
+function getResponseHeaderValue(string $rawHeaders, string $name): ?string
+{
+    foreach (explode("\r\n", $rawHeaders) as $line) {
+        $separator = strpos($line, ':');
+        if ($separator !== false && strcasecmp(trim(substr($line, 0, $separator)), $name) === 0) {
+            return trim(substr($line, $separator + 1));
+        }
+    }
+
+    return null;
 }
 
 /**
@@ -109,6 +155,11 @@ function fetchAllGitHubPages($url, $token, $maxPages = 3)
         $result = loadData($url, $token);
 
         if ($result === null || !isset($result["body"]) || $result["body"] === null) {
+            logWarning(
+                "Stopped paginating {url} after {pagesFetched} page(s) because a page failed to load",
+                ['url' => $url, 'pagesFetched' => $pagesFetched, 'itemsFetched' => count($results)],
+                'remote-calls'
+            );
             return $anySuccess ? $results : false;
         }
 
@@ -118,6 +169,14 @@ function fetchAllGitHubPages($url, $token, $maxPages = 3)
 
         $url = getNextPageUrl($result["headers"]);
     } while ($url && $pagesFetched < $maxPages);
+
+    if ($url) {
+        logNotice(
+            "Pagination cap of {maxPages} page(s) reached; {itemsFetched} item(s) returned, more are available",
+            ['maxPages' => $maxPages, 'itemsFetched' => count($results), 'nextUrl' => $url],
+            'remote-calls'
+        );
+    }
 
     return $anySuccess ? $results : false;
 }
@@ -161,7 +220,11 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     $issueData["mergeable_state"] = $pullRequest["body"]["mergeable_state"] ?? null;
 
     if (!isset($pullRequest["body"]["head"]) || $pullRequest["body"]["head"] === null) {
-        error_log("Missing head info in pull request for: " . ($issueData['url'] ?? 'unknown'));
+        logWarning(
+            "Pull request {url} has no head information; skipping CI status lookup",
+            ['url' => $issueData['url'] ?? 'unknown'],
+            'github'
+        );
         return $issueData;
     }
 
@@ -177,6 +240,12 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
             $state["body"]["state"] === "success" &&
             ($issueData["mergeable"] ?? false) === true &&
             in_array($issueData["mergeable_state"] ?? '', ["clean", "unstable"], true)
+        );
+    } else {
+        logWarning(
+            "Could not load CI status for pull request {url}",
+            ['url' => $issueData['url'] ?? 'unknown', 'sha' => $sha],
+            'github'
         );
     }
 
@@ -234,6 +303,11 @@ function checkAuth()
     require_once "session.php";
 
     if ($isAuthenticated === false) {
+        logNotice(
+            "Rejected unauthenticated API request to {path}",
+            ['path' => $_SERVER['REQUEST_URI'] ?? null],
+            'auth'
+        );
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
         exit();
@@ -259,6 +333,11 @@ function getCache($cacheKey = 'data', $ttl = 300)
         isset($_SESSION[$cacheKey]['last_api_call']) &&
         $_SESSION[$cacheKey]['last_api_call'] > (time() - $ttl)
     ) {
+        logDebug(
+            "Cache hit for {cacheKey} (age {ageSeconds} s, TTL {ttl} s)",
+            ['cacheKey' => $cacheKey, 'ageSeconds' => time() - $_SESSION[$cacheKey]['last_api_call'], 'ttl' => $ttl],
+            'cache'
+        );
         sendJsonResponse(
             $_SESSION[$cacheKey]["data"],
             $_SESSION[$cacheKey]['last_api_call'],
@@ -267,6 +346,8 @@ function getCache($cacheKey = 'data', $ttl = 300)
         );
         return true;
     }
+
+    logDebug("Cache miss for {cacheKey}", ['cacheKey' => $cacheKey], 'cache');
 
     return false;
 }

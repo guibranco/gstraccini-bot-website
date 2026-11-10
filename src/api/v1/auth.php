@@ -7,14 +7,16 @@
  * user's session and are scoped to their GitHub user id.
  */
 
+require_once "../../includes/constants.php";
+require_once "../../includes/log-stream.php";
+
 if (file_exists("../../webhook.secrets.php") === false) {
+    logCritical("Configuration file {file} not found", ['file' => 'webhook.secrets.php', 'endpoint' => basename(__FILE__)], 'configuration');
     http_response_code(500);
     die(json_encode(['error' => 'Configuration file not found']));
 }
 
 require_once "../../webhook.secrets.php";
-require_once "../../includes/constants.php";
-require_once "../../includes/log-stream.php";
 require_once "../../includes/remote-json-proxy.php";
 require_once "../../includes/session.php";
 require_once "../../includes/user-scope.php";
@@ -35,6 +37,7 @@ $authIndex = array_search('auth', $segments, true);
 $route = $authIndex !== false ? implode('/', array_slice($segments, $authIndex + 1)) : '';
 
 if (in_array($route, $routesRequiringSession, true) && $isAuthenticated === false) {
+    logNotice("Rejected unauthenticated request to auth route {route}", ['route' => $route], 'auth');
     http_response_code(401);
     echo json_encode(['error' => 'User not authenticated.']);
     exit();
@@ -54,5 +57,20 @@ if ($method === 'GET') {
 }
 
 $result = sendJsonToUpstream($upstreamUrl, $method, $body, ["X-Api-Key: $gstracciniApiKey"]);
+
+// Only the route, method and outcome are logged: never the body (passwords, codes, tokens).
+$authProperties = [
+    'method' => $method,
+    'route' => $route,
+    'httpCode' => $result['httpCode'],
+    'userId' => getCurrentUserId(),
+];
+if ($result['httpCode'] >= 200 && $result['httpCode'] < 300) {
+    logInfo("Auth {method} {route} succeeded: HTTP {httpCode}", $authProperties, 'auth');
+} elseif ($result['httpCode'] >= 400 && $result['httpCode'] < 500) {
+    logWarning("Auth {method} {route} rejected: HTTP {httpCode}", $authProperties, 'auth');
+} else {
+    logError("Auth {method} {route} failed: HTTP {httpCode}", $authProperties, 'auth');
+}
 http_response_code($result['httpCode'] > 0 ? $result['httpCode'] : 502);
 echo json_encode($result['decoded']);

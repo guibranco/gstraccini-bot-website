@@ -13,6 +13,10 @@ if ($cache !== false) {
 
 $repositories = fetchAllGitHubPages('https://api.github.com/user/repos?per_page=100', $token);
 
+if ($repositories === false) {
+    logError("Failed to fetch repositories from the GitHub API", [], 'github');
+}
+
 $formattedRepositories = [];
 if (is_array($repositories) && count($repositories) > 0) {
     foreach ($repositories as $repo) {
