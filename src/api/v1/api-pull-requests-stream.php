@@ -3,7 +3,7 @@
  * Server-Sent Events stream of pull request enrichment results.
  *
  * Reads the local SQLite store (no GitHub or CloudAMQP calls) and pushes each
- * result for the current user's pull requests as soon as the worker writes it.
+ * result for the current user's pull requests as soon as the drain job writes it.
  * Each connection lives at most STREAM_LIFETIME seconds so it does not hold a
  * PHP worker for long; EventSource reconnects with Last-Event-ID and resumes.
  *

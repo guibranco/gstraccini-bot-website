@@ -1,4 +1,4 @@
-# Worker scripts, secrets and the SQLite store are never served over HTTP.
+# The SQLite store is never served over HTTP.
 <IfModule mod_authz_core.c>
     Require all denied
 </IfModule>

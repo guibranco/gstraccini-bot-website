@@ -4,7 +4,7 @@
  *
  * CI state and mergeability are not fetched here any more: they come from the
  * local SQLite store, and stale/missing ones are queued to CloudAMQP for the
- * worker (see includes/pr-queue.php). While results are pending, the payload
+ * drain job (see includes/pr-queue.php). While results are pending, the payload
  * carries a "stream" descriptor the page uses to receive them live (SSE).
  */
 

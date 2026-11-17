@@ -237,4 +237,81 @@ class PrQueueTest extends TestCase
         $this->assertSame(0, $processed);
         $this->assertSame('released', prQueueLoadRows(['guibranco/repo#1'])['guibranco/repo#1']['status']);
     }
+
+    private function fakeMessage(string $body, int &$acks): object
+    {
+        return new class ($body, $acks) {
+            private string $body;
+            private $acks;
+
+            public function __construct(string $body, int &$acks)
+            {
+                $this->body = $body;
+                $this->acks = &$acks;
+            }
+
+            public function getBody(): string
+            {
+                return $this->body;
+            }
+
+            public function ack(): void
+            {
+                $this->acks++;
+            }
+        };
+    }
+
+    public function testDrainProcessesAndAcksUntilIdle(): void
+    {
+        $acks  = 0;
+        $queue = [$this->fakeMessage('a', $acks), $this->fakeMessage('b', $acks)];
+        $time  = self::NOW;
+
+        $result = prQueueDrainLoop(
+            function () use (&$queue) {
+                return array_shift($queue);
+            },
+            fn (string $body) => 3,
+            10,
+            50,
+            function () use (&$time) {
+                return $time;
+            },
+            function () use (&$time) {
+                $time++;
+            }
+        );
+
+        $this->assertSame(2, $result['messages']);
+        $this->assertSame(6, $result['pull_requests']);
+        $this->assertSame(2, $acks);
+        $this->assertSame('idle', $result['stopped']);
+        $this->assertSame(10, $result['duration_seconds']);
+    }
+
+    public function testDrainStopsAtMaxRuntimeAndAcksFailedBatches(): void
+    {
+        $acks = 0;
+        $time = self::NOW;
+
+        $result = prQueueDrainLoop(
+            function () use (&$acks, &$time) {
+                $time += 2;
+                return $this->fakeMessage('boom', $acks);
+            },
+            function () {
+                throw new \RuntimeException('store unavailable');
+            },
+            10,
+            20,
+            function () use (&$time) {
+                return $time;
+            }
+        );
+
+        $this->assertSame('max_runtime', $result['stopped']);
+        $this->assertSame($result['messages'], $acks);
+        $this->assertSame(0, $result['pull_requests']);
+    }
 }

@@ -130,7 +130,7 @@ function gitHubRateLimitState(?array $state = null): ?array
 
 /**
  * Records the rate-limit headers of a GitHub API response so callers (e.g. the
- * queue worker) can back off before the token's quota is exhausted.
+ * queue drain job) can back off before the token's quota is exhausted.
  *
  * @param string $rawHeaders Raw response headers.
  * @param int    $httpCode   HTTP status code of the response.

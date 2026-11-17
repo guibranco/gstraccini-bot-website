@@ -556,7 +556,7 @@ function loadData() {
 
 /**
  * Opens the SSE stream when the API reports results still being processed by
- * the queue worker. Each "pr" event updates one pull request in place; "done"
+ * the queue drain job. Each "pr" event updates one pull request in place; "done"
  * means nothing is left in flight.
  *
  * @param {Object} data - Payload returned by /api/v1/pull-requests.

@@ -11,9 +11,11 @@
  *      mergeability) is already stored in the local SQLite file.
  *   2. Pull requests with no result, or a stale one, are marked as "queued" in
  *      SQLite and published to CloudAMQP as ONE batch message per request.
- *   3. worker/loop_requests.sh (cron) sees the queue is not empty and starts
- *      worker/process-pr-queue.php, which calls GitHub and writes each result
- *      to SQLite as soon as it has it.
+ *   3. loop_requests.sh on vinhedo3 (Toolshed) polls the queue depth through
+ *      the CloudAMQP management API and, when messages are waiting, calls
+ *      POST /api/v1/jobs/pull-requests. That job drains the queue here on the
+ *      website host until it has been idle for a while, calling GitHub and
+ *      writing each result to SQLite as soon as it has it.
  *   4. The browser listens on /api/v1/pull-requests/stream (SSE), which reads
  *      new SQLite rows and pushes them to the page one by one.
  *
@@ -35,7 +37,7 @@ const PR_QUEUE_SESSION_KEYS    = 'pr-stream-keys';
 const PR_QUEUE_MAX_BATCH = 40;
 /** Seconds after which a "queued" pull request is assumed lost and re-queued. */
 const PR_QUEUE_INFLIGHT_TIMEOUT = 600;
-/** Messages older than this are discarded by the worker (token may be stale). */
+/** Messages older than this are discarded by the drain job (token may be stale). */
 const PR_QUEUE_MESSAGE_MAX_AGE = 900;
 /** Freshness of a result whose CI state and mergeability are final. */
 const PR_QUEUE_TTL_SETTLED = 1800;
@@ -43,10 +45,14 @@ const PR_QUEUE_TTL_SETTLED = 1800;
 const PR_QUEUE_TTL_UNSETTLED = 180;
 /** Wait before retrying a pull request whose lookup failed. */
 const PR_QUEUE_TTL_FAILED = 600;
-/** The worker stops calling GitHub for a user below this remaining quota. */
+/** The drain job stops calling GitHub for a user below this remaining quota. */
 const PR_QUEUE_RATE_LIMIT_FLOOR = 1000;
 /** Seconds the raw assigned-issues list is cached in the session. */
 const PR_QUEUE_ISSUES_CACHE_TTL = 120;
+/** The drain job stops after this many seconds without a message... */
+const PR_QUEUE_DRAIN_IDLE_SECONDS = 10;
+/** ...or after this many seconds in total (loop_requests calls it again). */
+const PR_QUEUE_DRAIN_MAX_SECONDS = 50;
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -56,9 +62,10 @@ const PR_QUEUE_ISSUES_CACHE_TTL = 120;
  * Expected variables:
  *   $rabbitMqUrl        CloudAMQP URL (amqp://user:pass@host/vhost)
  *   $queueEncryptionKey base64 of 32 random bytes (encrypts tokens in messages)
+ *   $jobsApiKey         X-Api-Key loop_requests (vinhedo3) sends to the job
  *   $queueSqlitePath    optional path to the SQLite file
  *
- * @return array{rabbitMqUrl: string, encryptionKey: string, sqlitePath: string}
+ * @return array{rabbitMqUrl: string, encryptionKey: string, jobsApiKey: string, sqlitePath: string}
  */
 function prQueueConfig(?array $override = null): array
 {
@@ -74,6 +81,7 @@ function prQueueConfig(?array $override = null): array
 
     $rabbitMqUrl        = '';
     $queueEncryptionKey = '';
+    $jobsApiKey         = '';
     $queueSqlitePath    = '';
 
     $secretsFile = __DIR__ . '/../queue.secrets.php';
@@ -84,9 +92,10 @@ function prQueueConfig(?array $override = null): array
     $config = [
         'rabbitMqUrl'   => (string) $rabbitMqUrl,
         'encryptionKey' => (string) $queueEncryptionKey,
+        'jobsApiKey'    => (string) $jobsApiKey,
         'sqlitePath'    => $queueSqlitePath !== ''
             ? (string) $queueSqlitePath
-            : __DIR__ . '/../worker/data/pr-queue.sqlite',
+            : __DIR__ . '/../data/pr-queue.sqlite',
     ];
 
     return $config;
@@ -365,7 +374,7 @@ function prQueueNeedsRefresh(?array $row, ?string $issueUpdatedAt, int $now): bo
 
 /**
  * Encrypts the user's GitHub token before it leaves the server. Only this host
- * (website + worker) holds the key, so CloudAMQP never sees a usable token.
+ * (the website host) holds the key, so CloudAMQP never sees a usable token.
  */
 function prQueueEncryptToken(string $token): string
 {
@@ -404,7 +413,7 @@ function prQueueEncryptionKey(): string
 
 /**
  * Publishes one message to CloudAMQP (plain durable queue, no DLX, so the
- * worker can declare it identically).
+ * drain job can declare it identically).
  */
 function prQueuePublish(array $message): void
 {
@@ -579,7 +588,7 @@ function buildQueuedPullRequests(array $issues, string $token, string $login, ?c
     ];
 }
 
-// ─── Worker side ──────────────────────────────────────────────────────────────
+// ─── Drain job (triggered by loop_requests on vinhedo3) ───────────────────────
 
 /**
  * Processes one batch message: looks each pull request up on GitHub and stores
@@ -659,4 +668,119 @@ function prQueueTrackRateLimit(string $login, int $now): void
     if ($limit !== null && $limit['remaining'] !== null) {
         prQueueSaveRateLimit($login, $limit['remaining'], $limit['reset'], $now);
     }
+}
+
+/**
+ * Pulls messages one at a time until the queue has been idle for
+ * $idleSeconds or $maxSeconds have passed, handing each body to $handle and
+ * acknowledging it afterwards (failures are recorded per item, so a message
+ * is never redelivered in a loop).
+ *
+ * @param callable $next   Returns an object with getBody()/ack(), or null when the queue is empty.
+ * @param callable $handle Receives the body, returns the number of pull requests processed.
+ * @param callable|null $clock Returns the current time (tests).
+ * @param callable|null $sleep Waits one poll interval (tests).
+ * @return array{messages: int, pull_requests: int, duration_seconds: int, stopped: string}
+ */
+function prQueueDrainLoop(
+    callable $next,
+    callable $handle,
+    int $idleSeconds,
+    int $maxSeconds,
+    ?callable $clock = null,
+    ?callable $sleep = null
+): array {
+    $clock ??= 'time';
+    $sleep ??= static fn () => usleep(500_000);
+
+    $started  = $clock();
+    $lastSeen = $started;
+    $messages = 0;
+    $prs      = 0;
+    $stopped  = 'idle';
+
+    while (true) {
+        $now = $clock();
+        if ($now - $started >= $maxSeconds) {
+            $stopped = 'max_runtime';
+            break;
+        }
+        if ($now - $lastSeen >= $idleSeconds) {
+            break;
+        }
+
+        $message = $next();
+        if ($message === null) {
+            $sleep();
+            continue;
+        }
+
+        try {
+            $prs += $handle($message->getBody());
+        } catch (Throwable $e) {
+            // Store/crypto problem: in-flight rows time out and are re-queued by a later poll.
+            logError('Pull request batch failed: {error}', ['error' => $e->getMessage()], 'queue');
+        }
+
+        $message->ack();
+        $messages++;
+        $lastSeen = $clock();
+    }
+
+    return [
+        'messages'         => $messages,
+        'pull_requests'    => $prs,
+        'duration_seconds' => $clock() - $started,
+        'stopped'          => $stopped,
+    ];
+}
+
+/**
+ * Connects to CloudAMQP and drains the pull request queue (see prQueueDrainLoop()).
+ *
+ * Uses basic_get + a short sleep rather than Pancake's Queue::consume(), whose
+ * non-blocking wait loop spins the CPU while idle (bad on shared hosting).
+ * The queue is declared exactly like Queue::publish(..., false) does.
+ */
+function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSeconds = PR_QUEUE_DRAIN_MAX_SECONDS): array
+{
+    $url = parse_url(prQueueConfig()['rabbitMqUrl']);
+    if (empty($url['host'])) {
+        throw new RuntimeException('rabbitMqUrl is not configured');
+    }
+
+    $vhostPath = $url['path'] ?? '/';
+    $vhost     = ($vhostPath === '/' || $vhostPath === '') ? '/' : rawurldecode(substr($vhostPath, 1));
+
+    $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
+        $url['host'],
+        $url['port'] ?? 5672,
+        rawurldecode($url['user'] ?? ''),
+        rawurldecode($url['pass'] ?? ''),
+        $vhost,
+        false,
+        'AMQPLAIN',
+        null,
+        'en_US',
+        10.0,
+        30.0
+    );
+
+    try {
+        $channel = $connection->channel();
+        $channel->queue_declare(PR_QUEUE_NAME, false, true, false, false);
+
+        $result = prQueueDrainLoop(
+            static fn () => $channel->basic_get(PR_QUEUE_NAME),
+            'prQueueHandleMessage',
+            $idleSeconds,
+            $maxSeconds
+        );
+
+        $channel->close();
+    } finally {
+        $connection->close();
+    }
+
+    return $result;
 }
