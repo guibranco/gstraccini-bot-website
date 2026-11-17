@@ -73,15 +73,15 @@ const PR_QUEUE_DRAIN_MAX_SECONDS = 50;
  *   $queueSqlitePath    optional path to the SQLite file
  *
  * @param array|null  $override    Use these settings instead (tests).
- * @param bool        $reload      Forget the cached settings and load again.
- * @param string|null $secretsFile Secrets file to load (default: src/queue.secrets.php).
+ * @param string|null $secretsFile Load this secrets file now instead of the cached settings
+ *                                 (default when nothing is cached: src/queue.secrets.php).
  * @return array{rabbitMqUrl: string, encryptionKey: string, jobsApiKey: string, sqlitePath: string}
  */
-function prQueueConfig(?array $override = null, bool $reload = false, ?string $secretsFile = null): array
+function prQueueConfig(?array $override = null, ?string $secretsFile = null): array
 {
     static $config = null;
 
-    if ($override !== null || $reload) {
+    if ($override !== null || $secretsFile !== null) {
         $config = $override;
     }
 

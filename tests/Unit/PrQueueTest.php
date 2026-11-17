@@ -587,7 +587,7 @@ class PrQueueTest extends TestCase
     {
         // An explicit missing path: the deploy workflow writes the real
         // src/queue.secrets.php before the tests run.
-        $config = prQueueConfig(null, true, sys_get_temp_dir() . '/no-such-dir-' . uniqid() . '/queue.secrets.php');
+        $config = prQueueConfig(null, sys_get_temp_dir() . '/no-such-dir-' . uniqid() . '/queue.secrets.php');
 
         $this->assertSame('', $config['rabbitMqUrl']);
         $this->assertSame('', $config['jobsApiKey']);
@@ -600,7 +600,7 @@ class PrQueueTest extends TestCase
         file_put_contents($file, "<?php\n\$rabbitMqUrl = 'amqp://broker.example/vh';\n\$jobsApiKey = 'from-file';\n\$queueSqlitePath = '/tmp/custom.sqlite';\n");
 
         try {
-            $config = prQueueConfig(null, true, $file);
+            $config = prQueueConfig(null, $file);
         } finally {
             unlink($file);
         }
