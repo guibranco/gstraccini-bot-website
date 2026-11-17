@@ -1,78 +1,174 @@
-        function fetchNotifications() {
-            fetch('/api/v1/notifications')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching notifications:', data.error);
-                        const notificationsMenu = document.getElementById('notificationsMenu');
-                        notificationsMenu.innerHTML = ''; // Clear any previous content
-                        const errorItem = document.createElement('li');
-                        errorItem.className = 'dropdown-item text-bg-danger';
-                        errorItem.textContent = data.error;
-                        notificationsMenu.appendChild(errorItem);
-                    } else {
-                        processNotifications(data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
-                })
-                .finally(() => { createViewAll(); });
-        }
+/**
+ * Creates a plain dropdown menu item.
+ * @param {string} text - Text to display.
+ * @param {string} [extraClass] - Optional extra CSS class.
+ * @returns {HTMLLIElement} The menu item.
+ */
+function createMenuItem(text, extraClass) {
+  const item = document.createElement("li");
+  item.className = extraClass ? `dropdown-item ${extraClass}` : "dropdown-item";
+  item.textContent = text;
+  return item;
+}
 
-        function processNotifications(notifications) {
-            const notificationsMenu = document.getElementById('notificationsMenu');
-            const notificationCount = document.getElementById('notification-count');
+/**
+ * Creates a dropdown menu item containing a link.
+ * External links (those with an aria label) open in a new tab.
+ * @param {string} href - Link destination.
+ * @param {string} text - Link text.
+ * @param {string} [ariaLabel] - Accessible label for external links.
+ * @returns {HTMLLIElement} The menu item.
+ */
+function createLinkItem(href, text, ariaLabel) {
+  const item = document.createElement("li");
+  item.classList.add("dropdown-item");
 
-            notificationsMenu.innerHTML = '';
+  const link = document.createElement("a");
+  link.href = href;
+  link.textContent = text;
+  if (ariaLabel) {
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("aria-label", ariaLabel);
+  }
 
-            if (notifications.length === 0) {
-                notificationsMenu.innerHTML = '<li class="dropdown-item">No new notifications.</li>';
-                notificationCount.textContent = '';
-                return;
-            }
+  item.appendChild(link);
+  return item;
+}
 
-            notifications.forEach(notification => {
-                const {title} = notification.subject;
-                const repo = notification.repository.full_name;
-                const url = notification.subject.url.replace('api.github.com/repos', 'github.com').replace('/issues', '/issues/');
+/**
+ * Replaces the dropdown content with an error item.
+ * @param {string} message - Error message to display.
+ */
+function showNotificationsError(message) {
+  const notificationsMenu = document.getElementById("notificationsMenu");
+  notificationsMenu.replaceChildren(createMenuItem(message, "text-bg-danger"));
+}
 
-                const listItem = document.createElement('li');
-                listItem.classList.add('dropdown-item');
+/**
+ * Fetches the signed-in user's notifications and renders them in the dropdown.
+ */
+function fetchNotifications() {
+  fetch("/api/v1/notifications")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        console.error("Error fetching notifications:", data.error);
+        showNotificationsError(data.error);
+      } else {
+        processNotifications(data);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      showNotificationsError("Failed to load notifications.");
+    })
+    .finally(() => {
+      createViewAll();
+    });
+}
 
-                const safeUrl = encodeURI(url);
-                const safeTitle = escapeHtml(title);
-                const safeRepo = escapeHtml(repo);
-                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" aria-label="Notification: ${safeTitle}">${safeTitle} - ${safeRepo}</a>`;
-                notificationsMenu.appendChild(listItem);
-            });
-            notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
-        }
+/**
+ * Returns a safe http(s) URL for a notification link, or "#" when missing or invalid.
+ * The URL is not re-encoded, so existing escapes (e.g. %3A) are preserved.
+ * @param {unknown} url - URL from the API.
+ * @returns {string} The URL to use as the link href.
+ */
+function toSafeHref(url) {
+  if (typeof url !== "string" || url === "") {
+    return "#";
+  }
+  try {
+    const parsed = new URL(url, window.location.origin);
+    return parsed.protocol === "https:" || parsed.protocol === "http:"
+      ? parsed.href
+      : "#";
+  } catch (error) {
+    console.warn("Ignoring invalid notification URL:", url, error);
+    return "#";
+  }
+}
 
-        function createViewAll() {
-            const notificationsMenu = document.getElementById('notificationsMenu');
+/**
+ * Renders notifications from the GStraccini API in the header dropdown.
+ * @param {Array<{title: string, url: string, repositoryOwner: string, repositoryName: string}>} notifications - Notifications to render.
+ */
+function processNotifications(notifications) {
+  const notificationsMenu = document.getElementById("notificationsMenu");
+  const notificationCount = document.getElementById("notification-count");
 
-            const listDivider = document.createElement('li');
-            listDivider.innerHTML = '<hr class="dropdown-divider">';
-            notificationsMenu.appendChild(listDivider);
+  notificationsMenu.replaceChildren();
 
-            const listViewAll = document.createElement('li');
-            listViewAll.classList.add('dropdown-item');
-            listViewAll.innerHTML = '<a href="notifications.php">View all notifications</a>';
-            notificationsMenu.appendChild(listViewAll);
-        }
+  if (!Array.isArray(notifications)) {
+    console.error("Unexpected notifications payload:", notifications);
+    showNotificationsError("Failed to load notifications.");
+    notificationCount.textContent = "";
+    return;
+  }
 
-document.addEventListener('DOMContentLoaded', function () {
+  if (notifications.length === 0) {
+    notificationsMenu.appendChild(createMenuItem("No new notifications."));
+    notificationCount.textContent = "";
+    return;
+  }
 
-        const notificationsDropdown = document.getElementById('notificationsDropdown');
-        if (!notificationsDropdown) {
-            console.error('Notifications dropdown element not found');
-            return;
-        }
+  // Items come from the GStraccini API (via /api/v1/notifications), not straight from GitHub:
+  // { title, url, repositoryOwner, repositoryName }
+  notifications.forEach((notification) => {
+    if (!notification || typeof notification !== "object") {
+      console.warn("Skipping malformed notification:", notification);
+      return;
+    }
 
-        notificationsDropdown.addEventListener('click', function () {
-            fetchNotifications();
-        });
-        fetchNotifications();
-});
+    const title =
+      typeof notification.title === "string" && notification.title !== ""
+        ? notification.title
+        : "(untitled)";
+    const repo = [notification.repositoryOwner, notification.repositoryName]
+      .filter(Boolean)
+      .join("/");
+    const label = repo ? `${title} - ${repo}` : title;
+    const href = toSafeHref(notification.url);
+
+    notificationsMenu.appendChild(
+      createLinkItem(href, label, `Notification: ${title}`)
+    );
+  });
+  notificationCount.textContent =
+    notifications.length > 9 ? "9+" : notifications.length;
+}
+
+/**
+ * Appends the divider and "View all notifications" link to the dropdown.
+ */
+function createViewAll() {
+  const notificationsMenu = document.getElementById("notificationsMenu");
+
+  const listDivider = document.createElement("li");
+  const divider = document.createElement("hr");
+  divider.className = "dropdown-divider";
+  listDivider.appendChild(divider);
+  notificationsMenu.appendChild(listDivider);
+
+  notificationsMenu.appendChild(
+    createLinkItem("notifications.php", "View all notifications")
+  );
+}
+
+/**
+ * Wires up the notifications dropdown once the DOM is ready.
+ */
+function initNotifications() {
+  const notificationsDropdown = document.getElementById(
+    "notificationsDropdown"
+  );
+  if (!notificationsDropdown) {
+    console.error("Notifications dropdown element not found");
+    return;
+  }
+
+  notificationsDropdown.addEventListener("click", fetchNotifications);
+  fetchNotifications();
+}
+
+document.addEventListener("DOMContentLoaded", initNotifications);
