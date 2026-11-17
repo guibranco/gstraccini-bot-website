@@ -150,10 +150,12 @@ function showLoadingIndicator(containerId, message) {
  * @param {HTMLElement} container      - The grouped list container.
  * @param {string}      groupAttribute - Dataset key of managed cards (e.g. 'owner').
  */
+/* exported removeUnmanagedChildren */
 function removeUnmanagedChildren(container, groupAttribute) {
-    [...container.children].forEach(child => {
-        if (child.dataset[groupAttribute] === undefined) child.remove();
-    });
+  const attributeName = `data-${groupAttribute}`;
+  [...container.children].forEach((child) => {
+    if (!child.hasAttribute(attributeName)) child.remove();
+  });
 }
 
 /**

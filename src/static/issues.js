@@ -1,3 +1,4 @@
+/* global removeUnmanagedChildren */
 let isUpdatingIssues = false;
 let isFetchingIssues = false;
 let retryCount = 0;
@@ -290,7 +291,7 @@ function populateIssuesGroupedByOwner(items) {
 
         // ── Build index of existing owner cards ───────────────────────────
         const existingCards = new Map();
-        removeUnmanagedChildren(groupedContainer, 'owner');
+    removeUnmanagedChildren(groupedContainer, "owner");
         groupedContainer.querySelectorAll('[data-owner]').forEach(el => {
             existingCards.set(el.dataset.owner, el);
         });
