@@ -1,92 +1,119 @@
-        function fetchNotifications() {
-            fetch('/api/v1/notifications')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error('Error fetching notifications:', data.error);
-                        const notificationsMenu = document.getElementById('notificationsMenu');
-                        notificationsMenu.innerHTML = ''; // Clear any previous content
-                        const errorItem = document.createElement('li');
-                        errorItem.className = 'dropdown-item text-bg-danger';
-                        errorItem.textContent = data.error;
-                        notificationsMenu.appendChild(errorItem);
-                    } else {
-                        processNotifications(data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('notificationsMenu').innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
-                })
-                .finally(() => { createViewAll(); });
-        }
+function createMenuItem(text, extraClass) {
+  const item = document.createElement("li");
+  item.className = extraClass ? `dropdown-item ${extraClass}` : "dropdown-item";
+  item.textContent = text;
+  return item;
+}
 
-        function processNotifications(notifications) {
-            const notificationsMenu = document.getElementById('notificationsMenu');
-            const notificationCount = document.getElementById('notification-count');
+function createLinkItem(href, text, ariaLabel) {
+  const item = document.createElement("li");
+  item.classList.add("dropdown-item");
 
-            notificationsMenu.innerHTML = '';
+  const link = document.createElement("a");
+  link.href = href;
+  link.textContent = text;
+  if (ariaLabel) {
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("aria-label", ariaLabel);
+  }
 
-            if (!Array.isArray(notifications)) {
-                console.error('Unexpected notifications payload:', notifications);
-                notificationsMenu.innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
-                notificationCount.textContent = '';
-                return;
-            }
+  item.appendChild(link);
+  return item;
+}
 
-            if (notifications.length === 0) {
-                notificationsMenu.innerHTML = '<li class="dropdown-item">No new notifications.</li>';
-                notificationCount.textContent = '';
-                return;
-            }
+function showNotificationsError(message) {
+  const notificationsMenu = document.getElementById("notificationsMenu");
+  notificationsMenu.replaceChildren(createMenuItem(message, "text-bg-danger"));
+}
 
-            // Items come from the GStraccini API (via /api/v1/notifications), not straight from GitHub:
-            // { title, url, repositoryOwner, repositoryName }
-            notifications.forEach(notification => {
-                if (!notification || typeof notification !== 'object') {
-                    console.warn('Skipping malformed notification:', notification);
-                    return;
-                }
+function fetchNotifications() {
+  fetch("/api/v1/notifications")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        console.error("Error fetching notifications:", data.error);
+        showNotificationsError(data.error);
+      } else {
+        processNotifications(data);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      showNotificationsError("Failed to load notifications.");
+    })
+    .finally(() => {
+      createViewAll();
+    });
+}
 
-                const title = notification.title ?? '(untitled)';
-                const repo = [notification.repositoryOwner, notification.repositoryName].filter(Boolean).join('/');
+function processNotifications(notifications) {
+  const notificationsMenu = document.getElementById("notificationsMenu");
+  const notificationCount = document.getElementById("notification-count");
 
-                const listItem = document.createElement('li');
-                listItem.classList.add('dropdown-item');
+  notificationsMenu.replaceChildren();
 
-                const safeUrl = notification.url ? encodeURI(notification.url) : '#';
-                const safeTitle = escapeHtml(title);
-                const safeRepo = escapeHtml(repo);
-                const label = safeRepo ? `${safeTitle} - ${safeRepo}` : safeTitle;
-                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" aria-label="Notification: ${safeTitle}">${label}</a>`;
-                notificationsMenu.appendChild(listItem);
-            });
-            notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
-        }
+  if (!Array.isArray(notifications)) {
+    console.error("Unexpected notifications payload:", notifications);
+    showNotificationsError("Failed to load notifications.");
+    notificationCount.textContent = "";
+    return;
+  }
 
-        function createViewAll() {
-            const notificationsMenu = document.getElementById('notificationsMenu');
+  if (notifications.length === 0) {
+    notificationsMenu.appendChild(createMenuItem("No new notifications."));
+    notificationCount.textContent = "";
+    return;
+  }
 
-            const listDivider = document.createElement('li');
-            listDivider.innerHTML = '<hr class="dropdown-divider">';
-            notificationsMenu.appendChild(listDivider);
+  // Items come from the GStraccini API (via /api/v1/notifications), not straight from GitHub:
+  // { title, url, repositoryOwner, repositoryName }
+  notifications.forEach((notification) => {
+    if (!notification || typeof notification !== "object") {
+      console.warn("Skipping malformed notification:", notification);
+      return;
+    }
 
-            const listViewAll = document.createElement('li');
-            listViewAll.classList.add('dropdown-item');
-            listViewAll.innerHTML = '<a href="notifications.php">View all notifications</a>';
-            notificationsMenu.appendChild(listViewAll);
-        }
+    const title = notification.title ?? "(untitled)";
+    const repo = [notification.repositoryOwner, notification.repositoryName]
+      .filter(Boolean)
+      .join("/");
+    const label = repo ? `${title} - ${repo}` : title;
+    const href = notification.url ? encodeURI(notification.url) : "#";
 
-document.addEventListener('DOMContentLoaded', function () {
+    notificationsMenu.appendChild(
+      createLinkItem(href, label, `Notification: ${title}`),
+    );
+  });
+  notificationCount.textContent =
+    notifications.length > 9 ? "9+" : notifications.length;
+}
 
-        const notificationsDropdown = document.getElementById('notificationsDropdown');
-        if (!notificationsDropdown) {
-            console.error('Notifications dropdown element not found');
-            return;
-        }
+function createViewAll() {
+  const notificationsMenu = document.getElementById("notificationsMenu");
 
-        notificationsDropdown.addEventListener('click', function () {
-            fetchNotifications();
-        });
-        fetchNotifications();
+  const listDivider = document.createElement("li");
+  const divider = document.createElement("hr");
+  divider.className = "dropdown-divider";
+  listDivider.appendChild(divider);
+  notificationsMenu.appendChild(listDivider);
+
+  notificationsMenu.appendChild(
+    createLinkItem("notifications.php", "View all notifications"),
+  );
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const notificationsDropdown = document.getElementById(
+    "notificationsDropdown",
+  );
+  if (!notificationsDropdown) {
+    console.error("Notifications dropdown element not found");
+    return;
+  }
+
+  notificationsDropdown.addEventListener("click", function () {
+    fetchNotifications();
+  });
+  fetchNotifications();
 });
