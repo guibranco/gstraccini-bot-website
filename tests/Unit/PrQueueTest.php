@@ -456,4 +456,128 @@ class PrQueueTest extends TestCase
         }
         $this->assertSame([200, ['status' => 'already_running']], $busy);
     }
+
+    public function testAmqpUrlIsParsedWithDefaultsAndDecoding(): void
+    {
+        $this->assertSame(
+            ['host' => 'h.example', 'port' => 5672, 'user' => 'u', 'password' => 'p@ss', 'vhost' => 'vh'],
+            prQueueParseAmqpUrl('amqp://u:p%40ss@h.example/vh')
+        );
+        $this->assertSame('/', prQueueParseAmqpUrl('amqp://u:p@h.example:5673')['vhost']);
+        $this->assertSame(5673, prQueueParseAmqpUrl('amqp://u:p@h.example:5673/')['port']);
+
+        $this->expectException(\PrQueueException::class);
+        prQueueParseAmqpUrl('');
+    }
+
+    public function testSseFrameFormat(): void
+    {
+        $this->assertSame("id: 7\nevent: pr\ndata: {\"a\":1}\n\n", prQueueSseFrame('pr', ['a' => 1], 7));
+        $this->assertSame("event: done\ndata: []\n\n", prQueueSseFrame('done', []));
+    }
+
+    public function testOpenDbCreatesDirectoryAndSchemaInWalMode(): void
+    {
+        $dir  = sys_get_temp_dir() . '/pr-queue-db-' . getmypid() . '-' . uniqid();
+        $path = $dir . '/nested/pr-queue.sqlite';
+
+        $pdo = prQueueOpenDb($path);
+
+        $this->assertFileExists($path);
+        $this->assertSame('wal', strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()));
+        $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM pr_status')->fetchColumn());
+    }
+
+    public function testAssignedIssuesAreFetchedOnceAndCachedInSession(): void
+    {
+        $fetches = 0;
+        $saved   = [];
+        $fetch   = function () use (&$fetches) {
+            $fetches++;
+            return [$this->issue(1) + ['body' => 'long']];
+        };
+        $persist = function (array $values) use (&$saved) {
+            $saved = $values + $saved;
+        };
+
+        $items = getAssignedIssuesCached('token', [], $fetch, $persist);
+        $again = getAssignedIssuesCached('token', $saved, $fetch, $persist);
+
+        $this->assertSame(1, $fetches);
+        $this->assertSame($items, $again);
+        $this->assertArrayNotHasKey('body', $items[0]);
+
+        $expired = ['assigned-issues' => ['items' => [], 'fetched_at' => time() - PR_QUEUE_ISSUES_CACHE_TTL - 1]];
+        getAssignedIssuesCached('token', $expired, $fetch, $persist);
+        $this->assertSame(2, $fetches);
+    }
+
+    public function testLoadQueuedAssignedItemsStoresStreamKeysAndSnapshot(): void
+    {
+        $saved = [];
+        $results = loadQueuedAssignedItems(
+            'token',
+            ['user' => ['login' => 'guibranco']],
+            fn () => [$this->issue(1), $this->issue(2, false)],
+            function (array $values) use (&$saved) {
+                $saved = $values + $saved;
+            },
+            fn () => null
+        );
+
+        $this->assertSame(['guibranco/repo#1'], $saved[PR_QUEUE_SESSION_KEYS]);
+        $this->assertCount(1, $saved['pull-requests']['data']['openPullRequests']);
+        $this->assertArrayHasKey('assigned-issues', $saved);
+
+        $prPayload = buildPullRequestsPayload($results);
+        $this->assertSame(1, $prPayload['pending']);
+        $this->assertSame('/api/v1/pull-requests/stream', $prPayload['stream']['url']);
+
+        $dashboard = buildDashboardPayload($results);
+        $this->assertCount(1, $dashboard['openPullRequestsDashboard']);
+        $this->assertCount(1, $dashboard['openIssuesDashboard']);
+    }
+
+    public function testRateLimitHeadersAreRecorded(): void
+    {
+        recordGitHubRateLimit("HTTP/2 200\r\nx-ratelimit-remaining: 4321\r\nx-ratelimit-reset: 1800000600\r\n", 200);
+        $this->assertSame(['remaining' => 4321, 'reset' => 1800000600, 'httpCode' => 200], getLastGitHubRateLimit());
+
+        recordGitHubRateLimit("HTTP/2 500\r\n", 500);
+        $this->assertSame(['remaining' => null, 'reset' => null, 'httpCode' => 500], getLastGitHubRateLimit());
+    }
+
+    public function testWorkerTracksRateLimitAndStopsBelowTheFloor(): void
+    {
+        $message = null;
+        buildQueuedPullRequests([$this->issue(1), $this->issue(2)], 'token', 'guibranco', function (array $m) use (&$message) {
+            $message = $m;
+        }, self::NOW);
+
+        $fetch = function () {
+            recordGitHubRateLimit("x-ratelimit-remaining: 5\r\nx-ratelimit-reset: " . (self::NOW + 600) . "\r\n", 200);
+            return null;
+        };
+
+        $processed = prQueueHandleMessage(json_encode($message), $fetch, self::NOW + 1);
+
+        $this->assertSame(1, $processed);
+        $rows = prQueueLoadRows(['guibranco/repo#1', 'guibranco/repo#2']);
+        $this->assertSame('failed', $rows['guibranco/repo#1']['status']);
+        $this->assertSame('released', $rows['guibranco/repo#2']['status']);
+    }
+
+    public function testMalformedAndUndecryptableMessagesAreDiscarded(): void
+    {
+        $this->assertSame(0, prQueueHandleMessage('not json'));
+
+        prQueueMarkQueued(['guibranco/repo#1'], self::NOW);
+        $message = json_encode([
+            'v' => PR_QUEUE_MESSAGE_VERSION, 'login' => 'guibranco', 'created_at' => self::NOW, 'token' => 'garbage',
+            'items' => [['key' => 'guibranco/repo#1', 'url' => 'u', 'updated_at' => null]],
+        ]);
+
+        $this->assertSame(0, prQueueHandleMessage($message, fn () => $this->fail('no GitHub call'), self::NOW));
+        $this->assertSame('released', prQueueLoadRows(['guibranco/repo#1'])['guibranco/repo#1']['status']);
+    }
 }

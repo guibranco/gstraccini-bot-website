@@ -9,10 +9,6 @@
 require_once 'api-common.php';
 
 $token   = checkAuth();
-$results = loadQueuedAssignedItems($token);
+$results = loadQueuedAssignedItems($token, $_SESSION);
 
-sendJsonResponse([
-    'openPullRequestsDashboard' => $results['pullRequests'],
-    'openIssuesDashboard'       => $results['issues'],
-    'pending'                   => $results['pending'],
-], time(), 'miss', 0);
+sendJsonResponse(buildDashboardPayload($results), time(), 'miss', 0);

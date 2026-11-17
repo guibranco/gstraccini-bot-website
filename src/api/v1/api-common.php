@@ -119,29 +119,42 @@ function cacheAndRespond(array $data, string $cacheKey): void
 }
 
 /**
+ * Writes values into the (already closed) session and closes it again.
+ *
+ * @param array<string, mixed> $values
+ */
+function writeSessionValues(array $values): void
+{
+    session_start();
+    foreach ($values as $key => $value) {
+        $_SESSION[$key] = $value;
+    }
+    session_write_close();
+}
+
+/**
  * Returns the user's assigned issues/PRs in slim form, cached in the session
  * for PR_QUEUE_ISSUES_CACHE_TTL seconds so the dashboard and the pull requests
  * page share a single GitHub call.
  *
  * Must be called after checkAuth() (the session is already closed then).
  *
- * @param  string $token GitHub API token.
+ * @param  string        $token   GitHub API token.
+ * @param  array         $session Current session values.
+ * @param  callable|null $fetch   Override for fetchAssignedIssues() (tests).
+ * @param  callable|null $persist Override for writeSessionValues() (tests).
  * @return array         Slim issue list (see prQueueSlimIssue()).
  */
-function getAssignedIssuesCached(string $token): array
+function getAssignedIssuesCached(string $token, array $session, ?callable $fetch = null, ?callable $persist = null): array
 {
-    $cacheKey = 'assigned-issues';
-    $cached   = $_SESSION[$cacheKey] ?? null;
+    $cached = $session['assigned-issues'] ?? null;
 
     if (is_array($cached) && ($cached['fetched_at'] ?? 0) > (time() - PR_QUEUE_ISSUES_CACHE_TTL)) {
         return $cached['items'];
     }
 
-    $items = array_map('prQueueSlimIssue', fetchAssignedIssues($token));
-
-    session_start();
-    $_SESSION[$cacheKey] = ['items' => $items, 'fetched_at' => time()];
-    session_write_close();
+    $items = array_map('prQueueSlimIssue', ($fetch ?? 'fetchAssignedIssues')($token));
+    ($persist ?? 'writeSessionValues')(['assigned-issues' => ['items' => $items, 'fetched_at' => time()]]);
 
     return $items;
 }
@@ -150,23 +163,58 @@ function getAssignedIssuesCached(string $token): array
  * Builds the queue-backed pull request payload, remembers which pull requests
  * this user may stream updates for, and stores the SSR snapshot.
  *
+ * @param  string        $token   GitHub API token.
+ * @param  array         $session Current session values.
+ * @param  callable|null $fetch   Override for fetchAssignedIssues() (tests).
+ * @param  callable|null $persist Override for writeSessionValues() (tests).
+ * @param  callable|null $publish Override for prQueuePublish() (tests).
  * @return array Result of buildQueuedPullRequests().
  */
-function loadQueuedAssignedItems(string $token): array
-{
-    $login   = $_SESSION['user']['login'] ?? 'unknown';
-    $issues  = getAssignedIssuesCached($token);
-    $results = buildQueuedPullRequests($issues, $token, $login);
+function loadQueuedAssignedItems(
+    string $token,
+    array $session,
+    ?callable $fetch = null,
+    ?callable $persist = null,
+    ?callable $publish = null
+): array {
+    $persist ??= 'writeSessionValues';
+    $login   = $session['user']['login'] ?? 'unknown';
+    $issues  = getAssignedIssuesCached($token, $session, $fetch, $persist);
+    $results = buildQueuedPullRequests($issues, $token, $login, $publish);
 
-    session_start();
-    $_SESSION[PR_QUEUE_SESSION_KEYS] = $results['keys'];
-    $_SESSION['pull-requests'] = [
-        'data'          => ['openPullRequests' => $results['pullRequests']],
-        'last_api_call' => time(),
-    ];
-    session_write_close();
+    $persist([
+        PR_QUEUE_SESSION_KEYS => $results['keys'],
+        'pull-requests'       => [
+            'data'          => ['openPullRequests' => $results['pullRequests']],
+            'last_api_call' => time(),
+        ],
+    ]);
 
     return $results;
+}
+
+/**
+ * Payload of GET /api/v1/pull-requests.
+ */
+function buildPullRequestsPayload(array $results): array
+{
+    return [
+        'openPullRequests' => $results['pullRequests'],
+        'pending'          => $results['pending'],
+        'stream'           => buildStreamDescriptor($results),
+    ];
+}
+
+/**
+ * Payload of GET /api/v1/dashboard.
+ */
+function buildDashboardPayload(array $results): array
+{
+    return [
+        'openPullRequestsDashboard' => $results['pullRequests'],
+        'openIssuesDashboard'       => $results['issues'],
+        'pending'                   => $results['pending'],
+    ];
 }
 
 /**

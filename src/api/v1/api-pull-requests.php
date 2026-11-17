@@ -11,10 +11,6 @@
 require_once 'api-common.php';
 
 $token   = checkAuth();
-$results = loadQueuedAssignedItems($token);
+$results = loadQueuedAssignedItems($token, $_SESSION);
 
-sendJsonResponse([
-    'openPullRequests' => $results['pullRequests'],
-    'pending'          => $results['pending'],
-    'stream'           => buildStreamDescriptor($results),
-], time(), 'miss', 0);
+sendJsonResponse(buildPullRequestsPayload($results), time(), 'miss', 0);

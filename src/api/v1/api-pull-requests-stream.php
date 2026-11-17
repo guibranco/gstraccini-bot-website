@@ -39,11 +39,7 @@ while (ob_get_level() > 0) {
  */
 function sendEvent(string $event, array $payload, ?int $id = null): void
 {
-    if ($id !== null) {
-        echo 'id: ' . $id . "\n";
-    }
-    echo 'event: ' . $event . "\n";
-    echo 'data: ' . json_encode($payload) . "\n\n";
+    echo prQueueSseFrame($event, $payload, $id);
     flush();
 }
 

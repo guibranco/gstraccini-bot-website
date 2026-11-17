@@ -129,8 +129,17 @@ function prQueueDb(?PDO $override = null): PDO
         return $pdo;
     }
 
-    $path = prQueueConfig()['sqlitePath'];
-    $dir  = dirname($path);
+    $pdo = prQueueOpenDb(prQueueConfig()['sqlitePath']);
+
+    return $pdo;
+}
+
+/**
+ * Opens (creating if needed) the SQLite file in WAL mode with the schema.
+ */
+function prQueueOpenDb(string $path): PDO
+{
+    $dir = dirname($path);
     if (!is_dir($dir)) {
         mkdir($dir, 0700, true);
     }
@@ -625,6 +634,16 @@ function buildQueuedPullRequests(array $issues, string $token, string $login, ?c
 // ─── SSE stream ───────────────────────────────────────────────────────────────
 
 /**
+ * Formats one Server-Sent Events frame.
+ */
+function prQueueSseFrame(string $event, array $payload, ?int $id = null): string
+{
+    $frame = $id !== null ? 'id: ' . $id . "\n" : '';
+
+    return $frame . 'event: ' . $event . "\n" . 'data: ' . json_encode($payload) . "\n\n";
+}
+
+/**
  * One poll of the SSE stream: the events to send for rows changed after
  * $since, the new cursor, and whether nothing is left in flight.
  *
@@ -797,6 +816,30 @@ function prQueueDrainLoop(
 }
 
 /**
+ * Splits an amqp:// URL into connection parameters (credentials and vhost
+ * URL-decoded; default port 5672 and vhost "/").
+ *
+ * @return array{host: string, port: int, user: string, password: string, vhost: string}
+ */
+function prQueueParseAmqpUrl(string $amqpUrl): array
+{
+    $url = parse_url($amqpUrl);
+    if ($url === false || empty($url['host'])) {
+        throw new PrQueueException('rabbitMqUrl is not configured');
+    }
+
+    $vhostPath = $url['path'] ?? '/';
+
+    return [
+        'host'     => $url['host'],
+        'port'     => (int) ($url['port'] ?? 5672),
+        'user'     => rawurldecode($url['user'] ?? ''),
+        'password' => rawurldecode($url['pass'] ?? ''),
+        'vhost'    => ($vhostPath === '/' || $vhostPath === '') ? '/' : rawurldecode(substr($vhostPath, 1)),
+    ];
+}
+
+/**
  * Connects to CloudAMQP and drains the pull request queue (see prQueueDrainLoop()).
  *
  * Uses basic_get + a short sleep rather than Pancake's Queue::consume(), whose
@@ -805,20 +848,14 @@ function prQueueDrainLoop(
  */
 function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSeconds = PR_QUEUE_DRAIN_MAX_SECONDS): array
 {
-    $url = parse_url(prQueueConfig()['rabbitMqUrl']);
-    if (empty($url['host'])) {
-        throw new PrQueueException('rabbitMqUrl is not configured');
-    }
-
-    $vhostPath = $url['path'] ?? '/';
-    $vhost     = ($vhostPath === '/' || $vhostPath === '') ? '/' : rawurldecode(substr($vhostPath, 1));
+    $server = prQueueParseAmqpUrl(prQueueConfig()['rabbitMqUrl']);
 
     $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
-        $url['host'],
-        $url['port'] ?? 5672,
-        rawurldecode($url['user'] ?? ''),
-        rawurldecode($url['pass'] ?? ''),
-        $vhost,
+        $server['host'],
+        $server['port'],
+        $server['user'],
+        $server['password'],
+        $server['vhost'],
         false,
         'AMQPLAIN',
         null,
