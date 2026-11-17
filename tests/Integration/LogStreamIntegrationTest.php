@@ -51,7 +51,7 @@ class LogStreamIntegrationTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testGetLogStreamIsDisabledForTheTestSuite(): void
+    public function testLogStreamIsDisabledInTests(): void
     {
         // tests/phpunit.xml sets LOGSTREAM_DISABLED=1, so the default secrets
         // file (written by deploy.yml before PHPUnit runs) is never used.
