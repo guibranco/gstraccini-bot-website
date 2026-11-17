@@ -27,24 +27,38 @@
 
             notificationsMenu.innerHTML = '';
 
+            if (!Array.isArray(notifications)) {
+                console.error('Unexpected notifications payload:', notifications);
+                notificationsMenu.innerHTML = '<li class="dropdown-item text-bg-danger">Failed to load notifications.</li>';
+                notificationCount.textContent = '';
+                return;
+            }
+
             if (notifications.length === 0) {
                 notificationsMenu.innerHTML = '<li class="dropdown-item">No new notifications.</li>';
                 notificationCount.textContent = '';
                 return;
             }
 
+            // Items come from the GStraccini API (via /api/v1/notifications), not straight from GitHub:
+            // { title, url, repositoryOwner, repositoryName }
             notifications.forEach(notification => {
-                const {title} = notification.subject;
-                const repo = notification.repository.full_name;
-                const url = notification.subject.url.replace('api.github.com/repos', 'github.com').replace('/issues', '/issues/');
+                if (!notification || typeof notification !== 'object') {
+                    console.warn('Skipping malformed notification:', notification);
+                    return;
+                }
+
+                const title = notification.title ?? '(untitled)';
+                const repo = [notification.repositoryOwner, notification.repositoryName].filter(Boolean).join('/');
 
                 const listItem = document.createElement('li');
                 listItem.classList.add('dropdown-item');
 
-                const safeUrl = encodeURI(url);
+                const safeUrl = notification.url ? encodeURI(notification.url) : '#';
                 const safeTitle = escapeHtml(title);
                 const safeRepo = escapeHtml(repo);
-                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" aria-label="Notification: ${safeTitle}">${safeTitle} - ${safeRepo}</a>`;
+                const label = safeRepo ? `${safeTitle} - ${safeRepo}` : safeTitle;
+                listItem.innerHTML = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" aria-label="Notification: ${safeTitle}">${label}</a>`;
                 notificationsMenu.appendChild(listItem);
             });
             notificationCount.textContent = notifications.length > 9 ? '9+' : notifications.length;
