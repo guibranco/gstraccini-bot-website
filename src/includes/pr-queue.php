@@ -72,13 +72,16 @@ const PR_QUEUE_DRAIN_MAX_SECONDS = 50;
  *   $jobsApiKey         X-Api-Key loop_requests (vinhedo3) sends to the job
  *   $queueSqlitePath    optional path to the SQLite file
  *
+ * @param array|null  $override    Use these settings instead (tests).
+ * @param string|null $secretsFile Load this secrets file now instead of the cached settings
+ *                                 (default when nothing is cached: src/queue.secrets.php).
  * @return array{rabbitMqUrl: string, encryptionKey: string, jobsApiKey: string, sqlitePath: string}
  */
-function prQueueConfig(?array $override = null, bool $reload = false): array
+function prQueueConfig(?array $override = null, ?string $secretsFile = null): array
 {
     static $config = null;
 
-    if ($override !== null || $reload) {
+    if ($override !== null || $secretsFile !== null) {
         $config = $override;
     }
 
@@ -91,7 +94,7 @@ function prQueueConfig(?array $override = null, bool $reload = false): array
     $jobsApiKey         = '';
     $queueSqlitePath    = '';
 
-    $secretsFile = __DIR__ . '/../queue.secrets.php';
+    $secretsFile ??= __DIR__ . '/../queue.secrets.php';
     if (file_exists($secretsFile)) {
         require_once $secretsFile;
     }
