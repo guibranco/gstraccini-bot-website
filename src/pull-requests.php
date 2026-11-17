@@ -28,7 +28,7 @@ foreach ($data["openPullRequests"] as $pr) {
     $groupedPullRequests[$owner][] = $pr;
 }
 
-$stateOrder = ['success', 'failure', 'pending', 'error', 'skipped', ''];
+$stateOrder = ['success', 'failure', 'pending', 'error', 'queued', 'skipped', ''];
 foreach ($groupedPullRequests as &$prs) {
     usort($prs, function ($a, $b) use ($stateOrder) {
 
@@ -187,6 +187,10 @@ function isValidPR($pr) {
                                                         <?php elseif ($pr["state"] === "error"): ?>
                                                             <span class="badge bg-danger">
                                                                 <i class="fas fa-exclamation-triangle"></i> CI Error
+                                                            </span>
+                                                        <?php elseif ($pr["state"] === "queued"): ?>
+                                                            <span class="badge bg-info text-dark">
+                                                                <i class="fas fa-spinner fa-spin"></i> Checking…
                                                             </span>
                                                         <?php elseif ($pr["state"] === "skipped"): ?>
                                                             <span class="badge bg-dark">

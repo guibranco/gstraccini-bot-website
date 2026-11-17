@@ -1,24 +1,14 @@
 <?php
 /**
- * API endpoint for dashboard view (mix of assigned issues and pull requests)
+ * API endpoint for dashboard view (mix of assigned issues and pull requests).
+ *
+ * Pull request enrichment is queue-backed (see includes/pr-queue.php); the
+ * dashboard simply shows the latest stored state on each poll.
  */
 
 require_once 'api-common.php';
 
-$cacheKey = "dashboard";
-$token    = checkAuth();
+$token   = checkAuth();
+$results = loadQueuedAssignedItems($token, $_SESSION);
 
-$cache = getCache($cacheKey);
-if ($cache !== false) {
-    exit();
-}
-
-$issues  = fetchAssignedIssues($token);
-$results = processIssuesAndPullRequests($issues, $token);
-
-$data = [
-    'openPullRequestsDashboard' => $results['pullRequests'],
-    'openIssuesDashboard'       => $results['issues'],
-];
-
-cacheAndRespond($data, $cacheKey);
+sendJsonResponse(buildDashboardPayload($results), time(), 'miss', 0);

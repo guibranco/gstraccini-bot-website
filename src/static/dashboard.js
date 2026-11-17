@@ -154,6 +154,12 @@ function getStateBadge(state) {
             icon: 'fa-arrow-circle-right',
             text: 'Skipped',
             title: 'CI checks were skipped'
+        },
+        'queued': {
+            class: 'bg-info text-dark',
+            icon: 'fa-spinner fa-spin',
+            text: 'Checking…',
+            title: 'CI and merge status are being refreshed'
         }
     };
     
