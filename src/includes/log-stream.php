@@ -20,7 +20,8 @@ const LOG_LEVELS_MIRRORED_TO_ERROR_LOG = [
  * @param  string|null $secretsFile Overrides the secrets file path (used by tests
  *                                  to avoid touching the real, environment-provided file).
  * @return LogStream|null Null when logstream.secrets.php is missing or incomplete,
- *                         so logging stays a no-op instead of breaking the app.
+ *                         or LOGSTREAM_DISABLED=1 (tests), so logging stays a no-op
+ *                         instead of breaking the app.
  */
 function getLogStream(?string $secretsFile = null): ?LogStream
 {
@@ -31,6 +32,13 @@ function getLogStream(?string $secretsFile = null): ?LogStream
         return $instance;
     }
     $initialized = true;
+
+    // The test suite sets LOGSTREAM_DISABLED (tests/phpunit.xml): the deploy
+    // workflow writes the real secrets file before running PHPUnit, and the
+    // tests' simulated failures must not reach production LogStream.
+    if ($secretsFile === null && getenv('LOGSTREAM_DISABLED') === '1') {
+        return null;
+    }
 
     $secretsFile ??= __DIR__ . '/../logstream.secrets.php';
     if (!file_exists($secretsFile)) {

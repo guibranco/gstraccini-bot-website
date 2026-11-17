@@ -49,4 +49,13 @@ class LogStreamIntegrationTest extends TestCase
 
         $this->assertInstanceOf(LogStream::class, getLogStream($this->secretsFile));
     }
+
+    #[RunInSeparateProcess]
+    public function testLogStreamIsDisabledInTests(): void
+    {
+        // tests/phpunit.xml sets LOGSTREAM_DISABLED=1, so the default secrets
+        // file (written by deploy.yml before PHPUnit runs) is never used.
+        $this->assertSame('1', getenv('LOGSTREAM_DISABLED'));
+        $this->assertNull(getLogStream());
+    }
 }

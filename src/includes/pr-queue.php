@@ -99,7 +99,7 @@ function prQueueConfig(?array $override = null, ?string $secretsFile = null): ar
         require_once $secretsFile;
     }
 
-    $config = [
+    return $config = [
         'rabbitMqUrl'   => (string) $rabbitMqUrl,
         'encryptionKey' => (string) $queueEncryptionKey,
         'jobsApiKey'    => (string) $jobsApiKey,
@@ -107,8 +107,6 @@ function prQueueConfig(?array $override = null, ?string $secretsFile = null): ar
             ? (string) $queueSqlitePath
             : __DIR__ . '/../data/pr-queue.sqlite',
     ];
-
-    return $config;
 }
 
 // ─── SQLite store ─────────────────────────────────────────────────────────────
@@ -137,9 +135,7 @@ function prQueueDb(?PDO $override = null, bool $reset = false): PDO
         return $pdo;
     }
 
-    $pdo = prQueueOpenDb(prQueueConfig()['sqlitePath']);
-
-    return $pdo;
+    return $pdo = prQueueOpenDb(prQueueConfig()['sqlitePath']);
 }
 
 /**
@@ -372,26 +368,22 @@ function prQueueIsSettled(?array $data): bool
  */
 function prQueueNeedsRefresh(?array $row, ?string $issueUpdatedAt, int $now): bool
 {
-    if ($row === null) {
-        return true;
+    $status = $row['status'] ?? null;
+
+    if ($status === 'queued') {
+        $stale = (int) $row['queued_at'] < ($now - PR_QUEUE_INFLIGHT_TIMEOUT);
+    } elseif ($status === 'done') {
+        $changed = $issueUpdatedAt !== null && $row['issue_updated_at'] !== $issueUpdatedAt;
+        $data    = $row['data'] !== null ? json_decode($row['data'], true) : null;
+        $ttl     = prQueueIsSettled($data) ? PR_QUEUE_TTL_SETTLED : PR_QUEUE_TTL_UNSETTLED;
+        $stale   = $changed || (int) $row['processed_at'] < ($now - $ttl);
+    } elseif ($status === 'failed') {
+        $stale = (int) $row['processed_at'] < ($now - PR_QUEUE_TTL_FAILED);
+    } else {
+        $stale = true; // never seen, or released
     }
 
-    $data = $row['data'] !== null ? json_decode($row['data'], true) : null;
-
-    switch ($row['status']) {
-        case 'queued':
-            return (int) $row['queued_at'] < ($now - PR_QUEUE_INFLIGHT_TIMEOUT);
-        case 'done':
-            if ($issueUpdatedAt !== null && $row['issue_updated_at'] !== $issueUpdatedAt) {
-                return true;
-            }
-            $ttl = prQueueIsSettled($data) ? PR_QUEUE_TTL_SETTLED : PR_QUEUE_TTL_UNSETTLED;
-            return (int) $row['processed_at'] < ($now - $ttl);
-        case 'failed':
-            return (int) $row['processed_at'] < ($now - PR_QUEUE_TTL_FAILED);
-        default:
-            return true;
-    }
+    return $stale;
 }
 
 // ─── Token encryption ─────────────────────────────────────────────────────────
@@ -679,6 +671,46 @@ function prQueueStreamPoll(array $keys, int $since): array
 // ─── Drain job (triggered by loop_requests on vinhedo3) ───────────────────────
 
 /**
+ * Validates a batch message and decrypts its token. Discarded batches are
+ * released so the next poll re-queues their pull requests.
+ *
+ * @return array{message: array, keys: list<string>, login: string, token: string}|null
+ */
+function prQueueOpenMessage(string $body, int $now): ?array
+{
+    $message = json_decode($body, true);
+
+    if (!is_array($message) || ($message['v'] ?? null) !== PR_QUEUE_MESSAGE_VERSION || !is_array($message['items'] ?? null)) {
+        logWarning('Discarding malformed pull request queue message', [], 'queue');
+        return null;
+    }
+
+    $keys   = array_column($message['items'], 'key');
+    $login  = (string) ($message['login'] ?? 'unknown');
+    $token  = null;
+    $reason = null;
+
+    if ((int) ($message['created_at'] ?? 0) < ($now - PR_QUEUE_MESSAGE_MAX_AGE)) {
+        $reason = 'expired';
+    } else {
+        $token  = prQueueDecryptToken((string) ($message['token'] ?? ''));
+        $reason = $token === null ? 'undecryptable token' : null;
+    }
+
+    if ($reason !== null) {
+        prQueueRelease($keys);
+        logNotice('Discarding batch of {count} pull request(s): {reason}', [
+            'count'  => count($keys),
+            'reason' => $reason,
+            'login'  => $login,
+        ], 'queue');
+        return null;
+    }
+
+    return ['message' => $message, 'keys' => $keys, 'login' => $login, 'token' => $token];
+}
+
+/**
  * Processes one batch message: looks each pull request up on GitHub and stores
  * the result immediately so the SSE stream can push it to the browser.
  *
@@ -689,29 +721,13 @@ function prQueueStreamPoll(array $keys, int $since): array
  */
 function prQueueHandleMessage(string $body, ?callable $fetch = null, ?int $now = null): int
 {
-    $fetch   ??= 'loadData';
-    $message = json_decode($body, true);
-
-    if (!is_array($message) || ($message['v'] ?? null) !== PR_QUEUE_MESSAGE_VERSION || !is_array($message['items'] ?? null)) {
-        logWarning('Discarding malformed pull request queue message', [], 'queue');
+    $fetch ??= 'loadData';
+    $opened = prQueueOpenMessage($body, $now ?? time());
+    if ($opened === null) {
         return 0;
     }
 
-    $keys  = array_column($message['items'], 'key');
-    $login = (string) ($message['login'] ?? 'unknown');
-
-    if ((int) ($message['created_at'] ?? 0) < (($now ?? time()) - PR_QUEUE_MESSAGE_MAX_AGE)) {
-        prQueueRelease($keys);
-        logNotice('Discarding expired batch of {count} pull request(s)', ['count' => count($keys)], 'queue');
-        return 0;
-    }
-
-    $token = prQueueDecryptToken((string) ($message['token'] ?? ''));
-    if ($token === null) {
-        prQueueRelease($keys);
-        logError('Could not decrypt the token of a pull request batch', ['login' => $login], 'queue');
-        return 0;
-    }
+    ['message' => $message, 'keys' => $keys, 'login' => $login, 'token' => $token] = $opened;
 
     $processed = 0;
     foreach ($message['items'] as $index => $item) {
@@ -922,41 +938,52 @@ function prQueueConnect(array $server): \PhpAmqpLib\Connection\AMQPStreamConnect
  */
 function prQueueHandleDrainRequest(string $method, string $providedKey, string $lockPath, callable $drain): array
 {
-    if ($method !== 'POST') {
-        return [405, ['error' => 'Method not allowed']];
-    }
-
     $expectedKey = prQueueConfig()['jobsApiKey'];
-    if ($expectedKey === '' || !hash_equals($expectedKey, $providedKey)) {
+
+    if ($method !== 'POST') {
+        $response = [405, ['error' => 'Method not allowed']];
+    } elseif ($expectedKey === '' || !hash_equals($expectedKey, $providedKey)) {
         logNotice('Rejected pull request drain job call with a missing or invalid API key', [], 'queue');
-        return [401, ['error' => 'Unauthorized']];
+        $response = [401, ['error' => 'Unauthorized']];
+    } else {
+        $response = prQueueRunLockedDrain($lockPath, $drain);
     }
 
+    return $response;
+}
+
+/**
+ * Runs the drain while holding a non-blocking file lock, so only one drain
+ * runs at a time (SQLite is single-writer and the batches would race).
+ *
+ * @return array{0: int, 1: array} HTTP status and JSON payload.
+ */
+function prQueueRunLockedDrain(string $lockPath, callable $drain): array
+{
     if (!is_dir(dirname($lockPath))) {
         mkdir(dirname($lockPath), 0700, true);
     }
 
-    // One drain at a time: SQLite is single-writer and the batches would race.
     $lock = fopen($lockPath, 'c');
     if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
         return [200, ['status' => 'already_running']];
     }
 
     try {
-        $result = $drain();
+        $result   = $drain();
+        $response = [200, ['status' => 'drained'] + $result];
+        logInfo(
+            'Drained {messages} message(s), {pull_requests} pull request(s) in {duration_seconds} s ({stopped})',
+            $result,
+            'queue'
+        );
     } catch (Throwable $e) {
         logError('Pull request drain job failed: {error}', ['error' => $e->getMessage()], 'queue');
-        return [500, ['error' => 'Drain failed']];
+        $response = [500, ['error' => 'Drain failed']];
     } finally {
         flock($lock, LOCK_UN);
         fclose($lock);
     }
 
-    logInfo(
-        'Drained {messages} message(s), {pull_requests} pull request(s) in {duration_seconds} s ({stopped})',
-        $result,
-        'queue'
-    );
-
-    return [200, ['status' => 'drained'] + $result];
+    return $response;
 }
