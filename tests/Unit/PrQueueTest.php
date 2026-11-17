@@ -585,10 +585,30 @@ class PrQueueTest extends TestCase
 
     public function testConfigDefaultsWhenNoSecretsFile(): void
     {
-        $config = prQueueConfig(null, true);
+        // An explicit missing path: the deploy workflow writes the real
+        // src/queue.secrets.php before the tests run.
+        $config = prQueueConfig(null, true, sys_get_temp_dir() . '/no-such-dir-' . uniqid() . '/queue.secrets.php');
 
+        $this->assertSame('', $config['rabbitMqUrl']);
         $this->assertSame('', $config['jobsApiKey']);
         $this->assertStringEndsWith('/data/pr-queue.sqlite', $config['sqlitePath']);
+    }
+
+    public function testConfigIsLoadedFromTheSecretsFile(): void
+    {
+        $file = sys_get_temp_dir() . '/queue-secrets-' . getmypid() . '-' . uniqid() . '.php';
+        file_put_contents($file, "<?php\n\$rabbitMqUrl = 'amqp://broker.example/vh';\n\$jobsApiKey = 'from-file';\n\$queueSqlitePath = '/tmp/custom.sqlite';\n");
+
+        try {
+            $config = prQueueConfig(null, true, $file);
+        } finally {
+            unlink($file);
+        }
+
+        $this->assertSame('amqp://broker.example/vh', $config['rabbitMqUrl']);
+        $this->assertSame('from-file', $config['jobsApiKey']);
+        $this->assertSame('', $config['encryptionKey']);
+        $this->assertSame('/tmp/custom.sqlite', $config['sqlitePath']);
     }
 
     public function testDefaultDbOpensTheConfiguredFile(): void
