@@ -436,15 +436,15 @@ function prQueueEncryptionKey(): string
  * Publishes one message to CloudAMQP (plain durable queue, no DLX, so the
  * drain job can declare it identically).
  */
-function prQueuePublish(array $message): void
+function prQueuePublish(array $message, ?callable $queueFactory = null): void
 {
     $url = prQueueConfig()['rabbitMqUrl'];
     if ($url === '') {
         throw new PrQueueException('rabbitMqUrl is not configured');
     }
 
-    $queue = new Queue([$url], new QueueOptions(5.0, 10.0));
-    $queue->publish(PR_QUEUE_NAME, json_encode($message), false);
+    $queueFactory ??= static fn (string $broker) => new Queue([$broker], new QueueOptions(5.0, 10.0));
+    $queueFactory($url)->publish(PR_QUEUE_NAME, json_encode($message), false);
 }
 
 // ─── Web-request side ─────────────────────────────────────────────────────────
@@ -723,28 +723,38 @@ function prQueueHandleMessage(string $body, ?callable $fetch = null, ?int $now =
             break;
         }
 
-        $pullRequest = $fetch($item['url'], $token);
-        prQueueTrackRateLimit($login, $time);
-
-        if ($pullRequest === null || !isset($pullRequest['body']) || !is_array($pullRequest['body'])) {
-            prQueueSaveResult($item['key'], 'failed', null, $item['updated_at'] ?? null, $time);
-            $processed++;
-            continue;
-        }
-
-        $enriched = enrichPullRequestData(['url' => $item['html_url'] ?? $item['url']], $pullRequest, $token, $fetch);
-        prQueueTrackRateLimit($login, $time);
-
-        prQueueSaveResult($item['key'], 'done', [
-            'state'           => $enriched['state'] ?? null,
-            'mergeable'       => $enriched['mergeable'] ?? null,
-            'mergeable_state' => $enriched['mergeable_state'] ?? null,
-            'is_valid_pr'     => $enriched['is_valid_pr'] ?? false,
-        ], $item['updated_at'] ?? null, $now ?? time());
+        prQueueProcessItem($item, $token, $login, $fetch, $time);
         $processed++;
     }
 
     return $processed;
+}
+
+/**
+ * Looks one pull request up on GitHub (PR + commit status) and stores the
+ * outcome: "done" with the enrichment fields, or "failed" to retry later.
+ *
+ * @param array{key: string, url: string, html_url?: string, updated_at?: string|null} $item
+ */
+function prQueueProcessItem(array $item, string $token, string $login, callable $fetch, int $time): void
+{
+    $pullRequest = $fetch($item['url'], $token);
+    prQueueTrackRateLimit($login, $time);
+
+    if ($pullRequest === null || !isset($pullRequest['body']) || !is_array($pullRequest['body'])) {
+        prQueueSaveResult($item['key'], 'failed', null, $item['updated_at'] ?? null, $time);
+        return;
+    }
+
+    $enriched = enrichPullRequestData(['url' => $item['html_url'] ?? $item['url']], $pullRequest, $token, $fetch);
+    prQueueTrackRateLimit($login, $time);
+
+    prQueueSaveResult($item['key'], 'done', [
+        'state'           => $enriched['state'] ?? null,
+        'mergeable'       => $enriched['mergeable'] ?? null,
+        'mergeable_state' => $enriched['mergeable_state'] ?? null,
+        'is_valid_pr'     => $enriched['is_valid_pr'] ?? false,
+    ], $item['updated_at'] ?? null, $time);
 }
 
 function prQueueTrackRateLimit(string $login, int $now): void

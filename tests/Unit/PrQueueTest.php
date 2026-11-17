@@ -274,7 +274,7 @@ class PrQueueTest extends TestCase
             function () use (&$queue) {
                 return array_shift($queue);
             },
-            fn (string $body) => 3,
+            fn () => 3,
             10,
             50,
             function () use (&$time) {
@@ -617,7 +617,7 @@ class PrQueueTest extends TestCase
             {
             }
 
-            public function queue_declare(string $queue, ...$args): void
+            public function queue_declare(string $queue): void
             {
                 $this->log[] = 'declare:' . $queue;
             }
@@ -682,5 +682,32 @@ class PrQueueTest extends TestCase
     {
         $this->assertSame(['error' => 'Method not allowed'], $this->runJobsEndpoint('GET', 'job-key'));
         $this->assertSame(['error' => 'Unauthorized'], $this->runJobsEndpoint('POST', 'nope'));
+    }
+
+    public function testPublishSendsTheMessageToTheConfiguredBroker(): void
+    {
+        $published = [];
+        $queue = new class ($published) {
+            private $published;
+
+            public function __construct(array &$published)
+            {
+                $this->published = &$published;
+            }
+
+            public function publish(string $queueName, string $body, bool $declareDlx): void
+            {
+                $this->published[] = [$queueName, json_decode($body, true), $declareDlx];
+            }
+        };
+
+        $broker = null;
+        prQueuePublish(['v' => 1, 'items' => []], function (string $url) use ($queue, &$broker) {
+            $broker = $url;
+            return $queue;
+        });
+
+        $this->assertSame('amqp://localhost/vhost', $broker);
+        $this->assertSame([[PR_QUEUE_NAME, ['v' => 1, 'items' => []], false]], $published);
     }
 }
