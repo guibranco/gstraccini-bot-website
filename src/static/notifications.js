@@ -83,7 +83,8 @@ function toSafeHref(url) {
     return parsed.protocol === "https:" || parsed.protocol === "http:"
       ? parsed.href
       : "#";
-  } catch {
+  } catch (error) {
+    console.warn("Ignoring invalid notification URL:", url, error);
     return "#";
   }
 }
@@ -120,9 +121,9 @@ function processNotifications(notifications) {
     }
 
     const title =
-      notification.title === undefined || notification.title === null
-        ? "(untitled)"
-        : String(notification.title);
+      typeof notification.title === "string" && notification.title !== ""
+        ? notification.title
+        : "(untitled)";
     const repo = [notification.repositoryOwner, notification.repositoryName]
       .filter(Boolean)
       .join("/");
