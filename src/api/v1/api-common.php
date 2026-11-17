@@ -3,6 +3,8 @@
  * Shared helpers used by api-dashboard.php and api-pull-requests.php.
  */
 
+require_once __DIR__ . '/../../includes/pr-queue.php';
+
 /**
  * Fetches all assigned GitHub issues, validates the response, and terminates
  * with a 500 error when the upstream call fails.
@@ -114,4 +116,70 @@ function cacheAndRespond(array $data, string $cacheKey): void
     setCache($data, $cacheKey);
     session_write_close();
     sendJsonResponse($data, time());
+}
+
+/**
+ * Returns the user's assigned issues/PRs in slim form, cached in the session
+ * for PR_QUEUE_ISSUES_CACHE_TTL seconds so the dashboard and the pull requests
+ * page share a single GitHub call.
+ *
+ * Must be called after checkAuth() (the session is already closed then).
+ *
+ * @param  string $token GitHub API token.
+ * @return array         Slim issue list (see prQueueSlimIssue()).
+ */
+function getAssignedIssuesCached(string $token): array
+{
+    $cacheKey = 'assigned-issues';
+    $cached   = $_SESSION[$cacheKey] ?? null;
+
+    if (is_array($cached) && ($cached['fetched_at'] ?? 0) > (time() - PR_QUEUE_ISSUES_CACHE_TTL)) {
+        return $cached['items'];
+    }
+
+    $items = array_map('prQueueSlimIssue', fetchAssignedIssues($token));
+
+    session_start();
+    $_SESSION[$cacheKey] = ['items' => $items, 'fetched_at' => time()];
+    session_write_close();
+
+    return $items;
+}
+
+/**
+ * Builds the queue-backed pull request payload, remembers which pull requests
+ * this user may stream updates for, and stores the SSR snapshot.
+ *
+ * @return array Result of buildQueuedPullRequests().
+ */
+function loadQueuedAssignedItems(string $token): array
+{
+    $login   = $_SESSION['user']['login'] ?? 'unknown';
+    $issues  = getAssignedIssuesCached($token);
+    $results = buildQueuedPullRequests($issues, $token, $login);
+
+    session_start();
+    $_SESSION[PR_QUEUE_SESSION_KEYS] = $results['keys'];
+    $_SESSION['pull-requests'] = [
+        'data'          => ['openPullRequests' => $results['pullRequests']],
+        'last_api_call' => time(),
+    ];
+    session_write_close();
+
+    return $results;
+}
+
+/**
+ * Stream descriptor sent to the browser when results are still on the way.
+ */
+function buildStreamDescriptor(array $results): ?array
+{
+    if ($results['pending'] === 0) {
+        return null;
+    }
+
+    return [
+        'url'   => '/api/v1/pull-requests/stream',
+        'since' => $results['since'],
+    ];
 }

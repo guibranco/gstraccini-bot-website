@@ -4,3 +4,5 @@ src/*.secrets.php
 .phpunit.result.cache
 tests/coverage.xml
 /coverage/
+src/worker/data/
+src/worker/*.secrets.env

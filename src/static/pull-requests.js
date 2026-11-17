@@ -7,7 +7,7 @@ const RETRY_DELAY = 5000;
 const COLLAPSE_STATE_KEY = 'pr_groups_collapse_state';
 const FLAT_GROUP_KEY = '__all__';
 
-const STATE_ORDER = ['success', 'failure', 'pending', 'error', 'skipped', ''];
+const STATE_ORDER = ['success', 'failure', 'pending', 'error', 'queued', 'skipped', ''];
 const MERGEABLE_STATES = {
     CLEAN: 'clean',
     UNSTABLE: 'unstable',
@@ -19,6 +19,15 @@ const MERGEABLE_STATES = {
 /** Serialised snapshot of the last successfully rendered payload. */
 let previousDataHash = null;
 
+/** Pull requests currently on screen; live updates are merged into it. */
+let currentPRs = [];
+
+/** Open EventSource while enrichment results are still on their way. */
+let prStream = null;
+let prStreamErrors = 0;
+let prRenderScheduled = false;
+const MAX_STREAM_ERRORS = 5;
+
 /**
  * Returns HTML badge markup based on CI state.
  */
@@ -29,6 +38,7 @@ function getStateBadge(state) {
         pending: { class: 'bg-warning text-dark',    icon: 'fa-hourglass-half',     text: 'CI Pending' },
         error:   { class: 'bg-danger',               icon: 'fa-exclamation-triangle', text: 'CI Error' },
         skipped: { class: 'bg-dark',                 icon: 'fa-arrow-circle-right', text: 'CI Skipped' },
+        queued:  { class: 'bg-info text-dark',       icon: 'fa-spinner fa-spin',    text: 'Checking…' },
     };
 
     const badge = badges[state] || { class: 'bg-secondary', icon: 'fa-question-circle', text: 'CI Unknown' };
@@ -516,7 +526,9 @@ function loadData() {
             if (!data || typeof data !== 'object') throw new Error('Invalid response format');
 
             const pullRequests = data.openPullRequests || data.pullRequests || [];
+            currentPRs = pullRequests;
             populateIssuesGroupedByOwner(pullRequests);
+            openPRStream(data);
             polling.scheduleNextLoad();
         })
         .catch(error => {
@@ -538,6 +550,74 @@ function loadData() {
         .finally(() => {
             isFetchingPRs = false;
         });
+}
+
+// ─── Live updates (Server-Sent Events) ───────────────────────────────────────
+
+/**
+ * Opens the SSE stream when the API reports results still being processed by
+ * the queue worker. Each "pr" event updates one pull request in place; "done"
+ * means nothing is left in flight.
+ *
+ * @param {Object} data - Payload returned by /api/v1/pull-requests.
+ */
+function openPRStream(data) {
+    if (!data.stream || !(data.pending > 0) || typeof EventSource === 'undefined') {
+        closePRStream();
+        return;
+    }
+
+    if (prStream) return; // already listening
+
+    const url = `${data.stream.url}?since=${encodeURIComponent(data.stream.since || 0)}`;
+    prStream = new EventSource(url, { withCredentials: true });
+    prStreamErrors = 0;
+
+    prStream.addEventListener('open', () => { prStreamErrors = 0; });
+    prStream.addEventListener('pr', event => {
+        try {
+            applyPRUpdate(JSON.parse(event.data));
+        } catch (error) {
+            console.error('Invalid pull request update:', error);
+        }
+    });
+    prStream.addEventListener('done', closePRStream);
+    prStream.addEventListener('error', () => {
+        // The server ends each connection after ~25 s; EventSource reconnects
+        // on its own (with Last-Event-ID). Give up only on repeated failures.
+        prStreamErrors++;
+        if (prStream && (prStream.readyState === EventSource.CLOSED || prStreamErrors > MAX_STREAM_ERRORS)) {
+            console.warn('Pull request stream unavailable; falling back to polling.');
+            closePRStream();
+        }
+    });
+}
+
+function closePRStream() {
+    if (prStream) {
+        prStream.close();
+        prStream = null;
+    }
+}
+
+/**
+ * Merges a single enrichment result into the on-screen list and schedules a
+ * (batched) incremental re-render.
+ *
+ * @param {Object} update - {pr_key, state, mergeable, mergeable_state, is_valid_pr, refreshing}
+ */
+function applyPRUpdate(update) {
+    const index = currentPRs.findIndex(pr => pr.pr_key === update.pr_key);
+    if (index === -1) return;
+
+    currentPRs[index] = { ...currentPRs[index], ...update };
+
+    if (prRenderScheduled) return;
+    prRenderScheduled = true;
+    requestAnimationFrame(() => {
+        prRenderScheduled = false;
+        populateIssuesGroupedByOwner([...currentPRs]);
+    });
 }
 
 /**

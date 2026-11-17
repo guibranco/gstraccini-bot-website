@@ -68,6 +68,24 @@ jobs:
             echo "\$logStreamApiToken = $(php_literal "$LOGSTREAM_API_TOKEN");"
           } > logstream.secrets.php
 
+      - name: 🔑 Generate Queue Configuration
+        env:
+          CLOUDAMQP_URL: ${{ secrets.CLOUDAMQP_URL }}
+          QUEUE_ENCRYPTION_KEY: ${{ secrets.QUEUE_ENCRYPTION_KEY }}
+        run: |
+          cd src
+          php_literal() {
+            local value="${1//\\/\\\\}"
+            printf "'%s'" "${value//\'/\\\'}"
+          }
+          {
+            echo "<?php"
+            echo "\$rabbitMqUrl        = $(php_literal "$CLOUDAMQP_URL");"
+            echo "\$queueEncryptionKey = $(php_literal "$QUEUE_ENCRYPTION_KEY");"
+          } > queue.secrets.php
+          mkdir -p worker
+          printf "RABBITMQ_URL='%s'\n" "${CLOUDAMQP_URL//\'/}" > worker/queue.secrets.env
+
       - name: 🐘 Setup PHP
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:

@@ -58,6 +58,8 @@ function loadData($url, $token)
     $httpCode   = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 
+    recordGitHubRateLimit(substr($response, 0, $headerSize), $httpCode);
+
     if ($httpCode >= 400) {
         $errorBody = trim(substr($response, $headerSize));
         $decoded   = json_decode($errorBody, true);
@@ -107,6 +109,52 @@ function loadData($url, $token)
     );
 
     return ["headers" => $header, "body" => $body];
+}
+
+/**
+ * Holds the rate-limit headers of the most recent GitHub API response.
+ *
+ * @param array|null $state New state to store, or null to only read it.
+ * @return array{remaining: int|null, reset: int|null, httpCode: int}|null
+ */
+function gitHubRateLimitState(?array $state = null): ?array
+{
+    static $current = null;
+
+    if ($state !== null) {
+        $current = $state;
+    }
+
+    return $current;
+}
+
+/**
+ * Records the rate-limit headers of a GitHub API response so callers (e.g. the
+ * queue worker) can back off before the token's quota is exhausted.
+ *
+ * @param string $rawHeaders Raw response headers.
+ * @param int    $httpCode   HTTP status code of the response.
+ */
+function recordGitHubRateLimit(string $rawHeaders, int $httpCode): void
+{
+    $remaining = getResponseHeaderValue($rawHeaders, 'x-ratelimit-remaining');
+    $reset     = getResponseHeaderValue($rawHeaders, 'x-ratelimit-reset');
+
+    gitHubRateLimitState([
+        'remaining' => $remaining === null ? null : (int) $remaining,
+        'reset'     => $reset === null ? null : (int) $reset,
+        'httpCode'  => $httpCode,
+    ]);
+}
+
+/**
+ * Returns the rate-limit headers captured from the most recent GitHub API response.
+ *
+ * @return array{remaining: int|null, reset: int|null, httpCode: int}|null
+ */
+function getLastGitHubRateLimit(): ?array
+{
+    return gitHubRateLimitState();
 }
 
 /**
@@ -229,10 +277,13 @@ function formatIssueData($issue)
  * @param array  $issueData   Base issue data
  * @param array  $pullRequest Pull request response from loadData()
  * @param string $token       GitHub API token
+ * @param callable|null $loader Override for loadData() (tests)
  * @return array Issue data enriched with PR-specific fields
  */
-function enrichPullRequestData($issueData, $pullRequest, $token)
+function enrichPullRequestData($issueData, $pullRequest, $token, ?callable $loader = null)
 {
+    $loader ??= 'loadData';
+
     $issueData["mergeable"]       = $pullRequest["body"]["mergeable"]       ?? null;
     $issueData["mergeable_state"] = $pullRequest["body"]["mergeable_state"] ?? null;
 
@@ -248,7 +299,7 @@ function enrichPullRequestData($issueData, $pullRequest, $token)
     $repoUrl = $pullRequest["body"]["head"]["repo"]["url"];
     $sha     = $pullRequest["body"]["head"]["sha"] ?? $pullRequest["body"]["head"]["ref"];
 
-    $state = loadData($repoUrl . "/commits/" . urlencode($sha) . "/status", $token);
+    $state = $loader($repoUrl . "/commits/" . urlencode($sha) . "/status", $token);
 
     if ($state === null || !isset($state["body"]["state"])) {
         logWarning(
