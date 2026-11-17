@@ -6,6 +6,10 @@
 			<text outputFile="php://stdout" showUncoveredFiles="true"/>
 		</report>
 	</coverage>
+	<php>
+		<!-- Never ship test log entries to LogStream, even when deploy.yml has written logstream.secrets.php -->
+		<env name="LOGSTREAM_DISABLED" value="1" force="true"/>
+	</php>
 	<testsuites>
 		<testsuite name="unit">
 			<directory suffix="Test.php">./Unit</directory>
