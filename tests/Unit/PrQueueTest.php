@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../src/includes/github-api.php';
 require_once __DIR__ . '/../../src/includes/pr-queue.php';
+require_once __DIR__ . '/../../src/api/v1/api-common.php';
 
 class PrQueueTest extends TestCase
 {
@@ -17,6 +18,7 @@ class PrQueueTest extends TestCase
         prQueueConfig([
             'rabbitMqUrl'   => 'amqp://user:pass@localhost/vhost',
             'encryptionKey' => base64_encode(str_repeat('k', SODIUM_CRYPTO_SECRETBOX_KEYBYTES)),
+            'jobsApiKey'    => 'job-key',
             'sqlitePath'    => ':memory:',
         ]);
 
@@ -311,7 +313,147 @@ class PrQueueTest extends TestCase
         );
 
         $this->assertSame('max_runtime', $result['stopped']);
-        $this->assertSame($result['messages'], $acks);
+        $this->assertSame($acks, $result['messages']);
         $this->assertSame(0, $result['pull_requests']);
+    }
+
+    public function testSlimIssueKeepsOnlyWhatThePagesNeed(): void
+    {
+        $issue = $this->issue(7) + ['body' => str_repeat('x', 5000), 'user' => ['login' => 'someone']];
+        $issue['labels'] = [['name' => 'bug', 'color' => 'f00', 'description' => 'Bug', 'id' => 1]];
+
+        $slim = prQueueSlimIssue($issue);
+
+        $this->assertArrayNotHasKey('body', $slim);
+        $this->assertArrayNotHasKey('user', $slim);
+        $this->assertSame(['color' => 'f00', 'description' => 'Bug', 'name' => 'bug'], $slim['labels'][0]);
+        $this->assertSame('guibranco/repo#7', prQueueKey($slim));
+        $this->assertArrayNotHasKey('pull_request', prQueueSlimIssue($this->issue(8, false)));
+    }
+
+    public function testReleaseKeepsLastKnownResult(): void
+    {
+        prQueueSaveResult('guibranco/repo#1', 'done', ['state' => 'success', 'mergeable' => true], 'x', self::NOW);
+        prQueueMarkQueued(['guibranco/repo#1'], self::NOW + 10);
+
+        prQueueRelease(['guibranco/repo#1']);
+
+        $row = prQueueLoadRows(['guibranco/repo#1'])['guibranco/repo#1'];
+        $this->assertSame('done', $row['status']);
+        $this->assertSame('success', json_decode($row['data'], true)['state']);
+    }
+
+    public function testFreshnessRulesForFailedAndUnknownStatuses(): void
+    {
+        $failed = ['status' => 'failed', 'processed_at' => self::NOW, 'data' => null, 'queued_at' => 0, 'issue_updated_at' => null];
+
+        $this->assertFalse(prQueueNeedsRefresh($failed, null, self::NOW + 60));
+        $this->assertTrue(prQueueNeedsRefresh($failed, null, self::NOW + PR_QUEUE_TTL_FAILED + 1));
+        $this->assertTrue(prQueueNeedsRefresh(['status' => 'released', 'data' => null] + $failed, null, self::NOW));
+        $this->assertFalse(prQueueIsSettled(null));
+        $this->assertFalse(prQueueIsSettled(['state' => 'success', 'mergeable' => null]));
+    }
+
+    public function testRateLimitClearsAfterReset(): void
+    {
+        prQueueSaveRateLimit('guibranco', 10, self::NOW + 60, self::NOW);
+
+        $this->assertTrue(prQueueIsRateLimited('guibranco', self::NOW));
+        $this->assertFalse(prQueueIsRateLimited('guibranco', self::NOW + 61));
+        $this->assertFalse(prQueueIsRateLimited('someone-else', self::NOW));
+    }
+
+    public function testInvalidEncryptionKeyIsRejected(): void
+    {
+        prQueueConfig(['rabbitMqUrl' => '', 'encryptionKey' => 'short', 'jobsApiKey' => '', 'sqlitePath' => ':memory:']);
+
+        $this->expectException(\PrQueueException::class);
+        prQueueEncryptToken('token');
+    }
+
+    public function testPublishWithoutBrokerConfigurationFails(): void
+    {
+        prQueueConfig(['rabbitMqUrl' => '', 'encryptionKey' => '', 'jobsApiKey' => '', 'sqlitePath' => ':memory:']);
+
+        $this->expectException(\PrQueueException::class);
+        prQueuePublish(['v' => 1]);
+    }
+
+    public function testStreamPollSendsUserRowsAndFinishesWhenNothingIsInFlight(): void
+    {
+        $result = buildQueuedPullRequests([$this->issue(1), $this->issue(2)], 'token', 'guibranco', fn () => null, self::NOW);
+        prQueueSaveResult('guibranco/other#9', 'done', ['state' => 'success'], 'x', self::NOW);
+
+        prQueueSaveResult('guibranco/repo#1', 'done', ['state' => 'failure', 'mergeable' => false], 'x', self::NOW);
+        $first = prQueueStreamPoll($result['keys'], $result['since']);
+
+        $this->assertCount(1, $first['events']);
+        $this->assertSame('guibranco/repo#1', $first['events'][0]['payload']['pr_key']);
+        $this->assertSame('failure', $first['events'][0]['payload']['state']);
+        $this->assertFalse($first['events'][0]['payload']['refreshing']);
+        $this->assertFalse($first['done']);
+
+        prQueueSaveResult('guibranco/repo#2', 'failed', null, 'x', self::NOW);
+        $second = prQueueStreamPoll($result['keys'], $first['since']);
+
+        $this->assertSame('skipped', $second['events'][0]['payload']['state']);
+        $this->assertTrue($second['done']);
+    }
+
+    public function testStreamPollWithoutKeysIsDone(): void
+    {
+        $this->assertTrue(prQueueStreamPoll([], 0)['done']);
+    }
+
+    public function testStreamDescriptorOnlyWhilePending(): void
+    {
+        $this->assertNull(buildStreamDescriptor(['pending' => 0, 'since' => 4]));
+        $this->assertSame(
+            ['url' => '/api/v1/pull-requests/stream', 'since' => 4],
+            buildStreamDescriptor(['pending' => 2, 'since' => 4])
+        );
+    }
+
+    private function lockPath(): string
+    {
+        return sys_get_temp_dir() . '/pr-queue-test-' . getmypid() . '/drain.lock';
+    }
+
+    public function testDrainRequestRejectsWrongMethodAndKey(): void
+    {
+        $drain = fn () => $this->fail('must not drain');
+
+        $this->assertSame(405, prQueueHandleDrainRequest('GET', 'job-key', $this->lockPath(), $drain)[0]);
+        $this->assertSame(401, prQueueHandleDrainRequest('POST', 'wrong', $this->lockPath(), $drain)[0]);
+        $this->assertSame(401, prQueueHandleDrainRequest('POST', '', $this->lockPath(), $drain)[0]);
+    }
+
+    public function testDrainRequestRunsDrainAndReportsResult(): void
+    {
+        [$status, $payload] = prQueueHandleDrainRequest('POST', 'job-key', $this->lockPath(), fn () => [
+            'messages' => 1, 'pull_requests' => 3, 'duration_seconds' => 2, 'stopped' => 'idle',
+        ]);
+
+        $this->assertSame(200, $status);
+        $this->assertSame('drained', $payload['status']);
+        $this->assertSame(3, $payload['pull_requests']);
+    }
+
+    public function testDrainRequestReportsFailuresAndConcurrentRuns(): void
+    {
+        $failed = prQueueHandleDrainRequest('POST', 'job-key', $this->lockPath(), function () {
+            throw new \PrQueueException('broker down');
+        });
+        $this->assertSame([500, ['error' => 'Drain failed']], $failed);
+
+        $held = fopen($this->lockPath(), 'c');
+        flock($held, LOCK_EX);
+        try {
+            $busy = prQueueHandleDrainRequest('POST', 'job-key', $this->lockPath(), fn () => $this->fail('must not drain'));
+        } finally {
+            flock($held, LOCK_UN);
+            fclose($held);
+        }
+        $this->assertSame([200, ['status' => 'already_running']], $busy);
     }
 }

@@ -50,28 +50,18 @@ function sendEvent(string $event, array $payload, ?int $id = null): void
 echo "retry: 3000\n\n";
 flush();
 
-if (empty($keys)) {
-    sendEvent('done', []);
-    exit();
-}
-
 $deadline      = time() + STREAM_LIFETIME;
 $lastHeartbeat = time();
 
 while (time() < $deadline && !connection_aborted()) {
-    $update = prQueueFetchUpdates($keys, $since);
+    $poll = prQueueStreamPoll($keys, $since);
 
-    foreach ($update['rows'] as $row) {
-        $item = prQueueApplyData(['pr_key' => $row['pr_key']], $row);
-        if (!isset($item['state'])) {
-            $item['state'] = $row['status'] === 'queued' ? 'queued' : 'skipped';
-        }
-        $item['refreshing'] = $row['status'] === 'queued';
-        sendEvent('pr', $item, (int) $row['seq']);
+    foreach ($poll['events'] as $event) {
+        sendEvent('pr', $event['payload'], $event['id']);
     }
-    $since = $update['maxSeq'];
+    $since = $poll['since'];
 
-    if ($update['pending'] === 0) {
+    if ($poll['done']) {
         sendEvent('done', [], $since);
         exit();
     }

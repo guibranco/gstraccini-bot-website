@@ -562,7 +562,7 @@ function loadData() {
  * @param {Object} data - Payload returned by /api/v1/pull-requests.
  */
 function openPRStream(data) {
-    if (!data.stream || !(data.pending > 0) || typeof EventSource === 'undefined') {
+    if (!data.stream || (data.pending || 0) <= 0 || typeof EventSource === 'undefined') {
         closePRStream();
         return;
     }
@@ -607,10 +607,9 @@ function closePRStream() {
  * @param {Object} update - {pr_key, state, mergeable, mergeable_state, is_valid_pr, refreshing}
  */
 function applyPRUpdate(update) {
-    const index = currentPRs.findIndex(pr => pr.pr_key === update.pr_key);
-    if (index === -1) return;
+    if (!currentPRs.some(pr => pr.pr_key === update.pr_key)) return;
 
-    currentPRs[index] = { ...currentPRs[index], ...update };
+    currentPRs = currentPRs.map(pr => (pr.pr_key === update.pr_key ? Object.assign({}, pr, update) : pr));
 
     if (prRenderScheduled) return;
     prRenderScheduled = true;

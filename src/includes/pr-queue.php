@@ -29,6 +29,13 @@ require_once __DIR__ . '/log-stream.php';
 use GuiBranco\Pancake\Queue\Queue;
 use GuiBranco\Pancake\Queue\QueueOptions;
 
+/**
+ * Configuration or broker problems of the pull request queue.
+ */
+class PrQueueException extends RuntimeException
+{
+}
+
 const PR_QUEUE_NAME            = 'gstraccini-website-pr-enrichment';
 const PR_QUEUE_MESSAGE_VERSION = 1;
 const PR_QUEUE_SESSION_KEYS    = 'pr-stream-keys';
@@ -86,7 +93,7 @@ function prQueueConfig(?array $override = null): array
 
     $secretsFile = __DIR__ . '/../queue.secrets.php';
     if (file_exists($secretsFile)) {
-        require $secretsFile;
+        require_once $secretsFile;
     }
 
     $config = [
@@ -403,7 +410,7 @@ function prQueueEncryptionKey(): string
     $key = base64_decode(prQueueConfig()['encryptionKey'], true);
 
     if ($key === false || strlen($key) !== SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-        throw new RuntimeException('queueEncryptionKey must be base64 of 32 bytes');
+        throw new PrQueueException('queueEncryptionKey must be base64 of 32 bytes');
     }
 
     return $key;
@@ -419,7 +426,7 @@ function prQueuePublish(array $message): void
 {
     $url = prQueueConfig()['rabbitMqUrl'];
     if ($url === '') {
-        throw new RuntimeException('rabbitMqUrl is not configured');
+        throw new PrQueueException('rabbitMqUrl is not configured');
     }
 
     $queue = new Queue([$url], new QueueOptions(5.0, 10.0));
@@ -484,6 +491,91 @@ function prQueueApplyData(array $item, ?array $row): array
 }
 
 /**
+ * Picks the pull requests that need a fresh lookup: never-seen first, then the
+ * oldest results, capped at PR_QUEUE_MAX_BATCH.
+ *
+ * @param array<string, array> $prIssues Slim issues keyed by pr_key.
+ * @param array<string, array> $rows     Stored rows keyed by pr_key.
+ * @return array{batch: list<string>, candidates: int}
+ */
+function prQueueSelectBatch(array $prIssues, array $rows, string $login, int $now): array
+{
+    $candidates = [];
+    foreach ($prIssues as $key => $issue) {
+        $row = $rows[$key] ?? null;
+        if (prQueueNeedsRefresh($row, $issue['updated_at'] ?? null, $now)) {
+            $candidates[$key] = ($row === null || $row['data'] === null) ? 0 : (int) $row['processed_at'];
+        }
+    }
+    asort($candidates);
+
+    if (empty($candidates) || prQueueIsRateLimited($login, $now)) {
+        return ['batch' => [], 'candidates' => count($candidates)];
+    }
+
+    return [
+        'batch'      => array_slice(array_keys($candidates), 0, PR_QUEUE_MAX_BATCH),
+        'candidates' => count($candidates),
+    ];
+}
+
+/**
+ * Marks the batch as queued and publishes it as one message. On failure the
+ * pull requests are released so the next poll tries again.
+ *
+ * @param list<string>         $batch
+ * @param array<string, array> $prIssues Slim issues keyed by pr_key.
+ */
+function prQueuePublishBatch(array $batch, array $prIssues, string $token, string $login, callable $publisher, int $now): void
+{
+    prQueueMarkQueued($batch, $now);
+
+    $message = [
+        'v'          => PR_QUEUE_MESSAGE_VERSION,
+        'login'      => $login,
+        'created_at' => $now,
+        'token'      => prQueueEncryptToken($token),
+        'items'      => array_map(static fn ($key) => [
+            'key'        => $key,
+            'url'        => $prIssues[$key]['pull_request']['url'],
+            'html_url'   => $prIssues[$key]['html_url'] ?? '',
+            'updated_at' => $prIssues[$key]['updated_at'] ?? null,
+        ], $batch),
+    ];
+
+    try {
+        $publisher($message);
+        logInfo(
+            'Queued {count} pull request(s) for enrichment',
+            ['count' => count($batch), 'login' => $login],
+            'queue'
+        );
+    } catch (Throwable $e) {
+        prQueueRelease($batch);
+        logError('Failed to publish pull request batch: {error}', ['error' => $e->getMessage()], 'queue');
+    }
+}
+
+/**
+ * Formats one pull request for the page, with its stored enrichment and a
+ * "queued"/"skipped" placeholder state when there is none yet.
+ */
+function prQueueBuildItem(string $key, array $issue, ?array $row): array
+{
+    $item = formatIssueData($issue);
+    $item['pr_key'] = $key;
+    $item = prQueueApplyData($item, $row);
+
+    $queued = ($row['status'] ?? null) === 'queued';
+    if ($queued) {
+        $item['refreshing'] = true;
+    }
+    $item['state'] ??= $queued ? 'queued' : 'skipped';
+
+    return $item;
+}
+
+/**
  * Splits the assigned items into pull requests and issues, merges stored
  * enrichment, and queues the pull requests that need a fresh lookup.
  *
@@ -495,8 +587,7 @@ function prQueueApplyData(array $item, ?array $row): array
  */
 function buildQueuedPullRequests(array $issues, string $token, string $login, ?callable $publisher = null, ?int $now = null): array
 {
-    $now       ??= time();
-    $publisher ??= 'prQueuePublish';
+    $now ??= time();
 
     $openIssues = [];
     $prIssues   = [];
@@ -508,84 +599,54 @@ function buildQueuedPullRequests(array $issues, string $token, string $login, ?c
         }
     }
 
-    $keys  = array_keys($prIssues);
-    $since = prQueueMaxSeq();
-    $rows  = prQueueLoadRows($keys);
+    $keys      = array_keys($prIssues);
+    $since     = prQueueMaxSeq();
+    $selection = prQueueSelectBatch($prIssues, prQueueLoadRows($keys), $login, $now);
 
-    // Pick what to refresh: never-seen first, then the oldest results.
-    $candidates = [];
-    foreach ($prIssues as $key => $issue) {
-        $row = $rows[$key] ?? null;
-        if (prQueueNeedsRefresh($row, $issue['updated_at'] ?? null, $now)) {
-            $candidates[$key] = ($row === null || $row['data'] === null) ? 0 : (int) $row['processed_at'];
-        }
-    }
-    asort($candidates);
-
-    $batch = [];
-    if (!empty($candidates) && !prQueueIsRateLimited($login, $now)) {
-        $batch = array_slice(array_keys($candidates), 0, PR_QUEUE_MAX_BATCH);
+    if (!empty($selection['batch'])) {
+        prQueuePublishBatch($selection['batch'], $prIssues, $token, $login, $publisher ?? 'prQueuePublish', $now);
     }
 
-    if (!empty($batch)) {
-        prQueueMarkQueued($batch, $now);
-
-        $message = [
-            'v'          => PR_QUEUE_MESSAGE_VERSION,
-            'login'      => $login,
-            'created_at' => $now,
-            'token'      => prQueueEncryptToken($token),
-            'items'      => array_map(static fn ($key) => [
-                'key'        => $key,
-                'url'        => $prIssues[$key]['pull_request']['url'],
-                'html_url'   => $prIssues[$key]['html_url'] ?? '',
-                'updated_at' => $prIssues[$key]['updated_at'] ?? null,
-            ], $batch),
-        ];
-
-        try {
-            $publisher($message);
-            logInfo(
-                'Queued {count} pull request(s) for enrichment ({candidates} needed a refresh)',
-                ['count' => count($batch), 'candidates' => count($candidates), 'login' => $login],
-                'queue'
-            );
-        } catch (Throwable $e) {
-            prQueueRelease($batch);
-            logError('Failed to publish pull request batch: {error}', ['error' => $e->getMessage()], 'queue');
-        }
-
-        $rows = prQueueLoadRows($keys);
-    }
-
+    $rows         = prQueueLoadRows($keys);
     $pullRequests = [];
-    $pending      = 0;
     foreach ($prIssues as $key => $issue) {
-        $row  = $rows[$key] ?? null;
-        $item = formatIssueData($issue);
-        $item['pr_key'] = $key;
-        $item = prQueueApplyData($item, $row);
-
-        if (($row['status'] ?? null) === 'queued') {
-            $pending++;
-            if (!isset($item['state'])) {
-                $item['state'] = 'queued';
-            }
-            $item['refreshing'] = true;
-        } elseif (!isset($item['state'])) {
-            $item['state'] = 'skipped';
-        }
-
-        $pullRequests[] = $item;
+        $pullRequests[] = prQueueBuildItem($key, $issue, $rows[$key] ?? null);
     }
 
     return [
         'pullRequests' => $pullRequests,
         'issues'       => $openIssues,
-        'pending'      => $pending,
+        'pending'      => count(array_filter($pullRequests, static fn ($pr) => !empty($pr['refreshing']))),
         'keys'         => $keys,
         'since'        => $since,
     ];
+}
+
+// ─── SSE stream ───────────────────────────────────────────────────────────────
+
+/**
+ * One poll of the SSE stream: the events to send for rows changed after
+ * $since, the new cursor, and whether nothing is left in flight.
+ *
+ * @param string[] $keys The user's pull request keys.
+ * @return array{events: list<array{id: int, payload: array}>, since: int, done: bool}
+ */
+function prQueueStreamPoll(array $keys, int $since): array
+{
+    if (empty($keys)) {
+        return ['events' => [], 'since' => $since, 'done' => true];
+    }
+
+    $update = prQueueFetchUpdates($keys, $since);
+    $events = [];
+    foreach ($update['rows'] as $row) {
+        $item = prQueueApplyData(['pr_key' => $row['pr_key']], $row);
+        $item['refreshing'] = $row['status'] === 'queued';
+        $item['state'] ??= $item['refreshing'] ? 'queued' : 'skipped';
+        $events[] = ['id' => (int) $row['seq'], 'payload' => $item];
+    }
+
+    return ['events' => $events, 'since' => $update['maxSeq'], 'done' => $update['pending'] === 0];
 }
 
 // ─── Drain job (triggered by loop_requests on vinhedo3) ───────────────────────
@@ -746,7 +807,7 @@ function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSe
 {
     $url = parse_url(prQueueConfig()['rabbitMqUrl']);
     if (empty($url['host'])) {
-        throw new RuntimeException('rabbitMqUrl is not configured');
+        throw new PrQueueException('rabbitMqUrl is not configured');
     }
 
     $vhostPath = $url['path'] ?? '/';
@@ -783,4 +844,52 @@ function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSe
     }
 
     return $result;
+}
+
+/**
+ * Handles POST /api/v1/jobs/pull-requests: method and X-Api-Key checks, a
+ * single-drain lock, then the drain itself.
+ *
+ * @param callable $drain Returns the prQueueDrain() result.
+ * @return array{0: int, 1: array} HTTP status and JSON payload.
+ */
+function prQueueHandleDrainRequest(string $method, string $providedKey, string $lockPath, callable $drain): array
+{
+    if ($method !== 'POST') {
+        return [405, ['error' => 'Method not allowed']];
+    }
+
+    $expectedKey = prQueueConfig()['jobsApiKey'];
+    if ($expectedKey === '' || !hash_equals($expectedKey, $providedKey)) {
+        logNotice('Rejected pull request drain job call with a missing or invalid API key', [], 'queue');
+        return [401, ['error' => 'Unauthorized']];
+    }
+
+    if (!is_dir(dirname($lockPath))) {
+        mkdir(dirname($lockPath), 0700, true);
+    }
+
+    // One drain at a time: SQLite is single-writer and the batches would race.
+    $lock = fopen($lockPath, 'c');
+    if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+        return [200, ['status' => 'already_running']];
+    }
+
+    try {
+        $result = $drain();
+    } catch (Throwable $e) {
+        logError('Pull request drain job failed: {error}', ['error' => $e->getMessage()], 'queue');
+        return [500, ['error' => 'Drain failed']];
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+
+    logInfo(
+        'Drained {messages} message(s), {pull_requests} pull request(s) in {duration_seconds} s ({stopped})',
+        $result,
+        'queue'
+    );
+
+    return [200, ['status' => 'drained'] + $result];
 }
