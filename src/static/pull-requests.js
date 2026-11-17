@@ -609,7 +609,18 @@ function closePRStream() {
 function applyPRUpdate(update) {
     if (!currentPRs.some(pr => pr.pr_key === update.pr_key)) return;
 
-    currentPRs = currentPRs.map(pr => (pr.pr_key === update.pr_key ? Object.assign({}, pr, update) : pr));
+    // Copy only the enrichment fields, never whatever else an event carries.
+    currentPRs = currentPRs.map(pr => {
+        if (pr.pr_key !== update.pr_key) return pr;
+
+        const merged = Object.assign({}, pr);
+        if ('state' in update) merged.state = update.state;
+        if ('mergeable' in update) merged.mergeable = update.mergeable;
+        if ('mergeable_state' in update) merged.mergeable_state = update.mergeable_state;
+        if ('is_valid_pr' in update) merged.is_valid_pr = update.is_valid_pr;
+        if ('refreshing' in update) merged.refreshing = update.refreshing;
+        return merged;
+    });
 
     if (prRenderScheduled) return;
     prRenderScheduled = true;
