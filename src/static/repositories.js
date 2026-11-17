@@ -280,6 +280,7 @@ function populateRepositoriesGroupedByOrganization(repositories) {
 
         // ── Build index of existing organization cards ─────────────────────
         const existingCards = new Map();
+        removeUnmanagedChildren(groupedContainer, 'organization');
         groupedContainer.querySelectorAll('[data-organization]').forEach(el => {
             existingCards.set(el.dataset.organization, el);
         });

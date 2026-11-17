@@ -141,6 +141,22 @@ function showLoadingIndicator(containerId, message) {
 }
 
 /**
+ * Removes every direct child of `container` that is not a group card managed
+ * by the incremental renderer (i.e. lacks `data-<groupAttribute>`). This clears
+ * the server-rendered groups, "Loading data..." placeholders and empty-state
+ * boxes, which would otherwise sit alongside the JS-rendered cards and show
+ * each group twice.
+ *
+ * @param {HTMLElement} container      - The grouped list container.
+ * @param {string}      groupAttribute - Dataset key of managed cards (e.g. 'owner').
+ */
+function removeUnmanagedChildren(container, groupAttribute) {
+    [...container.children].forEach(child => {
+        if (child.dataset[groupAttribute] === undefined) child.remove();
+    });
+}
+
+/**
  * Hides the loading indicator by removing it from the DOM.
  */
 function hideLoadingIndicator() {
