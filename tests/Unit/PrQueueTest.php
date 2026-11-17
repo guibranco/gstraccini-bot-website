@@ -16,7 +16,7 @@ class PrQueueTest extends TestCase
     protected function setUp(): void
     {
         prQueueConfig([
-            'rabbitMqUrl'   => 'amqp://user:pass@localhost/vhost',
+            'rabbitMqUrl'   => 'amqp://localhost/vhost',
             'encryptionKey' => base64_encode(str_repeat('k', SODIUM_CRYPTO_SECRETBOX_KEYBYTES)),
             'jobsApiKey'    => 'job-key',
             'sqlitePath'    => ':memory:',
@@ -459,12 +459,14 @@ class PrQueueTest extends TestCase
 
     public function testAmqpUrlIsParsedWithDefaultsAndDecoding(): void
     {
+        // Generated, so no credential-looking literal sits in the repository.
+        $credential = bin2hex(random_bytes(4)) . '@/';
         $this->assertSame(
-            ['host' => 'h.example', 'port' => 5672, 'user' => 'u', 'password' => 'p@ss', 'vhost' => 'vh'],
-            prQueueParseAmqpUrl('amqp://u:p%40ss@h.example/vh')
+            ['host' => 'h.example', 'port' => 5672, 'user' => 'u', 'password' => $credential, 'vhost' => 'vh'],
+            prQueueParseAmqpUrl('amqp://u:' . rawurlencode($credential) . '@h.example/vh')
         );
-        $this->assertSame('/', prQueueParseAmqpUrl('amqp://u:p@h.example:5673')['vhost']);
-        $this->assertSame(5673, prQueueParseAmqpUrl('amqp://u:p@h.example:5673/')['port']);
+        $this->assertSame('/', prQueueParseAmqpUrl('amqp://h.example:5673')['vhost']);
+        $this->assertSame(5673, prQueueParseAmqpUrl('amqp://h.example:5673/')['port']);
 
         $this->expectException(\PrQueueException::class);
         prQueueParseAmqpUrl('');
@@ -579,5 +581,106 @@ class PrQueueTest extends TestCase
 
         $this->assertSame(0, prQueueHandleMessage($message, fn () => $this->fail('no GitHub call'), self::NOW));
         $this->assertSame('released', prQueueLoadRows(['guibranco/repo#1'])['guibranco/repo#1']['status']);
+    }
+
+    public function testConfigDefaultsWhenNoSecretsFile(): void
+    {
+        $config = prQueueConfig(null, true);
+
+        $this->assertSame('', $config['jobsApiKey']);
+        $this->assertStringEndsWith('/data/pr-queue.sqlite', $config['sqlitePath']);
+    }
+
+    public function testDefaultDbOpensTheConfiguredFile(): void
+    {
+        $path = sys_get_temp_dir() . '/pr-queue-default-' . getmypid() . '-' . uniqid() . '/db.sqlite';
+        prQueueConfig(['rabbitMqUrl' => '', 'encryptionKey' => '', 'jobsApiKey' => '', 'sqlitePath' => $path]);
+
+        $pdo = prQueueDb(null, true);
+
+        $this->assertSame($pdo, prQueueDb());
+        $this->assertFileExists($path);
+    }
+
+    public function testReleasingNothingIsANoOp(): void
+    {
+        prQueueRelease([]);
+
+        $this->assertSame(0, prQueueMaxSeq());
+    }
+
+    public function testDrainDeclaresConsumesAndClosesTheConnection(): void
+    {
+        $log = new \ArrayObject();
+        $channel = new class ($log) {
+            public function __construct(private \ArrayObject $log)
+            {
+            }
+
+            public function queue_declare(string $queue, ...$args): void
+            {
+                $this->log[] = 'declare:' . $queue;
+            }
+
+            public function basic_get(string $queue): ?object
+            {
+                $this->log[] = 'get';
+                return null;
+            }
+
+            public function close(): void
+            {
+                $this->log[] = 'channel-close';
+            }
+        };
+        $connection = new class ($channel, $log) {
+            public function __construct(private object $channel, private \ArrayObject $log)
+            {
+            }
+
+            public function channel(): object
+            {
+                return $this->channel;
+            }
+
+            public function close(): void
+            {
+                $this->log[] = 'connection-close';
+            }
+        };
+
+        $server = null;
+        $result = prQueueDrain(1, 5, function (array $s) use ($connection, &$server) {
+            $server = $s;
+            return $connection;
+        });
+
+        $this->assertSame('localhost', $server['host']);
+        $this->assertSame('vhost', $server['vhost']);
+        $this->assertSame(0, $result['messages']);
+        $this->assertSame('declare:' . PR_QUEUE_NAME, $log[0]);
+        $this->assertContains('get', $log->getArrayCopy());
+        $this->assertSame(['channel-close', 'connection-close'], array_slice($log->getArrayCopy(), -2));
+    }
+
+    private function runJobsEndpoint(string $method, string $key): array
+    {
+        $_SERVER['REQUEST_METHOD'] = $method;
+        $_SERVER['HTTP_X_API_KEY'] = $key;
+
+        ob_start();
+        require __DIR__ . '/../../src/api/v1/jobs-pull-requests.php';
+        $body = ob_get_clean();
+        set_time_limit(0);
+
+        unset($_SERVER['REQUEST_METHOD'], $_SERVER['HTTP_X_API_KEY']);
+
+        return json_decode($body, true);
+    }
+
+    public function testJobsEndpointRejectsGetAndBadKeys(): void
+    {
+        $this->assertSame(['error' => 'Method not allowed'], $this->runJobsEndpoint('GET', 'job-key'));
+        $this->assertSame(['error' => 'Unauthorized'], $this->runJobsEndpoint('POST', 'nope'));
     }
 }

@@ -74,11 +74,11 @@ const PR_QUEUE_DRAIN_MAX_SECONDS = 50;
  *
  * @return array{rabbitMqUrl: string, encryptionKey: string, jobsApiKey: string, sqlitePath: string}
  */
-function prQueueConfig(?array $override = null): array
+function prQueueConfig(?array $override = null, bool $reload = false): array
 {
     static $config = null;
 
-    if ($override !== null) {
+    if ($override !== null || $reload) {
         $config = $override;
     }
 
@@ -114,10 +114,15 @@ function prQueueConfig(?array $override = null): array
  * Returns the shared SQLite connection, creating the schema on first use.
  *
  * @param PDO|null $override Inject a connection (tests use sqlite::memory:).
+ * @param bool     $reset    Forget the current connection (tests).
  */
-function prQueueDb(?PDO $override = null): PDO
+function prQueueDb(?PDO $override = null, bool $reset = false): PDO
 {
     static $pdo = null;
+
+    if ($reset) {
+        $pdo = null;
+    }
 
     if ($override !== null) {
         $pdo = $override;
@@ -846,23 +851,13 @@ function prQueueParseAmqpUrl(string $amqpUrl): array
  * non-blocking wait loop spins the CPU while idle (bad on shared hosting).
  * The queue is declared exactly like Queue::publish(..., false) does.
  */
-function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSeconds = PR_QUEUE_DRAIN_MAX_SECONDS): array
-{
-    $server = prQueueParseAmqpUrl(prQueueConfig()['rabbitMqUrl']);
-
-    $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(
-        $server['host'],
-        $server['port'],
-        $server['user'],
-        $server['password'],
-        $server['vhost'],
-        false,
-        'AMQPLAIN',
-        null,
-        'en_US',
-        10.0,
-        30.0
-    );
+function prQueueDrain(
+    int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS,
+    int $maxSeconds = PR_QUEUE_DRAIN_MAX_SECONDS,
+    ?callable $connect = null
+): array {
+    $server     = prQueueParseAmqpUrl(prQueueConfig()['rabbitMqUrl']);
+    $connection = ($connect ?? 'prQueueConnect')($server);
 
     try {
         $channel = $connection->channel();
@@ -881,6 +876,28 @@ function prQueueDrain(int $idleSeconds = PR_QUEUE_DRAIN_IDLE_SECONDS, int $maxSe
     }
 
     return $result;
+}
+
+/**
+ * Opens the AMQP connection used by prQueueDrain().
+ *
+ * @param array{host: string, port: int, user: string, password: string, vhost: string} $server
+ */
+function prQueueConnect(array $server): \PhpAmqpLib\Connection\AMQPStreamConnection
+{
+    return new \PhpAmqpLib\Connection\AMQPStreamConnection(
+        $server['host'],
+        $server['port'],
+        $server['user'],
+        $server['password'],
+        $server['vhost'],
+        false,
+        'AMQPLAIN',
+        null,
+        'en_US',
+        10.0,
+        30.0
+    );
 }
 
 /**
