@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../includes/pr-queue.php';
  */
 function fetchAssignedIssues(string $token): array
 {
-    $issues = fetchAllGitHubPages('https://api.github.com/issues?per_page=100', $token, 1);
+    $issues = fetchAllGitHubPages(gitHubApiUrl('issues?per_page=100'), $token, 1);
 
     if ($issues === false || !is_array($issues)) {
         logError("Failed to fetch assigned issues from the GitHub API", [], 'github');

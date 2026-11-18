@@ -17,6 +17,7 @@ require_once __DIR__ . '/log-stream.php';
  */
 function loadData($url, $token)
 {
+    $url  = gitHubApiUrl($url);
     $curl = curl_init($url);
 
     curl_setopt_array($curl, [
