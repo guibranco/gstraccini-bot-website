@@ -14,7 +14,7 @@ class GitHubApiUrlTest extends TestCase
         $this->assertSame(GITHUB_API_BASE_URL . '/issues?per_page=100', gitHubApiUrl('issues?per_page=100'));
     }
 
-    public function testAbsoluteGitHubApiUrlIsMovedToTheProxy(): void
+    public function testAbsoluteApiUrlMovesToProxy(): void
     {
         $this->assertSame(
             GITHUB_API_BASE_URL . '/repos/guibranco/repo/pulls/1',
