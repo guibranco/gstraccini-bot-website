@@ -14,7 +14,6 @@ require_once "webhook.secrets.php";
 class GitHubOAuthHandler 
 {
     private const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
-    private const GITHUB_API_BASE = 'https://api.github.com';
 
     private string $clientId;
     private string $clientSecret;
@@ -87,7 +86,7 @@ class GitHubOAuthHandler
      */
     public function makeGitHubApiRequest(string $endpoint, string $token): array
     {
-        $url = self::GITHUB_API_BASE . $endpoint;
+        $url = gitHubApiUrl($endpoint);
         $headers = [
             "Authorization: Bearer {$token}",
             "User-Agent: " . getUserAgent(),

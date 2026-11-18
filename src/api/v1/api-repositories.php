@@ -11,7 +11,7 @@ if ($cache !== false) {
     exit();
 }
 
-$repositories = fetchAllGitHubPages('https://api.github.com/user/repos?per_page=100', $token);
+$repositories = fetchAllGitHubPages(gitHubApiUrl('user/repos?per_page=100'), $token);
 
 if ($repositories === false) {
     logError("Failed to fetch repositories from the GitHub API", [], 'github');

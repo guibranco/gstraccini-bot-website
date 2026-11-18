@@ -18,7 +18,7 @@ if (!isset($_GET['page']) || !is_numeric($_GET['page']) || $_GET['page'] < 1) {
 
 $page = intval($_GET['page']);
 
-$response = loadData('https://api.github.com/issues?per_page=50&page=' . $page, $token);
+$response = loadData(gitHubApiUrl('issues?per_page=50&page=' . $page), $token);
 if ($response === null) {
     logWarning("Failed to load infinite scroll page {page} from the GitHub API", ['page' => $page], 'github');
 }
