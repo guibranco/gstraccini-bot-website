@@ -29,6 +29,9 @@ $providers = [
     "Llama" => "/images/Llama.png",
     "CPanel" => "https://cdn.simpleicons.org/Cpanel",
     "CloudAMQP" => "/images/CloudAMQP.jpg",
+    // A personal access token the bot uses to act as you where the app itself can't:
+    // Dependabot/Depfu commands and approving pull requests on your behalf.
+    "GitHub" => "/images/GitHub.png",
 ];
 ksort($providers);
 
@@ -217,6 +220,17 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                                                     <i class="fas fa-eye"></i>
                                                 </span>
                                             </div>
+                                            <div id="githubTokenHelp" class="form-text" style="display:none;">
+                                                GStraccini-bot uses this token to act as you where a GitHub App
+                                                can't: posting <code>@dependabot</code> and <code>@depfu</code>
+                                                commands and approving pull requests on your behalf. Create a
+                                                <a href="https://github.com/settings/personal-access-tokens/new"
+                                                    target="_blank" rel="noopener noreferrer">fine-grained token</a>
+                                                for the repositories where the bot is installed, with
+                                                <strong>Contents</strong>, <strong>Issues</strong> and
+                                                <strong>Pull requests</strong> set to read and write, or a classic
+                                                token with the <code>repo</code> scope.
+                                            </div>
                                             <div class="d-flex justify-content-between mt-2">
                                                 <span id="badgeStatus" class="badge" style="display:none;"></span>
                                                 <button class="btn btn-primary" id="saveBtn">Save API Key</button>
@@ -308,6 +322,8 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                 </span>`
                     );
                 $('#providerSelect').val(selectedProvider);
+                $('#githubTokenHelp').toggle(selectedProvider === 'GitHub');
+                $('#apiKey').attr('placeholder', selectedProvider === 'GitHub' ? 'Enter personal access token' : 'Enter API Key');
             });
         });
 
