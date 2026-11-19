@@ -149,7 +149,7 @@ class PrQueueTest extends TestCase
         $this->assertFalse(prQueueNeedsRefresh($settled, 'x', $later));
     }
 
-    public function testPendingWithoutAnyCommitStatusCountsAsSettled(): void
+    public function testActionsOnlyPendingIsSettled(): void
     {
         // Repositories whose CI only uses check runs report "pending" with no statuses forever.
         $actionsOnly = ['status' => 'done', 'issue_updated_at' => 'x', 'processed_at' => self::NOW,
@@ -178,7 +178,7 @@ class PrQueueTest extends TestCase
         $this->assertSame(0, $result['status_total']);
     }
 
-    public function testPageLoadDoesNotQueueWhenTheIssuesFetchReportsLowQuota(): void
+    public function testLowQuotaPageLoadQueuesNothing(): void
     {
         $published = 0;
         $results = loadQueuedAssignedItems(

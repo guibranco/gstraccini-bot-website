@@ -115,23 +115,26 @@ function loadData($url, $token)
 /**
  * Holds the rate-limit headers of the most recent GitHub API response.
  *
- * @param array|null $state New state to store, or null to only read it.
- * @param bool       $reset Clear the stored state first.
+ * @param array|null $state New state to store, an empty array to clear it, or null to only read it.
  * @return array{remaining: int|null, reset: int|null, httpCode: int}|null
  */
-function gitHubRateLimitState(?array $state = null, bool $reset = false): ?array
+function gitHubRateLimitState(?array $state = null): ?array
 {
     static $current = null;
 
-    if ($reset === true) {
-        $current = null;
-    }
-
     if ($state !== null) {
-        $current = $state;
+        $current = $state === [] ? null : $state;
     }
 
     return $current;
+}
+
+/**
+ * Forgets the last rate-limit reading, so only a later GitHub call can set one.
+ */
+function clearGitHubRateLimit(): void
+{
+    gitHubRateLimitState([]);
 }
 
 /**

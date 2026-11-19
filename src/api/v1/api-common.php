@@ -180,7 +180,7 @@ function loadQueuedAssignedItems(
     $persist ??= 'writeSessionValues';
     $login   = $session['user']['login'] ?? 'unknown';
     // Forget any earlier reading so only a fresh issues fetch updates the floor below.
-    gitHubRateLimitState(null, true);
+    clearGitHubRateLimit();
     $issues = getAssignedIssuesCached($token, $session, $fetch, $persist);
     // Let the rate-limit floor see the quota the issues fetch just reported, so a
     // page load never queues a batch when the user's quota is already nearly gone
