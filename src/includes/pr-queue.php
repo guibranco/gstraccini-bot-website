@@ -352,15 +352,25 @@ function prQueueIsRateLimited(string $login, int $now): bool
 
 /**
  * A result is settled when CI finished and GitHub computed mergeability.
+ *
+ * A commit with no commit statuses at all (repositories whose CI only uses
+ * check runs, e.g. GitHub Actions) is reported by GitHub as "pending" forever.
+ * That combined state never changes, so it counts as settled; otherwise every
+ * such pull request is re-fetched every PR_QUEUE_TTL_UNSETTLED seconds while a
+ * page is open, which spends the user's quota for nothing.
  */
 function prQueueIsSettled(?array $data): bool
 {
-    if ($data === null) {
+    if ($data === null || ($data['mergeable'] ?? null) === null) {
         return false;
     }
 
-    return in_array(($data['state'] ?? null), ['success', 'failure', 'error'], true)
-        && ($data['mergeable'] ?? null) !== null;
+    $state = $data['state'] ?? null;
+    if (in_array($state, ['success', 'failure', 'error'], true)) {
+        return true;
+    }
+
+    return $state === 'pending' && ($data['status_total'] ?? null) === 0;
 }
 
 /**
@@ -773,6 +783,7 @@ function prQueueProcessItem(array $item, string $token, string $login, callable 
         'mergeable'       => $enriched['mergeable'] ?? null,
         'mergeable_state' => $enriched['mergeable_state'] ?? null,
         'is_valid_pr'     => $enriched['is_valid_pr'] ?? false,
+        'status_total'    => $enriched['status_total'] ?? null,
     ], $item['updated_at'] ?? null, $time);
 }
 

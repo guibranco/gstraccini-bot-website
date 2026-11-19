@@ -149,6 +149,55 @@ class PrQueueTest extends TestCase
         $this->assertFalse(prQueueNeedsRefresh($settled, 'x', $later));
     }
 
+    public function testPendingWithoutAnyCommitStatusCountsAsSettled(): void
+    {
+        // Repositories whose CI only uses check runs report "pending" with no statuses forever.
+        $actionsOnly = ['status' => 'done', 'issue_updated_at' => 'x', 'processed_at' => self::NOW,
+            'data' => json_encode(['state' => 'pending', 'mergeable' => true, 'status_total' => 0]), 'queued_at' => 0];
+        $running     = ['status' => 'done', 'issue_updated_at' => 'x', 'processed_at' => self::NOW,
+            'data' => json_encode(['state' => 'pending', 'mergeable' => true, 'status_total' => 2]), 'queued_at' => 0];
+
+        $later = self::NOW + PR_QUEUE_TTL_UNSETTLED + 1;
+
+        $this->assertFalse(prQueueNeedsRefresh($actionsOnly, 'x', $later));
+        $this->assertTrue(prQueueNeedsRefresh($actionsOnly, 'x', self::NOW + PR_QUEUE_TTL_SETTLED + 1));
+        $this->assertTrue(prQueueNeedsRefresh($running, 'x', $later));
+        $this->assertFalse(prQueueIsSettled(['state' => 'pending', 'mergeable' => null, 'status_total' => 0]));
+        $this->assertFalse(prQueueIsSettled(['state' => 'pending', 'mergeable' => true]));
+    }
+
+    public function testEnrichmentKeepsTheCommitStatusCount(): void
+    {
+        $pullRequest = ['body' => ['mergeable' => true, 'mergeable_state' => 'clean',
+            'head' => ['sha' => 'abc', 'repo' => ['url' => 'https://api.github.com/repos/guibranco/repo']]]];
+        $loader = fn () => ['body' => ['state' => 'pending', 'total_count' => 0]];
+
+        $result = enrichPullRequestData(['url' => 'x'], $pullRequest, 'token', $loader);
+
+        $this->assertSame('pending', $result['state']);
+        $this->assertSame(0, $result['status_total']);
+    }
+
+    public function testPageLoadDoesNotQueueWhenTheIssuesFetchReportsLowQuota(): void
+    {
+        $published = 0;
+        $results = loadQueuedAssignedItems(
+            'token',
+            ['user' => ['login' => 'guibranco']],
+            function () {
+                recordGitHubRateLimit("x-ratelimit-remaining: 10\r\nx-ratelimit-reset: " . (time() + 600) . "\r\n", 200);
+                return [$this->issue(1)];
+            },
+            fn () => null,
+            function () use (&$published) {
+                $published++;
+            }
+        );
+
+        $this->assertSame(0, $published);
+        $this->assertSame(0, $results['pending']);
+    }
+
     public function testPublishFailureReleasesPullRequests(): void
     {
         $result = buildQueuedPullRequests([$this->issue(1)], 'token', 'guibranco', function () {
