@@ -115,7 +115,7 @@ function loadData($url, $token)
 /**
  * Holds the rate-limit headers of the most recent GitHub API response.
  *
- * @param array|null $state New state to store, or null to only read it.
+ * @param array|null $state New state to store, an empty array to clear it, or null to only read it.
  * @return array{remaining: int|null, reset: int|null, httpCode: int}|null
  */
 function gitHubRateLimitState(?array $state = null): ?array
@@ -123,10 +123,18 @@ function gitHubRateLimitState(?array $state = null): ?array
     static $current = null;
 
     if ($state !== null) {
-        $current = $state;
+        $current = $state === [] ? null : $state;
     }
 
     return $current;
+}
+
+/**
+ * Forgets the last rate-limit reading, so only a later GitHub call can set one.
+ */
+function clearGitHubRateLimit(): void
+{
+    gitHubRateLimitState([]);
 }
 
 /**
@@ -315,6 +323,9 @@ function enrichPullRequestData($issueData, $pullRequest, $token, ?callable $load
     }
 
     $issueData["state"] = $state["body"]["state"];
+    // GitHub reports "pending" when a commit has no statuses at all (CI on check runs only).
+    // Keep the count so the queue can tell "never finishes" apart from "still running".
+    $issueData["status_total"] = isset($state["body"]["total_count"]) ? (int) $state["body"]["total_count"] : null;
 
     $issueData["is_valid_pr"] = (
         $state["body"]["state"] === "success" &&
