@@ -47,6 +47,23 @@ if ($settingsResult['httpCode'] === 200 && is_array($settingsResult['decoded']))
     ];
 }
 
+// Opt-in features per GitHub account and per repository, saved one at a time
+// through /api/v1/account-settings and /api/v1/repository-settings.
+$apiKeyHeader = ["X-Api-Key: $gstracciniApiKey"];
+$accountSettings = [];
+$accountSettingsResult = sendJsonToUpstream(appendUserIdParam($gstracciniApiUrl."v1/account-settings/", getCurrentUserId()), 'GET', null, $apiKeyHeader);
+if ($accountSettingsResult['httpCode'] === 200 && is_array($accountSettingsResult['decoded'])) {
+    $accountSettings = $accountSettingsResult['decoded'];
+}
+
+$repositorySettings = [];
+$repositorySettingsResult = sendJsonToUpstream(appendUserIdParam($gstracciniApiUrl."v1/repository-settings/", getCurrentUserId()), 'GET', null, $apiKeyHeader);
+if ($repositorySettingsResult['httpCode'] === 200 && is_array($repositorySettingsResult['decoded'])) {
+    $repositorySettings = $repositorySettingsResult['decoded'];
+}
+
+$featureSettingsUnavailable = $accountSettingsResult['httpCode'] !== 200 || $repositorySettingsResult['httpCode'] !== 200;
+
 $title = "Settings";
 ?>
 
@@ -292,6 +309,97 @@ $title = "Settings";
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="card mt-4" id="version-bump-settings">
+                                <div class="card-header">
+                                    <h3 class="h5 mb-0"><i class="fas fa-code-compare"></i> Request version bump</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">
+                                        When enabled, the bot asks for a version bump decision (major, minor or
+                                        none) on pull requests that look like a feature and have no
+                                        <code>+semver:</code> directive, holding the <em>pull request</em> check
+                                        run until one is chosen. Disabled by default. Repositories inherit their
+                                        account unless set otherwise. Changes here are saved immediately.
+                                    </p>
+                                    <div id="version_bump_status" class="small mb-3" role="status" aria-live="polite"></div>
+
+                                    <?php if ($featureSettingsUnavailable): ?>
+                                        <div class="alert alert-warning mb-0">Unable to load the account and repository settings right now.</div>
+                                    <?php elseif (count($accountSettings) === 0): ?>
+                                        <div class="alert alert-info mb-0">No installation found for your account.</div>
+                                    <?php else: ?>
+                                        <h4 class="h6"><i class="fas fa-user-circle"></i> Accounts</h4>
+                                        <?php foreach ($accountSettings as $account): ?>
+                                            <?php $accountInputId = 'request_version_bump_account_' . (int) $account['accountId']; ?>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input js-account-version-bump" type="checkbox"
+                                                    id="<?php echo $accountInputId; ?>"
+                                                    data-account-id="<?php echo (int) $account['accountId']; ?>"
+                                                    <?php echo !empty($account['requestVersionBump']) ? 'checked' : ''; ?>>
+                                                <label class="form-check-label" for="<?php echo $accountInputId; ?>">
+                                                    <?php echo htmlspecialchars($account['accountLogin'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                                    <span class="text-muted small">(<?php echo htmlspecialchars($account['accountType'] ?? '', ENT_QUOTES, 'UTF-8'); ?>)</span>
+                                                </label>
+                                            </div>
+                                        <?php endforeach; ?>
+
+                                        <h4 class="h6 mt-4"><i class="fas fa-folder-open"></i> Repositories</h4>
+                                        <?php if (count($repositorySettings) === 0): ?>
+                                            <p class="text-muted mb-0">No repository found.</p>
+                                        <?php else: ?>
+                                            <input type="search" class="form-control form-control-sm mb-2" id="version_bump_filter"
+                                                placeholder="Filter repositories" aria-label="Filter repositories">
+                                            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                                                <table class="table table-sm align-middle mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Repository</th>
+                                                            <th scope="col" style="width: 200px;">Setting</th>
+                                                            <th scope="col" style="width: 110px;">Effective</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($repositorySettings as $repository): ?>
+                                                            <?php
+                                                            $repositoryValue = $repository['requestVersionBump'] ?? null;
+                                                            $selected = $repositoryValue === null ? 'inherit' : ($repositoryValue ? 'on' : 'off');
+                                                            $repositoryInputId = 'request_version_bump_repository_' . (int) $repository['repositoryId'];
+                                                            ?>
+                                                            <tr class="js-version-bump-row"
+                                                                data-full-name="<?php echo htmlspecialchars(strtolower($repository['fullName'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
+                                                                data-account-id="<?php echo (int) $repository['accountId']; ?>">
+                                                                <td>
+                                                                    <label for="<?php echo $repositoryInputId; ?>" class="mb-0">
+                                                                        <?php if (!empty($repository['private'])): ?><i class="fas fa-lock text-muted" title="Private"></i><?php endif; ?>
+                                                                        <?php echo htmlspecialchars($repository['fullName'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-select form-select-sm js-repository-version-bump"
+                                                                        id="<?php echo $repositoryInputId; ?>"
+                                                                        data-repository-id="<?php echo (int) $repository['repositoryId']; ?>">
+                                                                        <option value="inherit" <?php echo $selected === 'inherit' ? 'selected' : ''; ?>>Inherit from account</option>
+                                                                        <option value="on" <?php echo $selected === 'on' ? 'selected' : ''; ?>>Enabled</option>
+                                                                        <option value="off" <?php echo $selected === 'off' ? 'selected' : ''; ?>>Disabled</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td class="js-effective">
+                                                                    <?php if (!empty($repository['effectiveRequestVersionBump'])): ?>
+                                                                        <span class="badge bg-success">On</span>
+                                                                    <?php else: ?>
+                                                                        <span class="badge bg-secondary">Off</span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -353,6 +461,103 @@ $title = "Settings";
                         alert(error.message || 'Failed to save settings.');
                     });
             });
+
+            const versionBumpStatus = document.getElementById('version_bump_status');
+
+            function showVersionBumpStatus(message, isError) {
+                if (!versionBumpStatus) {
+                    return;
+                }
+                versionBumpStatus.textContent = message;
+                versionBumpStatus.className = 'small mb-3 ' + (isError ? 'text-danger' : 'text-success');
+            }
+
+            function saveFeatureSetting(url, value) {
+                return fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requestVersionBump: value }),
+                }).then(async (response) => {
+                    if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.error || 'Failed to save the setting.');
+                    }
+                });
+            }
+
+            function accountEnabled(accountId) {
+                const input = document.querySelector('.js-account-version-bump[data-account-id="' + accountId + '"]');
+                return input ? input.checked : false;
+            }
+
+            function refreshEffective(row) {
+                const select = row.querySelector('.js-repository-version-bump');
+                const effective = select.value === 'inherit' ? accountEnabled(row.dataset.accountId) : select.value === 'on';
+                row.querySelector('.js-effective').innerHTML = effective
+                    ? '<span class="badge bg-success">On</span>'
+                    : '<span class="badge bg-secondary">Off</span>';
+            }
+
+            document.querySelectorAll('.js-account-version-bump').forEach(function (input) {
+                input.addEventListener('change', function () {
+                    const accountId = this.dataset.accountId;
+                    const value = this.checked;
+                    this.disabled = true;
+                    saveFeatureSetting('/api/v1/account-settings/' + accountId, value)
+                        .then(() => {
+                            document.querySelectorAll('.js-version-bump-row[data-account-id="' + accountId + '"]').forEach(refreshEffective);
+                            showVersionBumpStatus('Account setting saved.', false);
+                        })
+                        .catch((error) => {
+                            this.checked = !value;
+                            // A repository saved meanwhile may have shown the failed value.
+                            document.querySelectorAll('.js-version-bump-row[data-account-id="' + accountId + '"]').forEach(refreshEffective);
+                            showVersionBumpStatus(error.message, true);
+                        })
+                        .finally(() => {
+                            this.disabled = false;
+                        });
+                });
+            });
+
+            document.querySelectorAll('.js-repository-version-bump').forEach(function (select) {
+                select.dataset.previous = select.value;
+                select.addEventListener('change', function () {
+                    const value = this.value === 'inherit' ? null : this.value === 'on';
+                    const row = this.closest('.js-version-bump-row');
+                    this.disabled = true;
+                    saveFeatureSetting('/api/v1/repository-settings/' + this.dataset.repositoryId, value)
+                        .then(() => {
+                            this.dataset.previous = this.value;
+                            refreshEffective(row);
+                            showVersionBumpStatus('Repository setting saved.', false);
+                        })
+                        .catch((error) => {
+                            this.value = this.dataset.previous;
+                            refreshEffective(row);
+                            showVersionBumpStatus(error.message, true);
+                        })
+                        .finally(() => {
+                            this.disabled = false;
+                        });
+                });
+            });
+
+            const versionBumpFilter = document.getElementById('version_bump_filter');
+            if (versionBumpFilter) {
+                // The filter sits inside the settings form: Enter must not submit it.
+                versionBumpFilter.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                });
+                versionBumpFilter.addEventListener('input', function () {
+                    const term = this.value.trim().toLowerCase();
+                    document.querySelectorAll('.js-version-bump-row').forEach(function (row) {
+                        row.style.display = row.dataset.fullName.includes(term) ? '' : 'none';
+                    });
+                });
+            }
 
             const reminder_issues = document.getElementById('reminder_issues');
             const reminder_issues_days = document.getElementById('reminder_issues_days');
