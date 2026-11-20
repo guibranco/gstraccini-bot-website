@@ -110,6 +110,20 @@ if ($listResult['httpCode'] !== 200 || !is_array($listResult['decoded'])) {
 }
 
 ksort($integrations);
+
+/**
+ * Shortens a masked API key for display so long tokens don't break the table layout.
+ * Keeps the first and last characters, which are the ones that identify the key.
+ */
+function shortenMaskedKey(string $maskedKey, int $edge = 6): string
+{
+    if (mb_strlen($maskedKey) <= ($edge * 2) + 3) {
+        return $maskedKey;
+    }
+
+    return mb_substr($maskedKey, 0, $edge) . '…' . mb_substr($maskedKey, -$edge);
+}
+
 $usedIntegrations = array_keys($integrations);
 
 $availableProviders = array_filter($providers, function ($provider) use ($usedIntegrations) {
@@ -139,6 +153,15 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
             color: #0d6efd;
             border-left-color: #0d6efd;
             font-weight: 600;
+        }
+
+        .integrations-table .api-key-cell {
+            white-space: nowrap;
+        }
+
+        .integrations-table .last-error-cell {
+            max-width: 20rem;
+            overflow-wrap: anywhere;
         }
     </style>
 </head>
@@ -255,7 +278,8 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                                     <p class="text-muted mb-0">You haven't configured any integrations yet. Add one
                                         from the "Add Integration" tab.</p>
                                 <?php else: ?>
-                                    <table class="table table-bordered align-middle">
+                                    <div class="table-responsive">
+                                    <table class="table table-bordered align-middle integrations-table">
                                         <thead>
                                             <tr>
                                                 <th>Provider</th>
@@ -274,7 +298,9 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                                                             alt="<?php echo htmlspecialchars($provider); ?>" class="provider-logo">
                                                         <?php echo htmlspecialchars($provider); ?>
                                                     </td>
-                                                    <td><code><?php echo htmlspecialchars($details['maskedApiKey'] ?? ''); ?></code>
+                                                    <?php $maskedApiKey = (string) ($details['maskedApiKey'] ?? ''); ?>
+                                                    <td class="api-key-cell">
+                                                        <code title="<?php echo htmlspecialchars($maskedApiKey); ?>"><?php echo htmlspecialchars(shortenMaskedKey($maskedApiKey)); ?></code>
                                                     </td>
                                                     <td>
                                                         <span
@@ -283,7 +309,7 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                                                         </span>
                                                     </td>
                                                     <td><?php echo htmlspecialchars($details['lastUsage']); ?></td>
-                                                    <td><?php echo htmlspecialchars($details['lastError']); ?></td>
+                                                    <td class="last-error-cell"><?php echo htmlspecialchars($details['lastError']); ?></td>
                                                     <td>
                                                         <a href="integrations.php?remove=<?php echo urlencode($provider); ?>"
                                                             class="btn btn-danger btn-sm"><i class="fas fa-trash"></i>
@@ -293,6 +319,7 @@ $availableProviders = array_filter($providers, function ($provider) use ($usedIn
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
