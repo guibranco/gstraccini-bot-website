@@ -510,6 +510,8 @@ $title = "Settings";
                         })
                         .catch((error) => {
                             this.checked = !value;
+                            // A repository saved meanwhile may have shown the failed value.
+                            document.querySelectorAll('.js-version-bump-row[data-account-id="' + accountId + '"]').forEach(refreshEffective);
                             showVersionBumpStatus(error.message, true);
                         })
                         .finally(() => {
@@ -532,6 +534,7 @@ $title = "Settings";
                         })
                         .catch((error) => {
                             this.value = this.dataset.previous;
+                            refreshEffective(row);
                             showVersionBumpStatus(error.message, true);
                         })
                         .finally(() => {
