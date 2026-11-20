@@ -24,14 +24,14 @@ ensureAuthenticated($isAuthenticated, basename(__FILE__));
 
 header('Content-Type: application/json');
 
-$resource = $_GET['resource'] ?? '';
+$resource = ($_GET['resource'] ?? '');
 if (in_array($resource, ['account-settings', 'repository-settings'], true) === false) {
     http_response_code(404);
     echo json_encode(['error' => 'Not found']);
     exit();
 }
 
-$id = $_GET['id'] ?? null;
+$id = ($_GET['id'] ?? null);
 if ($id !== null && ctype_digit((string) $id) === false) {
     http_response_code(400);
     echo json_encode(['error' => 'Invalid id']);
@@ -50,7 +50,7 @@ if ($id === null) {
     }
 
     $query = ['userId' => getCurrentUserId()];
-    if ($resource === 'repository-settings' && isset($_GET['accountId']) && ctype_digit((string) $_GET['accountId'])) {
+    if ($resource === 'repository-settings' && isset($_GET['accountId']) === true && ctype_digit((string) $_GET['accountId']) === true) {
         $query['accountId'] = (int) $_GET['accountId'];
     }
 
