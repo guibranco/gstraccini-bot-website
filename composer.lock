@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "60d5cf73aefb6d66dfa1d9e5a82fd7b3",
+    "content-hash": "1e426960c3f54e46289d53693a255db9",
     "packages": [
         {
             "name": "guibranco/pancake",
-            "version": "v1.12.3",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guibranco/pancake.git",
-                "reference": "46e778debbb8f9c7f7136672985b14e19ea2d930"
+                "reference": "9394eee3394d8cf79dda5b9e02dabd99c3af7b22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guibranco/pancake/zipball/46e778debbb8f9c7f7136672985b14e19ea2d930",
-                "reference": "46e778debbb8f9c7f7136672985b14e19ea2d930",
+                "url": "https://api.github.com/repos/guibranco/pancake/zipball/9394eee3394d8cf79dda5b9e02dabd99c3af7b22",
+                "reference": "9394eee3394d8cf79dda5b9e02dabd99c3af7b22",
                 "shasum": ""
             },
             "require": {
@@ -26,6 +26,9 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "13.4.8"
+            },
+            "suggest": {
+                "ext-apcu": "Share the Grimoire configuration snapshot between PHP-FPM workers (sentinel refresh)"
             },
             "type": "library",
             "autoload": {
@@ -46,9 +49,9 @@
             "description": "The Pancake project, a toolkit for PHP projects",
             "support": {
                 "issues": "https://github.com/guibranco/pancake/issues",
-                "source": "https://github.com/guibranco/pancake/tree/v1.12.3"
+                "source": "https://github.com/guibranco/pancake/tree/v1.13.1"
             },
-            "time": "2026-11-23T03:46:12+00:00"
+            "time": "2026-11-25T00:07:51+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
